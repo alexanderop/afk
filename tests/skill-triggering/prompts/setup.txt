@@ -1,0 +1,1 @@
+We keep having problems in this repo where AI agents skip running the tests and ignore lint errors, and every session makes the same mistakes again. Set the project up so that stops happening.

@@ -1,0 +1,1 @@
+I want to add a complete booking system to our app: users pick a service, choose a free time slot from a calendar, enter their payment details, and get a confirmation email. Admins need a way to manage availability and see upcoming bookings. Can you build this?

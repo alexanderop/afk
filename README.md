@@ -27,6 +27,10 @@ pipeline at 5 points and up.
 
 ## Install
 
+Installation differs by harness: [Claude Code](#claude-code) or [GitHub Copilot CLI](#github-copilot-cli). If you use both, install afk separately for each one.
+
+### Claude Code
+
 Prerequisite: [Claude Code](https://code.claude.com/docs/en/quickstart) installed and authenticated. If `/plugin` doesn't exist in your session, update Claude Code first.
 
 **1. Add this repo as a plugin marketplace** (one-time, inside any Claude Code session):
@@ -50,6 +54,30 @@ Prerequisite: [Claude Code](https://code.claude.com/docs/en/quickstart) installe
 ```
 
 Updates ship via the marketplace: `/plugin marketplace update afk`.
+
+### GitHub Copilot CLI
+
+Copilot CLI reads the same plugin format. In your terminal:
+
+**1. Add this repo as a plugin marketplace** (one-time):
+
+```bash
+copilot plugin marketplace add alexanderop/afk
+```
+
+**2. Install the plugin:**
+
+```bash
+copilot plugin install afk@afk
+```
+
+**3. Verify it's loaded:**
+
+```bash
+copilot plugin list
+```
+
+Skills written for afk use Claude Code tool names; Copilot CLI maps them automatically via `skills/using-afk/references/copilot-tools.md`. Update later with `copilot plugin update afk`.
 
 ### Try it without installing
 
@@ -126,6 +154,21 @@ qa/*.md + qa/screenshots/ # QA + review reports
 
 Everything is plain markdown on disk — a dead session resumes from the files,
 and humans can read every artifact the agents produced.
+
+## Testing the plugin
+
+The test suite (modeled on superpowers) runs real headless Claude Code
+sessions against the working tree and asserts on the transcript — see
+[tests/README.md](tests/README.md):
+
+```bash
+tests/skill-triggering/run-all.sh      # naive prompts trigger the right skill,
+                                       # and a typo fix does NOT enter the pipeline
+tests/claude-code/run-skill-tests.sh   # fast behavioral checks on skill content
+```
+
+Runs make real Claude calls (tokens + a few minutes) — use as a pre-release
+check, not on every edit.
 
 ## Credits
 

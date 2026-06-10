@@ -1,0 +1,1 @@
+The PRD for the booking feature is finished and saved at specs/booking.md. What's the next step to get this ready for implementation? Break it down into tickets we can work through.

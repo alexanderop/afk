@@ -45,6 +45,11 @@ a refactor pass, QA, and review. That is what the pipeline skills are for.
 If there is even a 1% chance one of these applies, invoke it via the Skill tool
 BEFORE responding or writing code.
 
+**In Copilot CLI:** use the `skill` tool — skills are auto-discovered from
+installed plugins and it works the same as Claude Code's Skill tool. afk skills
+use Claude Code tool names; see `references/copilot-tools.md` for the
+platform equivalents (subagent dispatch via `task`, etc.).
+
 ## Red Flags — STOP if you think any of these
 
 | Thought | Reality |

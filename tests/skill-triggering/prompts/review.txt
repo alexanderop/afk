@@ -1,0 +1,1 @@
+I just finished the branch feature/checkout-flow and I think it's done. Can you give it a thorough review before I open the PR?
