@@ -27,19 +27,38 @@ pipeline at 5 points and up.
 
 ## Install
 
-Inside Claude Code:
+Prerequisite: [Claude Code](https://code.claude.com/docs/en/quickstart) installed and authenticated. If `/plugin` doesn't exist in your session, update Claude Code first.
+
+**1. Add this repo as a plugin marketplace** (one-time, inside any Claude Code session):
 
 ```
 /plugin marketplace add alexanderop/afk
+```
+
+**2. Install the plugin:**
+
+```
 /plugin install afk@afk
 ```
 
-Or try it locally without installing:
+**3. Verify it's loaded** — run `/help`; you should see the skills listed under the `afk:` namespace. The session-start bootstrap (ticket sizing + skill routing) is active from your next session onward.
+
+**4. First run in a project:**
+
+```
+/afk:setup
+```
+
+Updates ship via the marketplace: `/plugin marketplace update afk`.
+
+### Try it without installing
 
 ```bash
 git clone https://github.com/alexanderop/afk
 claude --plugin-dir ./afk
 ```
+
+This loads the plugin for that session only — useful for kicking the tires or hacking on the plugin itself (edit + `/reload-plugins` to pick up changes).
 
 ## Quickstart
 
