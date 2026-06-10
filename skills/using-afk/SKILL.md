@@ -1,6 +1,6 @@
 ---
 name: using-afk
-description: The ticket-sizing gate and skill router. Injected automatically at session start by the plugin's SessionStart hook — do not invoke it as a skill; in harnesses without hook support (e.g. Copilot CLI), invoke it once at the start of a session.
+description: The ticket-sizing gate and skill router. Injected automatically at session start by the plugin's SessionStart hook — never invoked by the model. In harnesses where plugin hooks don't fire (e.g. Copilot CLI), the user loads it once per session via the slash-command picker; afk:setup also embeds the sizing gate in CLAUDE.md as a backstop.
 disable-model-invocation: true
 ---
 

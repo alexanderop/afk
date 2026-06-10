@@ -21,9 +21,11 @@ these in a skill, use your platform equivalent:
 
 ## Notes for afk skills
 
-- **Session start:** if the plugin's Claude Code hooks didn't run (no sizing
-  gate in your context), load the `using-afk` skill once at the start of the
-  session — it is the bootstrap the SessionStart hook would have injected.
+- **Session start:** if the plugin's hooks didn't run (no sizing gate in your
+  context), the gate should still be in the project's CLAUDE.md — `afk:setup`
+  embeds it there as a backstop. The `using-afk` skill itself is
+  manual-invocation-only (`disable-model-invocation`), so the *user* loads it
+  via the slash-command picker; don't try to invoke it yourself.
   Same for project memory: read `.afk/brain/index.md` when it exists.
 - **`afk:ralph` / `afk:review`** dispatch fresh-context subagents. Use the
   `task` tool with the matching plugin agent type (`implementer`,

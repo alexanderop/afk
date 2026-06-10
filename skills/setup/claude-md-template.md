@@ -47,6 +47,22 @@ or one-off hotfixes (delete them). NO style guidelines — the linter owns style
 - Never edit files in `migrations/` by hand; use `<generate command>`.
 - <…>
 
+## Ticket-sizing gate (afk)
+
+<Copy this section verbatim. It is the backstop for harnesses where the afk
+session-start hook doesn't fire (e.g. Copilot CLI) — without it, those sessions
+never see the sizing gate.>
+
+Before implementing any feature or fix, size it first:
+
+- **Small (1–3 points)** — one concern, few files, clear requirements: implement
+  directly in this session. TDD still applies.
+- **Big (5+ points)** — frontend + backend, multi-step flows, vague requirements:
+  do NOT implement in one pass. Route to the `afk:pipeline` skill (or `afk:spec`
+  if no spec exists).
+- If `.afk/brain/index.md` exists and is not already in your context, read it
+  before acting.
+
 ## Go deeper
 
 <Progressive disclosure. The brain at .afk/brain/ holds the project's docs and

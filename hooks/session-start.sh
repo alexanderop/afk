@@ -33,4 +33,6 @@ else
   json_content="\"$escaped\""
 fi
 
-printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$json_content"
+# Dual-format output: Claude Code reads hookSpecificOutput.additionalContext,
+# Copilot CLI reads the top-level additionalContext key. Each ignores the other.
+printf '{"additionalContext":%s,"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$json_content" "$json_content"

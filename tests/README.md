@@ -7,7 +7,36 @@ instructions*, not exhaustive execution.
 
 Requirements: Claude Code CLI installed and authenticated. Tests load the
 plugin from this repo via `--plugin-dir`, so no installation is needed —
-your working tree is what gets tested.
+your working tree is what gets tested. The parity suite additionally uses
+the Copilot CLI when it's installed.
+
+## tests/parity/
+
+The harness matrix: every supported harness (Claude Code, Copilot CLI) must
+deliver the same core experience. One cheap headless prompt per feature per
+harness, with a feature × harness summary table at the end:
+
+```bash
+tests/parity/run-parity-tests.sh                    # all installed harnesses
+tests/parity/run-parity-tests.sh --harness copilot  # one harness only
+```
+
+Features checked per harness:
+
+- **skills** — all 9 afk skills are discoverable by the model
+- **agents** — all 6 `agents/*.agent.md` subagents are loadable (this is what
+  `ralph` and `review` dispatch)
+- **hooks** — the SessionStart hook injects the ticket-sizing gate
+- **backstop** — a project CLAUDE.md carrying the template's sizing-gate
+  section routes big tickets away from single-pass implementation, even when
+  hooks don't fire
+
+A harness whose CLI is not on PATH is SKIPped, not failed. Known upstream
+bugs WARN instead of FAIL: Copilot CLI has an open issue where
+marketplace-installed plugin hooks are listed but never execute
+([copilot-cli#2540](https://github.com/github/copilot-cli/issues/2540)) —
+the hooks check warns there, and the backstop check proves the CLAUDE.md
+fallback covers it.
 
 ## tests/hooks/
 

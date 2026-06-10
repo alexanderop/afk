@@ -43,6 +43,12 @@ if printf '%s' "$out" | grep -q '"hookEventName":"SessionStart"'; then
 else
   fail "declares the SessionStart event"
 fi
+# Copilot CLI reads a top-level additionalContext key, not Claude's wrapper.
+if printf '%s' "$out" | grep -q '^{"additionalContext":'; then
+  pass "emits top-level additionalContext for Copilot CLI"
+else
+  fail "emits top-level additionalContext for Copilot CLI" "$out"
+fi
 case "$out" in
   *Ticket-Sizing*|*ticket-sizing*) pass "injects the sizing-gate content" ;;
   *) fail "injects the sizing-gate content" ;;

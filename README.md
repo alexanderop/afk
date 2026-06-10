@@ -79,7 +79,7 @@ copilot plugin list
 
 Skills written for afk use Claude Code tool names; Copilot CLI maps them automatically via `skills/using-afk/references/copilot-tools.md`. Update later with `copilot plugin update afk`.
 
-One difference: the ticket-sizing bootstrap is injected by a Claude Code SessionStart hook. If your Copilot session doesn't show the sizing gate, load the `using-afk` skill once at the start of the session — it's the same content.
+The plugin's hooks emit Copilot's output format too, but Copilot CLI has a known bug where plugin-shipped hooks are listed at startup yet never execute ([copilot-cli#2540](https://github.com/github/copilot-cli/issues/2540)). Two backstops cover this: `/afk:setup` embeds the ticket-sizing gate in your project's CLAUDE.md (which Copilot reads in every session), and you can load the `using-afk` skill manually — type `/` and pick it from the skill list — to inject the full bootstrap.
 
 ### Try it without installing
 
@@ -165,14 +165,18 @@ sessions against the working tree and asserts on the transcript — see
 
 ```bash
 tests/hooks/run-hook-tests.sh          # zero-token: hook JSON output + brain indexing
+tests/parity/run-parity-tests.sh       # feature × harness matrix: skills, agents,
+                                       # hooks, CLAUDE.md backstop on Claude Code
+                                       # AND Copilot CLI (skips uninstalled harnesses)
 tests/skill-triggering/run-all.sh      # naive prompts trigger the right skill,
                                        # and a typo fix does NOT enter the pipeline
 tests/claude-code/run-skill-tests.sh   # fast behavioral checks on skill content
 ```
 
-The hook tests are pure bash — run them on every edit. The other two suites
-make real Claude calls (tokens + a few minutes) — use them as a pre-release
-check.
+The hook tests are pure bash — run them on every edit. The other suites make
+real LLM calls (tokens + a few minutes) — use them as a pre-release check.
+The parity suite is the cross-harness guard: it asserts the same skills,
+agents, and sizing-gate bootstrap work on every harness afk supports.
 
 ## Credits
 
