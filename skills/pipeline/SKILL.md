@@ -85,9 +85,11 @@ Boundaries: `after-spec`, `after-slice`, `after-implement`, `after-refactor`,
 hooks at that boundary and invoke each via the Skill tool, in order. Log every
 hook run (and its outcome) in the state file.
 
-- **`blocking: true`** — a failure pauses the run and reports, exactly like a
-  failed phase. Default is non-blocking: log the failure, continue, and list it
-  in the PR handoff.
+- **`blocking: true`** — anything other than confirmed success pauses the run
+  and reports, exactly like a failed phase: the hook reporting a problem, but
+  also erroring out or not completing. A blocking hook never fails open.
+  Default is non-blocking: log the failure, continue, and list it in the PR
+  handoff.
 - **Hooks from `after-implement` onward must run without user input** — they
   fire after the point of no return. A hook that needs answers belongs at
   `after-spec` or `after-slice`; refuse the config otherwise and say why.

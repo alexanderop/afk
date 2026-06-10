@@ -138,9 +138,12 @@ You review Vue code only. Flag: props mutation, watchers that should be
 computed, ... Do NOT flag: ...
 ```
 
-The shared severity rubric and output format are appended automatically, and
-the coordinator's judge pass verifies their findings like everyone else's —
-a noisy team reviewer gets filtered, not obeyed.
+The shared severity rubric and output format are appended automatically (and
+win any conflict with the body), and the coordinator's judge pass verifies
+their findings like everyone else's — a noisy team reviewer gets filtered, not
+obeyed, and every finding it produces is tagged with the reviewer's name so you
+can tune the file behind it. Keep bodies short (~100 lines) and put
+mechanically checkable rules in your linter, not in a prompt.
 
 **Pipeline hooks.** Skills that already live in your repo (say, a `figma-sync`
 skill under `.claude/skills/`) can be wired into the pipeline via
@@ -157,8 +160,9 @@ skill under `.claude/skills/`) can be wired into the pipeline via
 ```
 
 Boundaries: `after-spec`, `after-slice`, `after-implement`, `after-refactor`,
-`after-qa`, `after-review`, `before-pr`. Blocking hooks pause the run on
-failure; non-blocking failures are logged and reported in the PR handoff.
+`after-qa`, `after-review`, `before-pr`. Blocking hooks pause the run on any
+failure — including the hook erroring out; they never fail open. Non-blocking
+failures are logged and reported in the PR handoff.
 Hooks from `after-implement` onward must run without user input — they fire
 while you're AFK. Unresolvable hook skills fail the phase-0 gate loudly
 instead of being skipped mid-run.

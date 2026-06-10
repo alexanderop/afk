@@ -57,8 +57,11 @@ if both match:
 Dispatch each match as a general-purpose subagent in the same parallel batch.
 Its prompt: the file's body, then the full contents of `reviewer-shared.md`,
 then the same base ref / branch / PRD pointers the built-ins get. The appended
-shared rules are what make their findings consolidatable — and they earn no
-extra trust: their findings go through Step 3 like everyone else's.
+shared rules are what make their findings consolidatable — **on any conflict
+about severity, output format, or what-not-to-flag, the shared rules win over
+the body**. Custom reviewers earn no extra trust: their findings go through
+Step 3 like everyone else's, tagged with the reviewer's `name` so noise traces
+back to its file.
 
 ## Step 3: The Judge Pass
 
@@ -79,7 +82,9 @@ Consolidate before reporting:
 
 Write the report (to `qa/review-<slug>.md` when run inside a pipeline):
 verdict first, then findings grouped by severity, each with file:line, what's
-wrong, why it matters, and a concrete fix. End with one paragraph for the human
+wrong, why it matters, and a concrete fix. Findings from a custom reviewer
+keep its tag (e.g. `[vue-reviewer]`) so the team can tune the file behind a
+noisy rule. End with one paragraph for the human
 reviewer: what this branch does and where to focus their attention.
 
 On re-review after fixes: only re-verify the previous findings plus the new
@@ -94,6 +99,7 @@ diff. Don't re-litigate the approved parts.
 | "This warning could theoretically matter" | If it needs 'theoretically', it's dropped. Concrete or gone. |
 | "It's a small diff but touches auth, lite tier is fine" | Security-sensitive paths force Full tier. Always. |
 | "I'll soften the verdict, the user worked hard on this" | The branch was written by agents. Spare the feelings budget; flag the bug. |
+| "The custom reviewer's file defines its own output format, I'll honor it" | The appended shared rules win every conflict. One format, or the judge pass can't consolidate. |
 
 ## Integration
 

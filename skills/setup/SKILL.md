@@ -131,9 +131,17 @@ Do NOT flag: <the team's what-not-to-flag list>
 ```
 
 The body needs only the domain rules — `afk:review` appends the shared severity
-rubric and output format (`reviewer-shared.md`) automatically, and its judge
-pass verifies these findings like any built-in's. Coach the team toward tight
-scopes: what to flag AND what to ignore.
+rubric and output format (`reviewer-shared.md`) automatically (and those win
+any conflict with the body), and its judge pass verifies these findings like
+any built-in's. Coach the team toward:
+
+- **Tight scope** — what to flag AND what to ignore, concrete and measurable
+  ("props mutation", not "write clean Vue").
+- **Short bodies** — under ~100 lines. Every AI review tool that accepts team
+  rules caps them; long prompts dilute every rule in them.
+- **The usual ladder first** — a rule that's mechanically checkable belongs in
+  the lint config (Part 1), not in a reviewer prompt. Never send an LLM to do
+  a linter's job.
 
 **Pipeline hooks — `pipeline.hooks` in `.afk/config.json`.** Wires project
 skills (`.claude/skills/<name>/SKILL.md`) to phase boundaries — schema and
