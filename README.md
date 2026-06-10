@@ -16,7 +16,7 @@ slop — get caught by the pipeline instead of by your users.
 2. Slice the ticket     ── HITL ──  vertical slices, you approve the cut
 3. Implement per slice  ── AFK  ──  fresh-context TDD loop + spec review per slice
 4. Refactor pass        ── AFK  ──  the step LLMs always skip
-5. Agentic QA           ── AFK  ──  agent-browser drives the real UI
+5. Agentic QA           ── AFK  ──  drives the real surface: browser, API, or CLI
 6. Review               ── AFK  ──  risk-tiered multi-agent review
 7. PR + handoff         ── HITL ──  you review, business does UAT
 ```
@@ -107,12 +107,12 @@ then opens a PR with the QA and review reports attached.
 
 | Skill | What it does |
 |-------|--------------|
-| `/afk:setup` | Audits & fixes backpressure, crafts a lean WHAT/WHY/HOW CLAUDE.md, stands up the `.afk/brain/` knowledge vault |
+| `/afk:setup` | Audits & fixes backpressure, records the project's QA surface, crafts a lean WHAT/WHY/HOW CLAUDE.md, stands up the `.afk/brain/` knowledge vault |
 | `/afk:spec` | Interview-mode PRD — AI asks, you answer, one question at a time |
 | `/afk:slice` | PRD → vertical slice tickets (UI + API + test, each shippable) |
 | `/afk:ralph` | Fresh-context TDD subagent loop per slice, with independent spec review |
 | `/afk:refactor-pass` | Dedicated cleanup pass: duplication, dead code, type holes |
-| `/afk:qa` | agent-browser walks happy + negative paths, screenshot-backed report |
+| `/afk:qa` | Walks happy + negative paths from the spec on the project's real surface — agent-browser for UIs, curl for pure APIs, real invocations for CLIs — evidence-backed report |
 | `/afk:review` | Risk-tiered review: security/quality/performance/docs specialists + judge pass |
 | `/afk:pipeline` | The meta-skill — runs all of the above end to end |
 | `/afk:reflect` | Banks learnings: lint rule → script → CLAUDE.md → `.afk/brain/` note → skip |
@@ -183,6 +183,60 @@ marketplace instead of copy-pasting `.afk/` files around.
 - **Blocked slices get skipped, not guessed**: vertical slices survive their
   siblings; invented requirements don't ship.
 
+## Actually going AFK: permissions
+
+The pipeline promises "no questions between slice approval and the PR" — but a
+default harness session stops at every permission prompt, which defeats the
+point. Decide your permission posture **before** the first run:
+
+- **Allowlist (recommended for teams).** Put the project's own commands in the
+  repo's `.claude/settings.json` (`permissions.allow`): the test/lint/typecheck/
+  dev commands from `.afk/config.json`, plus `git` and your package manager.
+  The run then only pauses on genuinely unusual actions. Committed settings
+  mean the whole team shares the same posture.
+- **`--permission-mode acceptEdits`** auto-approves file edits but still gates
+  shell commands — pair it with the allowlist above.
+- **Full bypass only in isolation.** `--dangerously-skip-permissions` (Copilot
+  CLI: `--allow-all-tools`) is acceptable inside a devcontainer/VM with nothing
+  to lose and no production credentials — never on a developer machine with
+  your real keychain and dotfiles.
+
+Two prompts the allowlist can't cover by design: `git push` and opening the PR.
+Either allow them deliberately or treat the open-PR step as your "I'm back"
+checkpoint.
+
+## What a run costs
+
+Be honest with your team about the bill before the first big run: phase 3
+dispatches one fresh implementer subagent per slice (up to 150 turns each) plus
+an independent spec reviewer per slice; refactoring and QA run as forked
+contexts; review fans out 2–6 specialist agents plus a judge pass; failed QA or
+review adds capped fix cycles on top. A 4-slice feature is easily an
+order of magnitude more tokens than an interactive session — that's the trade:
+agent tokens are cheap, your evening is not. Start with smaller features and
+let the run logs (`.afk/pipeline/<slug>.md` records every cycle) calibrate your
+expectations.
+
+## Rolling it out to a team
+
+Don't lead with the full pipeline — trust is built per phase, and every skill
+works standalone:
+
+1. **Review first** (`/afk:review` on human-written branches). Zero risk, and
+   the team immediately sees the noise-filtered, judge-verified findings. Tune
+   `.afk/reviewers/` until the team trusts the output.
+2. **Spec + slice next** (`/afk:spec`, `/afk:slice`). The interview and the
+   slice cut are useful even when humans implement — and they teach the team
+   what a pipeline-ready ticket looks like.
+3. **First supervised pipeline run.** Pick a real but low-stakes 5-pointer,
+   watch it go, read every artifact it leaves behind.
+4. **Then go AFK.** By now the team knows what the artifacts mean, what a
+   blocked slice looks like, and where the human attention belongs.
+
+Projects that shouldn't get the bootstrap at all (a repo where afk makes no
+sense) can opt out without uninstalling: set `"enabled": false` in that repo's
+`.afk/config.json`.
+
 ## Project memory
 
 The brain at `.afk/brain/` is the project's docs AND memory in one vault:
@@ -199,17 +253,21 @@ Structure beats memory — a rule fires every time, a note only when read.
 
 ```
 CLAUDE.md                 # lean WHAT/WHY/HOW onboarding (~60 lines, crafted not generated)
-.afk/config.json          # check commands + backpressure status + optional pipeline hooks
+.afk/config.json          # check commands + QA mode + backpressure + optional pipeline hooks
 .afk/brain/               # docs + memory vault — how-tos and learnings, auto-indexed
 .afk/reviewers/           # optional: team-authored custom reviewers, joined into /afk:review
-.afk/pipeline/<slug>.md   # resumable pipeline state
+.afk/pipeline/<slug>.md   # resumable pipeline state        (gitignored)
 docs/specs/prd-*.md       # PRDs
 docs/tickets/NN-*.md      # slice tickets (checkboxes = progress)
-qa/*.md + qa/screenshots/ # QA + review reports
+qa/*.md + qa/evidence/    # QA + review reports, screenshots/transcripts (gitignored)
 ```
 
 Everything is plain markdown on disk — a dead session resumes from the files,
-and humans can read every artifact the agents produced.
+and humans can read every artifact the agents produced. Setup writes the
+commit policy into `.gitignore`: config, brain, and reviewers are the team's
+shared assets and get committed; per-run state and QA evidence stay local
+(their verdicts are inlined into the PR body instead). Delete the `qa/`
+gitignore line if your team wants the evidence trail in the repo.
 
 ## Testing the plugin
 

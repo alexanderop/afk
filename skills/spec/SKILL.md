@@ -40,6 +40,11 @@ Before asking, read the codebase for answers the code already gives (existing
 patterns, existing endpoints, naming). Don't waste interview questions on things
 you can grep.
 
+If an answer belongs to someone who isn't in the chair — a PM, a designer, the
+business — don't let the user guess on their behalf. Collect those into a
+sendable list of open questions, let the user forward it, and park the PRD until
+the answers come back. Guessed requirements are the most expensive kind.
+
 ## Write the PRD
 
 Write to `docs/specs/prd-<slug>.md`:

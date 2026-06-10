@@ -35,7 +35,8 @@ these in a skill, use your platform equivalent:
 - **`context: fork` skills** (`afk:qa`, `afk:refactor-pass`) run as subagents
   in Claude Code. In Copilot, run them via `task` with `"general-purpose"`,
   passing the skill's body as the prompt.
-- **`afk:qa`** drives the `agent-browser` CLI through `bash` — no mapping
-  needed, it's a plain shell tool on every platform.
+- **`afk:qa`** drives plain shell tools through `bash` — `agent-browser` in
+  browser mode, `curl` in api mode, the project's own binary in cli mode — so
+  no mapping is needed on any platform.
 - Async shell sessions (`bash` with `async: true`, `write_bash`, `read_bash`)
   are useful for long-running dev servers during `afk:qa`.

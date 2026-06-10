@@ -38,7 +38,7 @@ a refactor pass, QA, and review. That is what the pipeline skills are for.
 | Spec exists, needs to become tickets | `afk:slice` — vertical slice tickets |
 | Tickets exist, time to implement | `afk:ralph` — fresh-subagent TDD loop per slice |
 | Implementation done, code is messy | `afk:refactor-pass` — the step that always gets skipped |
-| Feature works in tests, unverified in browser | `afk:qa` — agent-browser walkthrough + report |
+| Feature works in tests, nobody has exercised the real thing | `afk:qa` — spec-driven walk of the real surface (browser, API, or CLI) + evidence-backed report |
 | Branch ready for human eyes | `afk:review` — risk-tiered multi-agent review |
 | "Build this whole thing for me" with a spec | `afk:pipeline` — runs all of the above end to end |
 | After a pipeline run or notable session | `afk:reflect` — capture learnings into .afk/brain/ |
@@ -60,7 +60,7 @@ platform equivalents (subagent dispatch via `task`, etc.).
 | "The user is in a hurry, skip the spec" | A flawed spec cascades into hundreds of bad lines. 30 minutes of spec is the cheapest part. |
 | "Tests are failing, I'll delete/skip the test" | A deleted test is a silently shipped bug. Fix the bug or report BLOCKED. |
 | "No need for the refactor pass, the code looks fine" | LLM code appends, never restructures. The pass exists because 'looks fine' is how hoarder garages start. |
-| "Tests pass, so the feature works" | Tests prove units work, not that a user can finish the flow. That's what `afk:qa` is for. |
+| "Tests pass, so the feature works" | Tests prove units work, not that a user (or API client) can finish the flow. That's what `afk:qa` is for. |
 | "I'll run the loop on the main branch, it's faster" | Implementation loops run in worktrees/branches. Never on main. |
 
 ## Backpressure Check

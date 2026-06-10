@@ -32,8 +32,9 @@ defines the order and the gates, not the phase internals.
 run `afk:setup` first. Then **re-run the test, typecheck, and lint commands
 now** — the recorded status is from whenever setup last ran, and documented ≠
 working. A recorded green that doesn't reproduce is `red`. **HARD GATE: never
-go AFK in a project with no failing tests to fail.** `yellow` → tell the user
-what's weak and let them decide.
+go AFK in a project where nothing fails loudly — no tests, or tests that don't
+run, means no backpressure.** `yellow` → tell the user what's weak and let
+them decide.
 
 If the config declares `pipeline.hooks`, also verify now that every referenced
 skill resolves (it appears in your available skills). An unresolvable hook is a
@@ -61,8 +62,11 @@ file. Skip only if the user says to work in place.
 - A slice BLOCKED on requirements → **skip it, continue the others** (vertical slices survive their siblings), report it in the handoff. Never invent requirements to keep moving.
 
 **Phase 7 — Handoff.** Push the branch, open a PR. Body: what shipped (per
-slice), QA verdict with report link, review verdict with report link, skipped/
-blocked items, and where the human should focus. Then suggest `afk:reflect`.
+slice), the QA verdict with its per-case PASS/FAIL table inlined, the review
+verdict with its findings inlined, skipped/blocked items, and where the human
+should focus. Inline the verdicts, don't link them — `qa/` and `.afk/pipeline/`
+are gitignored by default (afk:setup's policy), so the PR body is where the
+evidence summary lives. Then suggest `afk:reflect`.
 
 ## Team Hooks: Repo-Local Phase Extensions
 

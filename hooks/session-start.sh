@@ -7,6 +7,14 @@ set -euo pipefail
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$PWD}"
 
+# Per-project opt-out: "enabled": false in .afk/config.json silences the
+# bootstrap here (e.g. a repo where the team doesn't want afk), without
+# uninstalling the plugin everywhere else.
+config="$PROJECT_DIR/.afk/config.json"
+if [ -f "$config" ] && grep -Eq '"enabled"[[:space:]]*:[[:space:]]*false' "$config"; then
+  exit 0
+fi
+
 content="$(cat "$PLUGIN_ROOT/skills/using-afk/SKILL.md")"
 
 brain_index="$PROJECT_DIR/.afk/brain/index.md"

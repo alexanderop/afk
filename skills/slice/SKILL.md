@@ -18,7 +18,7 @@ other slice, and context compaction is guaranteed.
 
 ## Slicing Rules
 
-1. **Every slice is end-to-end.** It touches whatever layers the behavior needs (UI + API + test), not one layer across all behaviors.
+1. **Every slice is end-to-end.** It touches whatever layers the behavior needs — UI + API + test for a web feature; endpoint + storage + contract test for a pure backend; subcommand + output + test for a CLI — not one layer across all behaviors.
 2. **Every slice is independently shippable.** If the pipeline died after slice 2 of 4, slices 1–2 would still be mergeable and useful.
 3. **Every slice is a 1–2 pointer.** It must fit one fresh-context loop: roughly 3–10 tasks, a handful of files. If a slice needs a mid-slice "phase 2", split it.
 4. **Order by dependency, minimize dependencies.** Slice 1 is the tracer bullet — the thinnest possible end-to-end path that proves the architecture. Later slices widen it.
@@ -31,6 +31,14 @@ Example — booking wizard PRD becomes:
 02-room-selection    form + GET /rooms + e2e test
 03-payment           form + POST /booking/confirm + e2e test
 04-wizard-navigation cross-step state machine + e2e test
+```
+
+The same cut works with no UI — a webhook-ingestion PRD becomes:
+
+```
+01-receive-and-store    POST /webhooks/orders + persistence + contract test
+02-signature-check      reject unsigned/replayed payloads + test
+03-retry-on-downstream  queue + retry policy + failure-injection test
 ```
 
 ## Ticket Format

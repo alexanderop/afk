@@ -6,10 +6,26 @@
 set -euo pipefail
 
 input="$(cat)"
-case "$input" in
-  *".afk/brain/"*) ;;
-  *) exit 0 ;;
-esac
+
+# Gate on the written file's PATH, not the whole payload — a note whose CONTENT
+# merely mentions .afk/brain/ shouldn't trigger a reindex. jq extracts the path
+# on Claude Code's input shape; anything else (no jq, other harnesses) falls
+# back to the substring check, which can only over-trigger, never under.
+path=""
+if command -v jq >/dev/null 2>&1; then
+  path="$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)"
+fi
+if [ -n "$path" ]; then
+  case "$path" in
+    *".afk/brain/"*) ;;
+    *) exit 0 ;;
+  esac
+else
+  case "$input" in
+    *".afk/brain/"*) ;;
+    *) exit 0 ;;
+  esac
+fi
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$PWD}"
 BRAIN="$PROJECT_DIR/.afk/brain"

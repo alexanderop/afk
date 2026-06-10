@@ -70,12 +70,24 @@ case "$out" in
   *) fail "includes the brain index when present" ;;
 esac
 
+# 3. Per-project opt-out: "enabled": false in .afk/config.json silences the hook.
+mkdir -p "$tmp_project/.afk"
+echo '{"enabled": false}' > "$tmp_project/.afk/config.json"
+out="$(CLAUDE_PLUGIN_ROOT="$PLUGIN_DIR" CLAUDE_PROJECT_DIR="$tmp_project" \
+  "$PLUGIN_DIR/hooks/session-start.sh")"
+if [ -z "$out" ]; then
+  pass "respects the per-project opt-out (enabled: false)"
+else
+  fail "respects the per-project opt-out (enabled: false)" "$out"
+fi
+rm -f "$tmp_project/.afk/config.json"
+
 # --- auto-index-brain.sh ----------------------------------------------------
 
 echo ""
 echo "auto-index-brain.sh:"
 
-# 3. Fast-exits on input that doesn't touch the brain (and writes nothing).
+# 4. Fast-exits on input that doesn't touch the brain (and writes nothing).
 rm -rf "$tmp_project/.afk"
 echo '{"tool_input":{"file_path":"/src/app.ts"}}' | \
   CLAUDE_PROJECT_DIR="$tmp_project" "$PLUGIN_DIR/hooks/auto-index-brain.sh"
@@ -85,7 +97,7 @@ else
   fail "fast-exits on non-brain writes"
 fi
 
-# 4. Regenerates the index with a description per note.
+# 5. Regenerates the index with a description per note.
 mkdir -p "$tmp_project/.afk/brain"
 printf '# Database schema\n\nSchema conventions and how to add a migration safely.\n' \
   > "$tmp_project/.afk/brain/database-schema.md"
@@ -113,6 +125,49 @@ if ! grep -q '\[\[index\]\]' "$index" 2>/dev/null; then
   pass "index does not list itself"
 else
   fail "index does not list itself"
+fi
+
+# 6. A non-brain file whose CONTENT mentions .afk/brain/ does not reindex.
+#    (Path extraction needs jq; without it the substring fallback over-triggers
+#    by design, so skip there.)
+if command -v jq >/dev/null 2>&1; then
+  rm -f "$index"
+  echo '{"tool_input":{"file_path":"/src/app.ts","content":"see .afk/brain/database-schema.md"}}' | \
+    CLAUDE_PROJECT_DIR="$tmp_project" "$PLUGIN_DIR/hooks/auto-index-brain.sh"
+  if [ ! -e "$index" ]; then
+    pass "gates on the file path, not payload content"
+  else
+    fail "gates on the file path, not payload content"
+  fi
+fi
+
+# --- reviewer rules sync ------------------------------------------------------
+
+echo ""
+echo "reviewer rules sync (reviewer-shared.md vs agent definitions):"
+
+# The shared rubric is hand-copied into each review specialist; drift breaks
+# the judge pass's ability to consolidate findings. Assert the load-bearing
+# sentences exist verbatim in all four.
+SYNC_OK=1
+while IFS= read -r sentence; do
+  for f in skills/review/reviewer-shared.md \
+           agents/security-reviewer.agent.md agents/code-quality-reviewer.agent.md \
+           agents/performance-reviewer.agent.md agents/docs-reviewer.agent.md; do
+    if ! grep -qF "$sentence" "$PLUGIN_DIR/$f"; then
+      fail "rubric drift: '$sentence' missing from $f"
+      SYNC_OK=0
+    fi
+  done
+done <<'SENTENCES'
+will cause an outage, data loss, or is exploitable
+measurable regression or concrete risk in a realistic scenario
+an improvement worth considering. Never blocks.
+When unsure between two severities, pick the lower one
+not already handled two lines up
+SENTENCES
+if [ "$SYNC_OK" -eq 1 ]; then
+  pass "severity rubric is in sync across reviewer-shared.md and all four specialists"
 fi
 
 # --- summary ----------------------------------------------------------------
