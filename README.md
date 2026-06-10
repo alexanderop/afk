@@ -117,6 +117,55 @@ then opens a PR with the QA and review reports attached.
 | `/afk:pipeline` | The meta-skill — runs all of the above end to end |
 | `/afk:reflect` | Banks learnings: lint rule → script → CLAUDE.md → `.afk/brain/` note → skip |
 
+## Customizing for your team
+
+Both extension points live in **your repo**, versioned with the code and shared
+by everyone on the team — no plugin fork, no reinstall.
+
+**Custom reviewers.** Drop specialist definitions in `.afk/reviewers/*.md` and
+`/afk:review` dispatches them alongside the built-in four. Frontmatter scopes
+them — `paths` globs decide *when* they run (e.g. only when the diff touches
+`*.vue` files), `tier` decides at which review tier:
+
+```markdown
+---
+name: vue-reviewer
+description: Vue SFC patterns, composables misuse, reactivity leaks
+paths: ["**/*.vue", "**/composables/**"]
+tier: lite
+---
+You review Vue code only. Flag: props mutation, watchers that should be
+computed, ... Do NOT flag: ...
+```
+
+The shared severity rubric and output format are appended automatically, and
+the coordinator's judge pass verifies their findings like everyone else's —
+a noisy team reviewer gets filtered, not obeyed.
+
+**Pipeline hooks.** Skills that already live in your repo (say, a `figma-sync`
+skill under `.claude/skills/`) can be wired into the pipeline via
+`.afk/config.json`:
+
+```json
+{
+  "pipeline": {
+    "hooks": {
+      "after-slice": [{ "skill": "figma-sync", "blocking": true }]
+    }
+  }
+}
+```
+
+Boundaries: `after-spec`, `after-slice`, `after-implement`, `after-refactor`,
+`after-qa`, `after-review`, `before-pr`. Blocking hooks pause the run on
+failure; non-blocking failures are logged and reported in the PR handoff.
+Hooks from `after-implement` onward must run without user input — they fire
+while you're AFK. Unresolvable hook skills fail the phase-0 gate loudly
+instead of being skipped mid-run.
+
+For assets shared across many repos, publish a companion plugin on your own
+marketplace instead of copy-pasting `.afk/` files around.
+
 ## How it stays safe
 
 - **Backpressure gate**: the pipeline refuses to run AFK in a project with no
@@ -146,8 +195,9 @@ Structure beats memory — a rule fires every time, a note only when read.
 
 ```
 CLAUDE.md                 # lean WHAT/WHY/HOW onboarding (~60 lines, crafted not generated)
-.afk/config.json          # check commands + backpressure status
+.afk/config.json          # check commands + backpressure status + optional pipeline hooks
 .afk/brain/               # docs + memory vault — how-tos and learnings, auto-indexed
+.afk/reviewers/           # optional: team-authored custom reviewers, joined into /afk:review
 .afk/pipeline/<slug>.md   # resumable pipeline state
 docs/specs/prd-*.md       # PRDs
 docs/tickets/NN-*.md      # slice tickets (checkboxes = progress)

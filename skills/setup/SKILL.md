@@ -48,7 +48,8 @@ Write `.afk/config.json`:
 ```
 
 `backpressure`: `green` (1–3 pass), `yellow` (gaps — pipeline warns), `red`
-(no tests — `afk:pipeline` refuses to run AFK).
+(no tests — `afk:pipeline` refuses to run AFK). One optional key exists:
+`pipeline.hooks` (team phase hooks — Part 4).
 
 ## Part 2: Craft the CLAUDE.md
 
@@ -106,6 +107,44 @@ Seed it now with what Parts 1–2 actually surfaced:
 Don't pre-write empty placeholder notes — the quality bar in `afk:reflect`
 decides what earns its way in later.
 
+## Part 4: Team Extension Points (optional)
+
+afk reads two repo-local extension points. Both are committed files, so the
+whole team shares them and they version with the code — no plugin fork needed.
+Don't scaffold them unprompted (empty extension dirs are placeholder noise);
+tell the user they exist and set one up only when the team has something to
+plug in.
+
+**Custom reviewers — `.afk/reviewers/<name>.md`.** One specialist per file;
+`afk:review` dispatches each matching one alongside the built-in four:
+
+```markdown
+---
+name: vue-reviewer
+description: Vue SFC patterns, composables misuse, reactivity leaks
+paths: ["**/*.vue", "**/composables/**"]   # spawn only when the diff touches these; omit = always
+tier: lite                                  # lite = Lite AND Full tiers; full (default) = Full only
+---
+You review Vue code only. Flag: props mutation, watchers that should be
+computed, missing `key` in v-for, ...
+Do NOT flag: <the team's what-not-to-flag list>
+```
+
+The body needs only the domain rules — `afk:review` appends the shared severity
+rubric and output format (`reviewer-shared.md`) automatically, and its judge
+pass verifies these findings like any built-in's. Coach the team toward tight
+scopes: what to flag AND what to ignore.
+
+**Pipeline hooks — `pipeline.hooks` in `.afk/config.json`.** Wires project
+skills (`.claude/skills/<name>/SKILL.md`) to phase boundaries — schema and
+rules in `afk:pipeline`. Two constraints to relay: hooks from `after-implement`
+onward must run without user input, and a hook naming a skill that doesn't
+resolve fails the pipeline's phase 0 gate.
+
+For assets shared across many repos (an org-wide reviewer, a company Figma
+skill), a companion plugin on the team's own marketplace fits better than
+copy-pasting `.afk/` files between repos.
+
 ## Red Flags
 
 | Thought | Reality |
@@ -121,4 +160,5 @@ decides what earns its way in later.
 
 - Supporting file: `claude-md-template.md` (annotated CLAUDE.md skeleton).
 - Run before the first **afk:pipeline** in any project; the pipeline's phase 0 gates on `.afk/config.json`.
+- Part 4's extension points are consumed by **afk:review** (`.afk/reviewers/`) and **afk:pipeline** (`pipeline.hooks`).
 - **afk:reflect** routes learnings into the structure built here: lint rules → Part 1's config, universal conventions → CLAUDE.md (sparingly), everything else → `.afk/brain/` notes.

@@ -3,7 +3,9 @@
 The coordinator's reference for the judge pass. Each specialist agent embeds a
 copy of the severity rubric, evidence standard, and output format in its own
 definition (`agents/*.agent.md`) — when you edit a rule here, sync it there too.
-These rules override the specialist's enthusiasm.
+Custom reviewers (`.afk/reviewers/*.md`) get this file appended to their prompt
+verbatim, so they need no sync. These rules override the specialist's
+enthusiasm.
 
 ## Severity Rubric
 

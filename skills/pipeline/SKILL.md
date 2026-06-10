@@ -35,6 +35,10 @@ working. A recorded green that doesn't reproduce is `red`. **HARD GATE: never
 go AFK in a project with no failing tests to fail.** `yellow` → tell the user
 what's weak and let them decide.
 
+If the config declares `pipeline.hooks`, also verify now that every referenced
+skill resolves (it appears in your available skills). An unresolvable hook is a
+config error: stop and tell the user — never silently skip a hook mid-run.
+
 **Phase 1 — Spec.** If the user provided a spec/PRD: read it critically against
 the `afk:spec` template. Gaps in acceptance criteria, error states, or
 out-of-scope → ask now (this is the last conversation). No spec → run the
@@ -59,6 +63,34 @@ file. Skip only if the user says to work in place.
 **Phase 7 — Handoff.** Push the branch, open a PR. Body: what shipped (per
 slice), QA verdict with report link, review verdict with report link, skipped/
 blocked items, and where the human should focus. Then suggest `afk:reflect`.
+
+## Team Hooks: Repo-Local Phase Extensions
+
+Teams wire their own project skills (e.g. a `figma-sync` skill living in the
+repo's `.claude/skills/`) into the run via `.afk/config.json`:
+
+```json
+{
+  "pipeline": {
+    "hooks": {
+      "after-slice": [{ "skill": "figma-sync", "blocking": true }],
+      "after-review": [{ "skill": "notify-slack" }]
+    }
+  }
+}
+```
+
+Boundaries: `after-spec`, `after-slice`, `after-implement`, `after-refactor`,
+`after-qa`, `after-review`, `before-pr`. After completing each phase, check for
+hooks at that boundary and invoke each via the Skill tool, in order. Log every
+hook run (and its outcome) in the state file.
+
+- **`blocking: true`** — a failure pauses the run and reports, exactly like a
+  failed phase. Default is non-blocking: log the failure, continue, and list it
+  in the PR handoff.
+- **Hooks from `after-implement` onward must run without user input** — they
+  fire after the point of no return. A hook that needs answers belongs at
+  `after-spec` or `after-slice`; refuse the config otherwise and say why.
 
 ## State: Resumable by Design
 
@@ -92,9 +124,11 @@ skill before continuing — the summarized version of a skill is not the skill.
 | "QA failed twice, third fix cycle will do it" | Two cycles, then stop and report. Loops that don't converge need a human, not persistence. |
 | "I'll keep the pipeline state in my head" | The session WILL die at slice 3 of 4. Disk or it didn't happen. |
 | "Skip review, QA already passed" | QA proves the user can finish the flow. Review catches the injection in the endpoint QA happily used. |
+| "That team hook failed, but it's not a core phase — move on quietly" | Non-blocking ≠ invisible. Every hook outcome goes in the state-file log and the PR handoff. |
 
 ## Integration
 
 - Chains: **afk:setup** → **afk:spec** → **afk:slice** → **afk:ralph** → **afk:refactor-pass** → **afk:qa** → **afk:review**.
+- Team hooks (repo-local skills at phase boundaries) come from `pipeline.hooks` in `.afk/config.json` — declared by the team, documented in **afk:setup** Part 4.
 - After the PR: **afk:reflect** to bank what the run taught.
 - Small tickets don't belong here — the sizing gate in `using-afk` decides.
