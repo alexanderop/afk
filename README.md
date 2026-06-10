@@ -27,12 +27,19 @@ pipeline at 5 points and up.
 
 ## Install
 
-```bash
-# Try it locally
-claude --plugin-dir /path/to/afk
+Inside Claude Code:
+
+```
+/plugin marketplace add alexanderop/afk
+/plugin install afk@afk
 ```
 
-Or distribute through a [plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces).
+Or try it locally without installing:
+
+```bash
+git clone https://github.com/alexanderop/afk
+claude --plugin-dir ./afk
+```
 
 ## Quickstart
 
