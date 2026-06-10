@@ -30,6 +30,9 @@ Features checked per harness:
 - **backstop** — a project CLAUDE.md carrying the template's sizing-gate
   section routes big tickets away from single-pass implementation, even when
   hooks don't fire
+- **custom reviewers** — a repo-local `.afk/reviewers/vue-reviewer.md` (the
+  team-extension convention) shows up in the review skill's dispatch plan for
+  a matching diff, alongside the built-in specialists
 
 A harness whose CLI is not on PATH is SKIPped, not failed. Known upstream
 bugs WARN instead of FAIL: Copilot CLI has an open issue where

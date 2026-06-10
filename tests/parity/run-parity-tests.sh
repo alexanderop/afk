@@ -128,6 +128,34 @@ for harness in "${HARNESSES[@]}"; do
     record "backstop: CLAUDE.md sizing gate routes big tickets away" "$harness" FAIL "$(echo "$out" | tail -3)"
   fi
 
+  # 5. Custom reviewers: a repo-local .afk/reviewers/ definition joins the
+  # review skill's dispatch plan (the team-extension convention). Asserting
+  # the plan, not a real agent spawn, keeps this one prompt instead of a
+  # full multi-agent review run.
+  mkdir -p "$project/.afk/reviewers"
+  cat > "$project/.afk/reviewers/vue-reviewer.md" <<'EOF'
+---
+name: vue-reviewer
+description: Vue SFC patterns, composables misuse
+paths: ["**/*.vue"]
+tier: lite
+---
+You review Vue code only. Flag props mutation and watchers that should be
+computed. Do NOT flag style preferences.
+EOF
+  out="$(run_on "$harness" "$project" \
+    "Load the afk review skill, then check this repo's .afk/reviewers/ directory. For a Lite-tier review of a diff that changes only src/components/Button.vue, list the names of every reviewer the skill tells you to dispatch, one per line, names only. Do not dispatch any agents and do not read any git diff.")"
+  missing=""
+  for reviewer in vue-reviewer code-quality-reviewer; do
+    echo "$out" | grep -qi "$reviewer" || missing="$missing $reviewer"
+  done
+  if [ -z "$missing" ]; then
+    record "custom reviewers: .afk/reviewers/ joins the dispatch plan" "$harness" PASS
+  else
+    record "custom reviewers: .afk/reviewers/ joins the dispatch plan" "$harness" FAIL \
+      "missing:$missing — $(echo "$out" | tail -3)"
+  fi
+
   rm -rf "$project"
 done
 
