@@ -1,7 +1,9 @@
 # Shared Reviewer Rules
 
-Paste this into every specialist reviewer dispatch. These rules override the
-specialist's enthusiasm.
+The coordinator's reference for the judge pass. Each specialist agent embeds a
+copy of the severity rubric, evidence standard, and output format in its own
+definition (`agents/*.md`) — when you edit a rule here, sync it there too.
+These rules override the specialist's enthusiasm.
 
 ## Severity Rubric
 

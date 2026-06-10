@@ -21,11 +21,16 @@ Read the linked notes that are relevant before acting.
 $(cat "$brain_index")"
 fi
 
-# JSON-escape via parameter substitution (no heredoc, no jq dependency)
-escaped=${content//\\/\\\\}
-escaped=${escaped//\"/\\\"}
-escaped=${escaped//$'\n'/\\n}
-escaped=${escaped//$'\t'/\\t}
-escaped=${escaped//$'\r'/\\r}
+# JSON-escape: jq when available (handles every control char), manual fallback.
+if command -v jq >/dev/null 2>&1; then
+  json_content="$(printf '%s' "$content" | jq -Rs .)"
+else
+  escaped=${content//\\/\\\\}
+  escaped=${escaped//\"/\\\"}
+  escaped=${escaped//$'\n'/\\n}
+  escaped=${escaped//$'\t'/\\t}
+  escaped=${escaped//$'\r'/\\r}
+  json_content="\"$escaped\""
+fi
 
-printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "$escaped"
+printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$json_content"

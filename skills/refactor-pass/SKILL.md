@@ -1,6 +1,7 @@
 ---
 name: refactor-pass
 description: Use after all slices of a feature are implemented and before QA/review — a dedicated cleanup pass over the branch that collapses duplication across slices, removes dead code, and fixes naming, because the implementation loops will not do this on their own.
+context: fork
 ---
 
 # Refactor Pass: The Step LLMs Always Skip
@@ -16,6 +17,11 @@ its own slice. This pass sees the whole branch.
 **Iron Laws:**
 - **DO NOT CHANGE BEHAVIOR. DO NOT ADD FEATURES.**
 - **TESTS STAY GREEN AFTER EVERY SINGLE COMMIT.**
+
+This skill runs in a forked context (diffs and test output stay out of the main
+session — only the summary comes back). Orient yourself from disk: the base ref
+and branch are in `.afk/pipeline/<slug>.md` when a pipeline is running;
+otherwise use `git merge-base` with the default branch.
 
 ## The Pass
 

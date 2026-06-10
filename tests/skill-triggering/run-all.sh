@@ -17,6 +17,8 @@ TESTS=(
     "review:review"
     "qa:qa"
     "setup:setup"
+    "refactor-pass:refactor"
+    "reflect:reflect"
 )
 
 # Negative tests: "<forbidden-skill-pattern>:<prompt-file-basename>"

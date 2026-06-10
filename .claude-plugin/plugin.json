@@ -1,10 +1,13 @@
 {
   "name": "afk",
+  "displayName": "AFK Coding Pipeline",
   "description": "AFK coding pipeline: spec → vertical slices → TDD implementation loops → refactor pass → agentic QA → multi-agent review. Human judgment at the edges, agent execution in the middle.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Alexander Opalic"
   },
   "homepage": "https://alexop.dev",
+  "repository": "https://github.com/alexanderop/afk",
+  "license": "MIT",
   "keywords": ["afk", "pipeline", "tdd", "vertical-slices", "code-review", "agents", "spec-driven"]
 }

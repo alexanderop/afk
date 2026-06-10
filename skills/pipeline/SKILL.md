@@ -29,8 +29,11 @@ defines the order and the gates, not the phase internals.
 ## Phase Gates
 
 **Phase 0 — Backpressure.** Read `.afk/config.json`. Missing or `red` →
-run `afk:setup` first. **HARD GATE: never go AFK in a project with no failing
-tests to fail.** `yellow` → tell the user what's weak and let them decide.
+run `afk:setup` first. Then **re-run the test, typecheck, and lint commands
+now** — the recorded status is from whenever setup last ran, and documented ≠
+working. A recorded green that doesn't reproduce is `red`. **HARD GATE: never
+go AFK in a project with no failing tests to fail.** `yellow` → tell the user
+what's weak and let them decide.
 
 **Phase 1 — Spec.** If the user provided a spec/PRD: read it critically against
 the `afk:spec` template. Gaps in acceptance criteria, error states, or
@@ -40,6 +43,11 @@ out-of-scope → ask now (this is the last conversation). No spec → run the
 **Phase 2 — Slice.** Run `afk:slice`. Present the slice list. **This approval
 is the point of no return — say so.** Also confirm now: PR target branch, and
 anything destructive-adjacent (migrations, deletions) the slices imply.
+
+After approval, create a dedicated git worktree for the run (`git worktree add
+../<repo>-afk-<slug> -b <branch>`) and do all AFK work there — the user's
+checkout stays free while they're away. Record the worktree path in the state
+file. Skip only if the user says to work in place.
 
 **Phases 3–6 — AFK.** Run `afk:ralph` → `afk:refactor-pass` → `afk:qa` →
 `afk:review` in order. Failure routing:
@@ -57,7 +65,7 @@ blocked items, and where the human should focus. Then suggest `afk:reflect`.
 Maintain `.afk/pipeline/<slug>.md` from phase 0:
 
 ```markdown
-# Pipeline: <feature>   branch: <name>   base: <ref>
+# Pipeline: <feature>   branch: <name>   base: <ref>   worktree: <path>
 - [x] 0 backpressure: green
 - [x] 1 spec: docs/specs/prd-<slug>.md (approved)
 - [x] 2 slices: 4 tickets (approved)
@@ -70,6 +78,10 @@ Maintain `.afk/pipeline/<slug>.md` from phase 0:
 Update it after every phase transition. If a session dies mid-run, the next
 session reads this file plus the ticket checkboxes and resumes exactly where it
 stopped. Progress lives on disk, never only in conversation memory.
+
+Compaction is survival, not failure: after the conversation gets compacted
+mid-run, re-read `.afk/pipeline/<slug>.md` AND re-invoke the current phase's
+skill before continuing — the summarized version of a skill is not the skill.
 
 ## Red Flags
 

@@ -21,9 +21,9 @@ Look at the diff (`git diff {base}..HEAD --stat`):
 
 | Tier | Condition | Reviewers |
 |------|-----------|-----------|
-| **Trivial** | ≤10 lines, ≤20 files, no security-sensitive paths | You review it yourself directly. No subagents. |
-| **Lite** | ≤100 lines, ≤20 files | `code-quality-reviewer` + `docs-reviewer` |
-| **Full** | >100 lines, OR >50 files, OR any security-sensitive file | All four specialists |
+| **Trivial** | ≤10 lines AND ≤3 files, no security-sensitive paths | You review it yourself directly. No subagents. |
+| **Lite** | ≤100 lines AND ≤20 files, no security-sensitive paths | `code-quality-reviewer` + `docs-reviewer` |
+| **Full** | Everything bigger — OR any security-sensitive file, at any size | All four specialists |
 
 Security-sensitive paths always force **Full**: anything matching auth, login,
 session, crypto, token, permission, payment, secret, or middleware/config that
@@ -35,12 +35,12 @@ minified assets, snapshots, vendored deps — but never filter migrations.
 ## Step 2: Dispatch Specialists in Parallel
 
 Spawn the tier's reviewers concurrently (agents: `security-reviewer`,
-`code-quality-reviewer`, `performance-reviewer`, `docs-reviewer`). Give each:
+`code-quality-reviewer`, `performance-reviewer`, `docs-reviewer`). The severity
+rubric, evidence standard, and output format are baked into each agent's
+definition — the dispatch prompt only needs:
 
 - The base ref and branch (they read the diff themselves).
 - The PRD path, if one exists, for intent.
-- The instruction to follow `reviewer-shared.md` from this skill's directory
-  (paste its content into the prompt).
 
 Each returns structured findings with severity: `critical` / `warning` /
 `suggestion`.
@@ -82,6 +82,6 @@ diff. Don't re-litigate the approved parts.
 
 ## Integration
 
-- Supporting file: `reviewer-shared.md` (severity rubric + global what-not-to-flag).
+- Supporting file: `reviewer-shared.md` (the coordinator's copy of the severity rubric + global what-not-to-flag, used in the judge pass; each specialist agent embeds the same rules — keep them in sync when editing).
 - Specialist agents ship with this plugin: `security-reviewer`, `code-quality-reviewer`, `performance-reviewer`, `docs-reviewer`.
 - Critical findings route back to **afk:ralph**. Called by **afk:pipeline** as phase 6.

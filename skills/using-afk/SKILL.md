@@ -1,6 +1,7 @@
 ---
 name: using-afk
-description: Use when starting any conversation in a project with the afk plugin — establishes the ticket-sizing gate and routes work to the right pipeline skill before any code is written.
+description: The ticket-sizing gate and skill router. Injected automatically at session start by the plugin's SessionStart hook — do not invoke it as a skill; in harnesses without hook support (e.g. Copilot CLI), invoke it once at the start of a session.
+disable-model-invocation: true
 ---
 
 # Using AFK

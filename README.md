@@ -79,6 +79,8 @@ copilot plugin list
 
 Skills written for afk use Claude Code tool names; Copilot CLI maps them automatically via `skills/using-afk/references/copilot-tools.md`. Update later with `copilot plugin update afk`.
 
+One difference: the ticket-sizing bootstrap is injected by a Claude Code SessionStart hook. If your Copilot session doesn't show the sizing gate, load the `using-afk` skill once at the start of the session — it's the same content.
+
 ### Try it without installing
 
 ```bash
@@ -162,13 +164,15 @@ sessions against the working tree and asserts on the transcript — see
 [tests/README.md](tests/README.md):
 
 ```bash
+tests/hooks/run-hook-tests.sh          # zero-token: hook JSON output + brain indexing
 tests/skill-triggering/run-all.sh      # naive prompts trigger the right skill,
                                        # and a typo fix does NOT enter the pipeline
 tests/claude-code/run-skill-tests.sh   # fast behavioral checks on skill content
 ```
 
-Runs make real Claude calls (tokens + a few minutes) — use as a pre-release
-check, not on every edit.
+The hook tests are pure bash — run them on every edit. The other two suites
+make real Claude calls (tokens + a few minutes) — use them as a pre-release
+check.
 
 ## Credits
 

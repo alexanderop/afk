@@ -1,6 +1,7 @@
 ---
 name: qa
 description: Use when implementation and refactoring are done but no human has seen the feature run — drives the real app in a real browser with agent-browser, walks the happy path and negative paths from the spec, and writes a screenshot-backed QA report.
+context: fork
 ---
 
 # QA: Agentic Browser Verification
@@ -13,6 +14,11 @@ quietly fail — and it's exactly the gap a real browser walk closes.
 
 You act as a QA engineer: drive the UI, observe what actually renders, and
 report with evidence. **A claim without a screenshot is not a finding.**
+
+This skill runs in a forked context (browser snapshots and console dumps stay
+out of the main session — only the report comes back). Orient yourself from
+disk: `.afk/pipeline/<slug>.md` for the feature slug and PRD path if a pipeline
+is running, otherwise the newest `docs/specs/prd-*.md`.
 
 ## Setup
 

@@ -21,8 +21,9 @@ the user approves the written PRD.**
 ## The Interview
 
 Ask **one question at a time**. Multiple choice preferred — it's faster to answer
-and surfaces options the user hadn't considered. Adapt based on answers; skip
-questions the context already answers.
+and surfaces options the user hadn't considered (in Claude Code, use the
+AskUserQuestion tool). Adapt based on answers; skip questions the context
+already answers.
 
 Cover, in roughly this order:
 

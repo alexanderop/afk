@@ -9,6 +9,19 @@ Requirements: Claude Code CLI installed and authenticated. Tests load the
 plugin from this repo via `--plugin-dir`, so no installation is needed —
 your working tree is what gets tested.
 
+## tests/hooks/
+
+Zero-token tests for the two hooks — pure bash, no LLM calls, safe to run on
+every edit:
+
+```bash
+tests/hooks/run-hook-tests.sh
+```
+
+Covers: `session-start.sh` emits valid JSON (including with JSON-hostile
+characters in the brain index), and `auto-index-brain.sh` fast-exits on
+non-brain writes, regenerates the index, and carries a description per note.
+
 ## tests/skill-triggering/
 
 The core suite. Each prompt in `prompts/` is a *naive* request that never
