@@ -77,7 +77,7 @@ then opens a PR with the QA and review reports attached.
 
 | Skill | What it does |
 |-------|--------------|
-| `/afk:setup` | Audits & fixes backpressure, crafts a lean WHAT/WHY/HOW CLAUDE.md (with `agent_docs/` progressive disclosure), stands up `.afk/` |
+| `/afk:setup` | Audits & fixes backpressure, crafts a lean WHAT/WHY/HOW CLAUDE.md, stands up the `.afk/brain/` knowledge vault |
 | `/afk:spec` | Interview-mode PRD — AI asks, you answer, one question at a time |
 | `/afk:slice` | PRD → vertical slice tickets (UI + API + test, each shippable) |
 | `/afk:ralph` | Fresh-context TDD subagent loop per slice, with independent spec review |
@@ -85,7 +85,7 @@ then opens a PR with the QA and review reports attached.
 | `/afk:qa` | agent-browser walks happy + negative paths, screenshot-backed report |
 | `/afk:review` | Risk-tiered review: security/quality/performance/docs specialists + judge pass |
 | `/afk:pipeline` | The meta-skill — runs all of the above end to end |
-| `/afk:reflect` | Banks learnings: lint rule → script → `agent_docs/` → CLAUDE.md → `.afk/brain/` → skip |
+| `/afk:reflect` | Banks learnings: lint rule → script → CLAUDE.md → `.afk/brain/` note → skip |
 
 ## How it stays safe
 
@@ -102,18 +102,22 @@ then opens a PR with the QA and review reports attached.
 
 ## Project memory
 
+The brain at `.afk/brain/` is the project's docs AND memory in one vault:
+deliberate how-to notes (how to build, test, add a migration) plus earned
+learnings (gotchas, failed approaches). CLAUDE.md points to the high-traffic
+notes; the index is injected at session start and auto-reindexed on write, so
+every pipeline run starts smarter than the last.
+
 `/afk:reflect` routes session learnings with a strict hierarchy: lint rule →
-script → AGENTS.md line → `.afk/brain/` note → skip. The brain index is
-injected at session start and auto-reindexed on write, so every pipeline run
-starts smarter than the last.
+script → CLAUDE.md line (universal only) → `.afk/brain/` note → skip.
+Structure beats memory — a rule fires every time, a note only when read.
 
 ## What lands in your repo
 
 ```
 CLAUDE.md                 # lean WHAT/WHY/HOW onboarding (~60 lines, crafted not generated)
-agent_docs/               # task-specific guides, pointed to from CLAUDE.md
 .afk/config.json          # check commands + backpressure status
-.afk/brain/               # project memory — learnings, auto-indexed
+.afk/brain/               # docs + memory vault — how-tos and learnings, auto-indexed
 .afk/pipeline/<slug>.md   # resumable pipeline state
 docs/specs/prd-*.md       # PRDs
 docs/tickets/NN-*.md      # slice tickets (checkboxes = progress)

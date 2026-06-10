@@ -30,11 +30,10 @@ Look for:
 In strict order — first match wins:
 
 1. **Lint rule / typecheck config / test** → add it (or propose it). The lesson now enforces itself. Done; no note needed.
-2. **Script or command** → if the lesson is "this 5-step dance must happen in order," make it one script and reference it from CLAUDE.md or agent_docs/.
-3. **agent_docs/ doc** → if it's task-specific know-how ("how we add a migration", "how the build pipeline works"). Write/extend `agent_docs/<topic>.md` and make sure CLAUDE.md's "Go deeper" section points to it. Read on demand, not carried in every session.
-4. **CLAUDE.md line** → ONLY if it's universal — true in every session regardless of task ("we use bun, never npm"). CLAUDE.md is instruction-budget-constrained: one line in, consider one line out. Non-universal lines teach the model to ignore the whole file.
-5. **Brain note** → only for knowledge that can't be a rule or a how-to: architectural reasoning, gotcha explanations, "we tried X and it failed because Y."
-6. **Skip** → one-off incidents. Apply the frequency test: would this come up in a DIFFERENT task? No → don't save it.
+2. **Script or command** → if the lesson is "this 5-step dance must happen in order," make it one script and reference it from CLAUDE.md or a brain note.
+3. **CLAUDE.md line** → ONLY if it's universal — true in every session regardless of task ("we use bun, never npm"). CLAUDE.md is instruction-budget-constrained: one line in, consider one line out. Non-universal lines teach the model to ignore the whole file.
+4. **Brain note** → everything else worth keeping: task-specific know-how ("how we add a migration"), architectural reasoning, gotcha explanations, "we tried X and it failed because Y." For high-traffic how-to notes, also add a one-line pointer in CLAUDE.md's "Go deeper" section.
+5. **Skip** → one-off incidents. Apply the frequency test: would this come up in a DIFFERENT task? No → don't save it.
 
 ## Step 3: Write Brain Notes
 
@@ -64,7 +63,7 @@ SessionStart hook injects it into every future session.
 | "Better to save everything, storage is free" | Context isn't. Every injected note taxes every future session. Three-part quality bar. |
 | "This correction was one-off, but just in case…" | Frequency test failed → skip. The brain is for patterns, not incidents. |
 | "I'll append to one big LEARNINGS.md" | One topic per file, or recall becomes grep-and-pray. |
-| "This how-to belongs in CLAUDE.md so it's never missed" | Task-specific content in CLAUDE.md gets the whole file ignored. agent_docs/ pointer instead. |
+| "This how-to belongs in CLAUDE.md so it's never missed" | Task-specific content in CLAUDE.md gets the whole file ignored. Brain note + a "Go deeper" pointer instead. |
 
 ## Integration
 
