@@ -45,6 +45,17 @@ business — don't let the user guess on their behalf. Collect those into a
 sendable list of open questions, let the user forward it, and park the PRD until
 the answers come back. Guessed requirements are the most expensive kind.
 
+## Explore Approaches
+
+Interview done, before writing: propose 2–3 implementation approaches with
+trade-offs, in one message. Lead with your recommendation and why; let the
+user pick (AskUserQuestion in Claude Code). The chosen approach becomes the
+PRD's Architecture section; each rejected one gets a one-line "considered,
+rejected because…" note there, so no later agent re-litigates it mid-slice.
+
+Skip this only when the codebase leaves no real choice — and write that down
+in Architecture too.
+
 ## Write the PRD
 
 Write to `docs/specs/prd-<slug>.md`:
@@ -58,6 +69,7 @@ Write to `docs/specs/prd-<slug>.md`:
 ## Edge cases        (each with expected behavior)
 ## Validation & error states
 ## Data & integrations  (existing vs. new, with file/endpoint references)
+## Architecture         (chosen approach + key components; rejected alternatives, one line each with why)
 ## Out of scope
 ## Acceptance criteria  (numbered, testable — afk:qa runs these verbatim)
 ## Open questions       (must be empty before pipeline starts)

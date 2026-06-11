@@ -56,9 +56,14 @@ One paragraph: what a user can do after this slice that they couldn't before.
 What exists already (files, endpoints, components — concrete paths).
 Which PRD sections this implements. What other slices it depends on.
 
+## Files
+- Create: `exact/path/to/file.ts` — one-line responsibility
+- Modify: `exact/path/to/existing.ts`
+- Test: `exact/path/to/file.test.ts`
+
 ## Tasks
-- [ ] Task 1 (test-first: name the behavior the test asserts)
-- [ ] Task 2
+- [ ] Task 1 — test: <the behavior the test asserts>; introduces `<signature / type / endpoint shape, if any>`
+- [ ] Task 2 — test: <...>
 ...
 
 ## Acceptance
@@ -68,7 +73,30 @@ How to verify this slice alone works (command to run, URL to click).
 What belongs to other slices — name them.
 ```
 
-After writing all tickets, present the slice list to the user with one line per
+The Files section locks in decomposition: which files exist and what each is
+responsible for is decided here, with the whole PRD in view — not improvised
+by an implementer mid-loop. Each task names the test that proves it and any
+interface it introduces, because a later slice will consume that interface by
+exactly the name written down now.
+
+**No placeholders.** These are ticket failures, not shorthand: "TBD"/"TODO",
+"add appropriate error handling", "handle edge cases", a task with no named
+test, "similar to slice NN" (copy the details in — the loop reads only its
+own ticket).
+
+## Self-Review
+
+After writing all tickets, re-read them against the PRD with fresh eyes:
+
+1. **PRD coverage** — point each acceptance criterion to the slice that
+   implements it. A criterion with no slice is a missing ticket.
+2. **Placeholder scan** — hunt the failure patterns above. Fix them.
+3. **Cross-ticket consistency** — names, types, and endpoint shapes a later
+   slice consumes must match what the earlier slice defines. `POST
+   /booking/draft` in slice 01 but `/bookings/draft` in slice 04 is a bug —
+   cheap now, expensive three implementation loops later.
+
+Fix issues inline. Then present the slice list to the user with one line per
 slice and **get approval**. This is the last cheap moment to change direction.
 
 ## Red Flags
