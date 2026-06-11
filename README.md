@@ -205,6 +205,17 @@ Two prompts the allowlist can't cover by design: `git push` and opening the PR.
 Either allow them deliberately or treat the open-PR step as your "I'm back"
 checkpoint.
 
+Parallel slices raise the bar: when `afk:ralph` runs implementers concurrently,
+they run as background subagents, and background subagents **auto-deny** any
+permission prompt instead of asking — the slice keeps going half-broken. If you
+plan to parallelize, the allowlist isn't optional.
+
+One environment-variable gotcha: `CLAUDE_CODE_SUBAGENT_MODEL` overrides the
+model pinned in every afk agent definition (the implementer's `sonnet`, the
+docs-reviewer's `haiku`). If it's set in your shell, every subagent in the run
+silently uses that model instead — unset it for pipeline runs unless that's
+deliberate.
+
 ## What a run costs
 
 Be honest with your team about the bill before the first big run: phase 3

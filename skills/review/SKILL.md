@@ -41,6 +41,8 @@ definition — the dispatch prompt only needs:
 
 - The base ref and branch (they read the diff themselves).
 - The PRD path, if one exists, for intent.
+- Relevant `.afk/brain/` notes, if any exist — especially false-positive
+  patterns banked by `afk:reflect`, so known noise doesn't resurface.
 
 Each returns structured findings with severity: `critical` / `warning` /
 `suggestion`.
@@ -67,11 +69,36 @@ back to its file.
 
 Consolidate before reporting:
 
-1. **Deduplicate** — same issue from two specialists → keep once, in the best-fitting section.
-2. **Verify** — for every `critical` and any finding you doubt: read the code yourself. Specialists hallucinate; the coordinator checks. Drop anything you can't confirm at a specific file:line.
-3. **Re-judge severity** — against the rubric in `reviewer-shared.md`. Speculative risks and nitpicks get dropped, not downgraded.
+1. **Deduplicate** — same file, line within ±3, same underlying issue = one
+   finding. Keep it once, in the best-fitting section — but record the
+   corroboration: two reviewers flagging it independently promotes its
+   confidence one anchor (50→75, 75→100).
+2. **Gate on confidence** — after promotion, drop non-critical findings below
+   75. Criticals at 50 survive the gate, but only into the verify step — an
+   unverified low-confidence critical never reaches the report.
+3. **Verify** — for every `critical` and any finding you doubt: read the code yourself. Specialists hallucinate; the coordinator checks. Drop anything you can't confirm at a specific file:line.
+4. **Re-judge severity** — against the rubric in `reviewer-shared.md`. Speculative risks and nitpicks get dropped, not downgraded.
 
-## Step 4: Verdict
+## Step 4: Apply Mechanical Fixes
+
+A finding whose fix costs less than its fix loop gets fixed here. **Mechanical**
+means: one obvious change in one place, fully spelled out by the finding, no
+design decision involved — a typo'd flag, the null check the reviewer quoted, a
+doc line that lies.
+
+Apply a fix directly only when ALL hold:
+
+- Confidence 100, or 75 with corroboration.
+- The working tree is the reviewed branch with nothing uncommitted.
+- The change can't alter intended behavior beyond what the finding describes.
+
+Then run the project's test + lint commands. Anything not green → revert every
+applied fix and report them as ordinary findings. Green → one
+`fix(review): <summary>` commit, and the findings move to an **Applied**
+section of the report — they no longer count toward the verdict. Everything
+non-mechanical routes as usual: criticals to afk:ralph, the rest to the report.
+
+## Step 5: Verdict
 
 | Findings | Verdict |
 |----------|---------|
@@ -82,7 +109,8 @@ Consolidate before reporting:
 
 Write the report (to `qa/review-<slug>.md` when run inside a pipeline):
 verdict first, then findings grouped by severity, each with file:line, what's
-wrong, why it matters, and a concrete fix. Findings from a custom reviewer
+wrong, why it matters, and a concrete fix; then the **Applied** section from
+Step 4, if any. Findings from a custom reviewer
 keep its tag (e.g. `[vue-reviewer]`) so the team can tune the file behind a
 noisy rule. End with one paragraph for the human
 reviewer: what this branch does and where to focus their attention.
@@ -100,6 +128,7 @@ diff. Don't re-litigate the approved parts.
 | "It's a small diff but touches auth, lite tier is fine" | Security-sensitive paths force Full tier. Always. |
 | "I'll soften the verdict, the user worked hard on this" | The branch was written by agents. Spare the feelings budget; flag the bug. |
 | "The custom reviewer's file defines its own output format, I'll honor it" | The appended shared rules win every conflict. One format, or the judge pass can't consolidate. |
+| "While I'm applying fixes, I'll clean up the rest too" | A review that rewrites the branch isn't a review. Mechanical, gated, test-guarded — or it goes in the report. |
 
 ## Integration
 

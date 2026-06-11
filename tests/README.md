@@ -54,6 +54,35 @@ Covers: `session-start.sh` emits valid JSON (including with JSON-hostile
 characters in the brain index), and `auto-index-brain.sh` fast-exits on
 non-brain writes, regenerates the index, and carries a description per note.
 
+## tests/lint/
+
+Zero-token structural lint for the markdown itself — the unit-test layer for
+a product that *is* markdown. Pure bash + jq, safe to run on every edit:
+
+```bash
+tests/lint/run-lint-tests.sh
+```
+
+Covers: plugin/marketplace manifests parse, `hooks.json` commands point at
+executable scripts, every SKILL.md and agent definition has well-formed
+frontmatter (name matches its directory/filename, single-line description
+within Claude Code's 1024-char limit), SKILL.md bodies stay under 500 lines,
+and plugin-internal file references (`references/...`, `skills/...`, …)
+resolve to real files.
+
+## tests/smoke/
+
+One headless turn (~$0.01) asserting Claude Code actually *loads* the plugin:
+the stream-json `system/init` event must list `afk` in `plugins` with no
+`plugin_errors`. Catches manifest/frontmatter/hook-wiring breakage that the
+static lint can't see — Claude Code silently drops a plugin it can't parse.
+Runs locally on subscription auth, and in CI when the `ANTHROPIC_API_KEY`
+secret is configured (skipped otherwise):
+
+```bash
+tests/smoke/plugin-load.sh
+```
+
 ## tests/skill-triggering/
 
 The core suite. Each prompt in `prompts/` is a *naive* request that never
@@ -80,6 +109,12 @@ where the router could legitimately pick either skill (`"spec|pipeline"`).
 Each run leaves its full transcript under `/tmp/afk-tests/<timestamp>/` for
 debugging, and warns when Claude invoked other tools *before* loading the
 skill (the "started working without reading the instructions" failure mode).
+
+Runs are hermetic: `--setting-sources project` keeps user-level
+plugins/skills/hooks out of the session (their skills would otherwise compete
+with afk's for triggering) while the plugin's own SessionStart hook still
+fires — which `--bare` would disable. The same flag is set in
+`tests/claude-code/test-helpers.sh`.
 
 ## tests/claude-code/
 

@@ -164,6 +164,7 @@ will cause an outage, data loss, or is exploitable
 measurable regression or concrete risk in a realistic scenario
 an improvement worth considering. Never blocks.
 When unsure between two severities, pick the lower one
+verifiable from the code alone, no assumed runtime conditions
 not already handled two lines up
 SENTENCES
 if [ "$SYNC_OK" -eq 1 ]; then

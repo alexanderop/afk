@@ -16,12 +16,12 @@ bash test harness. No build step, no package manager, no dependencies beyond
 - `skills/` — the 9 pipeline skills, one directory each (`SKILL.md` + supporting files)
 - `agents/` — 6 subagent definitions (`*.agent.md`) that `ralph` and `review` dispatch
 - `hooks/` — SessionStart sizing-gate injection, brain auto-indexer (`hooks.json` wires them)
-- `tests/` — four suites with very different costs; read `tests/README.md` before running anything
+- `tests/` — six suites with very different costs; read `tests/README.md` before running anything
 - `.claude-plugin/` — plugin manifest (version lives here) and marketplace manifest
 
 ## Commands
 
-- Test: `tests/hooks/run-hook-tests.sh` (zero tokens, run on every edit)
+- Test: `tests/hooks/run-hook-tests.sh && tests/lint/run-lint-tests.sh` (zero tokens, run on every edit)
 - Lint: `find hooks tests -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR`
 - Run the plugin: `claude --plugin-dir . -p "<prompt>"` (your working tree, no install needed)
 
@@ -29,7 +29,7 @@ bash test harness. No build step, no package manager, no dependencies beyond
 
 - The LLM-in-the-loop suites (`tests/skill-triggering/`, `tests/claude-code/`,
   `tests/parity/`) cost real tokens and minutes — run them deliberately, never
-  as a reflex. The hook tests + shellcheck are the every-edit check.
+  as a reflex. The hook tests + markdown lint + shellcheck are the every-edit check.
 - The severity rubric must stay in sync between `skills/review/reviewer-shared.md`
   and all four reviewer agents — a hook test enforces this; change them together.
 - Every skill must work on both Claude Code and Copilot CLI. Don't rely on
@@ -49,6 +49,8 @@ Before implementing any feature or fix, size it first:
   if no spec exists).
 - If `.afk/brain/index.md` exists and is not already in your context, read it
   before acting.
+- Dispatched afk subagents (implementer, reviewers): this gate does not apply
+  to you — sizing already happened. Do the task in your dispatch prompt.
 
 ## Go deeper
 

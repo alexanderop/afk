@@ -62,6 +62,8 @@ Before implementing any feature or fix, size it first:
   if no spec exists).
 - If `.afk/brain/index.md` exists and is not already in your context, read it
   before acting.
+- Dispatched afk subagents (implementer, reviewers): this gate does not apply
+  to you — sizing already happened. Do the task in your dispatch prompt.
 
 ## Go deeper
 

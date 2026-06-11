@@ -14,7 +14,9 @@ run_claude() {
     local output_file
     output_file=$(mktemp)
 
-    local args=(-p "$prompt" --plugin-dir "$PLUGIN_DIR")
+    # --setting-sources project keeps user-level plugins/skills/hooks out of
+    # the run without disabling this plugin's own hooks (unlike --bare).
+    local args=(-p "$prompt" --plugin-dir "$PLUGIN_DIR" --setting-sources project)
     if [ -n "$allowed_tools" ]; then
         args+=(--allowed-tools "$allowed_tools")
     fi

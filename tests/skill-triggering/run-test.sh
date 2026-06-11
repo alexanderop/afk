@@ -57,8 +57,12 @@ cd "$PROJECT_DIR"
 
 echo "Plugin dir: $PLUGIN_DIR"
 echo "Running claude -p with naive prompt..."
+# --setting-sources project keeps user-level plugins/skills/hooks out of the
+# run (their skills compete with afk's for triggering) without disabling the
+# plugin's own SessionStart hook, which --bare would.
 timeout 300 claude -p "$PROMPT" \
     --plugin-dir "$PLUGIN_DIR" \
+    --setting-sources project \
     --dangerously-skip-permissions \
     --max-turns "$MAX_TURNS" \
     --output-format stream-json \

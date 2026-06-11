@@ -17,6 +17,18 @@ enthusiasm.
 
 When unsure between two severities, pick the lower one.
 
+## Confidence Anchors
+
+Score each finding at exactly one anchor — anchors have behavioral definitions,
+not gut-feel percentages:
+
+- **100** — verifiable from the code alone, no assumed runtime conditions.
+- **75** — a complete, concrete failure scenario traced end to end.
+- **50** — plausible, but a condition you could not confirm must hold.
+
+Below 50 is not a finding. Score honestly: the coordinator drops non-critical
+findings under 75 unless a second reviewer independently corroborates them.
+
 ## What NOT to Flag (all reviewers)
 
 - Theoretical risks requiring unlikely preconditions.
@@ -40,6 +52,7 @@ return exactly `LGTM` with one sentence on what you checked.
 
 ```
 - severity: critical|warning|suggestion
+  confidence: 100|75|50
   file: path/to/file.ts:42
   issue: <one sentence, concrete>
   why: <one sentence, consequence>

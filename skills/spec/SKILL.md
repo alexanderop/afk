@@ -67,6 +67,43 @@ Then **self-review**: read it as the implementer. Every "it depends" or "probabl
 is an open question. Resolve them with the user. Present the PRD and get explicit
 approval.
 
+## Fast Lane (small specs only)
+
+After the PRD is approved — never before — estimate its size with the
+sizing-gate rubric: **small = ≤3 points, or it would cut into ≤2 slices**.
+When in doubt or borderline, treat it as big. Big estimates get no fast-lane
+offer; the next step stays **afk:slice**.
+
+If small, present the lane choice (AskUserQuestion in Claude Code; plain-text
+question in Copilot CLI, like the interview), with fast lane recommended:
+
+- **Fast lane (recommended)** — implement the whole PRD in one go: no slicing,
+  no per-slice implementer loops.
+- **Full pipeline** — afk:slice + afk:ralph as usual.
+
+If the user declines both, end as today: approved PRD on disk, next steps
+named, nothing started.
+
+On fast lane, present the context choice, with fresh chat recommended:
+
+- **Fresh chat (recommended)** — print a copy-paste handoff prompt containing
+  the PRD's real path (it's already written to `docs/specs/` — never a
+  placeholder) plus the fast-lane rules below, so implementation starts on a
+  clean context budget.
+- **Stay in this chat** — dispatch **one** subagent to implement the entire
+  PRD (Copilot CLI: the `task` tool, per using-afk's
+  `references/copilot-tools.md`), so this conversation's context isn't burned
+  on implementation detail.
+
+Fast-lane rules — include them verbatim in the handoff prompt or subagent prompt:
+
+- Work on a feature branch, never main — if on main, branch first. No worktree needed.
+- TDD applies: test-first, red-green.
+- Explore-style read-only subagents are fine for research; no slicing, no
+  per-slice implementer dispatch.
+- Done when the code and its tests are green. Then name **afk:qa** and
+  **afk:review** as optional manual follow-ups — neither runs automatically.
+
 ## Red Flags
 
 | Thought | Reality |
@@ -79,6 +116,7 @@ approval.
 
 ## Integration
 
-- Next: **afk:slice** turns the approved PRD into vertical slice tickets.
+- Next: **afk:slice** turns the approved PRD into vertical slice tickets —
+  unless the spec estimated small and the user picked the fast lane above.
 - **afk:qa** executes the Acceptance criteria section verbatim — write them as testable steps.
 - Called automatically by **afk:pipeline** when no spec exists.

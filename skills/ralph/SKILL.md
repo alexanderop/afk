@@ -31,13 +31,19 @@ For each ticket in `docs/tickets/`, in dependency order:
    - `NEEDS_CONTEXT` → answer its questions (read code/PRD yourself if needed), re-dispatch.
    - `BLOCKED` → do not push through. Surface to the user if it's a requirements problem; fix the environment if it's an environment problem.
 4. **Dispatch the spec reviewer** — spawn the plugin's `spec-reviewer` agent with the ticket text, the implementer's report, the slice-start sha, and the check commands. It reads THIS slice's diff (`{slice-start}..HEAD`, not the whole branch) and verifies every checkbox, every acceptance criterion, and that tests are real (assert behavior, not `expect(true)`).
-5. **Fix loop** — reviewer found issues → re-dispatch the implementer with the issue list. Re-review. Repeat until clean (cap at 3 rounds, then escalate to the user).
+5. **Fix loop** — reviewer found issues → send the issue list back to the implementer. Where the harness can resume a finished subagent (Claude Code: SendMessage to its agent ID), resume the SAME implementer — it already holds the slice context, so fix rounds are cheap. Where it can't (Copilot CLI), re-dispatch fresh with the ticket plus the issue list. Re-review. Repeat until clean (cap at 3 rounds, then escalate to the user).
 6. **Gate** — run test + typecheck + lint yourself. All green → mark the ticket's boxes, commit if the implementer hasn't, move to the next slice.
 
 **Parallel slices:** only when slices share no files and no dependency edges.
 Use one git worktree per slice, dispatch implementers concurrently, merge in
 ticket order. When in doubt, run sequentially — a merge conflict between two
 agents costs more than the parallelism saves.
+
+Concurrent implementers run as background subagents, which auto-deny any
+permission prompt and keep going — a slice can die half-done in silence. Only
+parallelize when the session's permission posture already covers every command
+the implementers need (allowlist or acceptEdits — see the README's permissions
+section); otherwise sequential foreground is the safe default.
 
 ## Progress Tracking
 

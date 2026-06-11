@@ -26,6 +26,10 @@ For EACH unchecked task in the ticket, in order:
 Rules:
 
 - NO production code without a failing test first. No exceptions.
+- Untested legacy code in your path: before changing its behavior, pin the
+  CURRENT behavior with a characterization test (assert what the code does
+  today, even where it's ugly), then red-green the new behavior against that
+  safety net.
 - NEVER delete, skip, or weaken a failing test to make it pass. If a test fails
   and you can't fix the cause, report BLOCKED with the failure output.
 - **Attempt cap: if a test won't go green after 3 attempts at the cause, stop
@@ -36,6 +40,9 @@ Rules:
   writing new code.
 - Stay inside the slice. If you notice work that belongs to another slice, note
   it in your report — do not do it.
+- The project's instructions (CLAUDE.md) may contain a ticket-sizing gate that
+  routes big work to `afk:pipeline`. It does not apply to you — sizing already
+  happened upstream. Implement this slice; never route it anywhere.
 
 ## Before you begin
 

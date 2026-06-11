@@ -44,6 +44,9 @@ config error: stop and tell the user — never silently skip a hook mid-run.
 the `afk:spec` template. Gaps in acceptance criteria, error states, or
 out-of-scope → ask now (this is the last conversation). No spec → run the
 `afk:spec` interview. Either way: explicit user approval of the PRD.
+If `afk:spec`'s fast-lane offer fires (small estimate) and the user picks the
+fast lane, the pipeline run ends here: log the decision in the state file and
+mark phases 2–7 skipped.
 
 **Phase 2 — Slice.** Run `afk:slice`. Present the slice list. **This approval
 is the point of no return — say so.** Also confirm now: PR target branch, and

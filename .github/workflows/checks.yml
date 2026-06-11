@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Hook tests + shellcheck
+    name: Hook tests + lint + shellcheck
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,5 +23,31 @@ jobs:
           persist-credentials: false
       - name: Hook tests (zero-token)
         run: tests/hooks/run-hook-tests.sh
+      - name: Markdown lint (zero-token)
+        run: tests/lint/run-lint-tests.sh
       - name: Shellcheck
         run: find hooks tests -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR
+
+  # One cheap headless turn (~$0.01) asserting Claude Code actually loads the
+  # plugin — catches manifest/frontmatter/hook-wiring breakage the static lint
+  # can't see. Skips cleanly when the secret isn't configured (e.g. forks).
+  plugin-load:
+    name: Plugin-load smoke
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+      - name: Install Claude Code CLI
+        if: env.ANTHROPIC_API_KEY != ''
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Plugin loads with no plugin_errors
+        if: env.ANTHROPIC_API_KEY != ''
+        run: tests/smoke/plugin-load.sh
+      - name: Skipped (ANTHROPIC_API_KEY secret not configured)
+        if: env.ANTHROPIC_API_KEY == ''
+        run: echo "no ANTHROPIC_API_KEY secret — smoke test skipped"

@@ -55,6 +55,21 @@ Update existing notes rather than writing near-duplicates; delete notes the
 codebase has outgrown. The index regenerates automatically on write; the
 SessionStart hook injects it into every future session.
 
+## Step 4: Prune While You're Here
+
+Memory compounds only while it stays true — a note recommending what the
+codebase now contradicts is worse than no note. For each existing brain note
+touching the areas this session worked in:
+
+- **Verify its references** — file paths, commands, named symbols, `[[links]]`.
+  Cosmetic drift (moved file, renamed symbol) with the advice still right →
+  fix in place.
+- **Check the recommendation** — if the note's advice now contradicts how the
+  code actually works, an in-place touch-up isn't enough. The boundary: when
+  you're rewriting what the note *recommends*, that's a replace — rewrite it
+  from current reality, or delete it.
+- **Delete, don't archive** — git history is the archive.
+
 ## Red Flags
 
 | Thought | Reality |
@@ -64,6 +79,7 @@ SessionStart hook injects it into every future session.
 | "This correction was one-off, but just in case…" | Frequency test failed → skip. The brain is for patterns, not incidents. |
 | "I'll append to one big LEARNINGS.md" | One topic per file, or recall becomes grep-and-pray. |
 | "This how-to belongs in CLAUDE.md so it's never missed" | Task-specific content in CLAUDE.md gets the whole file ignored. Brain note + a "Go deeper" pointer instead. |
+| "That old note is probably still fine" | Verify, don't assume. A stale note injected into every session makes agents confidently wrong at scale. |
 
 ## Integration
 
