@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Use when a project is new to AFK coding, when agents keep making the same mistakes, or before the first pipeline run — audits and fixes the project's backpressure (tests, lint, types), crafts a proper CLAUDE.md, and stands up the .afk/ brain structure so agents can self-correct and remember.
+description: Use when a project is new to AFK coding, when agents keep making the same mistakes, before the first pipeline run, or when a team's existing docs should be imported into the brain — audits and fixes the project's backpressure (tests, lint, types), crafts a proper CLAUDE.md, and stands up the .afk/ brain structure (importing existing docs into it) so agents can self-correct and remember.
 ---
 
 # Setup: Backpressure, CLAUDE.md, and the Brain
@@ -114,8 +114,66 @@ Seed it now with what Parts 1–2 actually surfaced:
 - A how-to note for anything non-obvious you had to figure out during the audit (quirky build step, test layout, env var dance).
 - A learning note for any real gotcha (flaky test, non-obvious boundary).
 
-Don't pre-write empty placeholder notes — the quality bar in `afk:reflect`
-decides what earns its way in later.
+### Import existing docs
+
+Established repos usually already carry knowledge — a `docs/` tree, ADRs, a fat
+`ARCHITECTURE.md`, a `CONTRIBUTING`, an onboarding wiki exported to a file.
+Before finishing, fold the high-signal parts into the brain so they reach the
+session-start index. (External systems — Confluence, Notion, Google Docs — are
+not fetched; ask the user to export to a file on disk first.)
+
+1. **Find candidates.** Scan the repo for readable docs (`docs/`, `adr/`,
+   README sections, CONTRIBUTING, onboarding guides — any text format: md, rst,
+   txt, html export) plus any path the user points at. **No docs found → skip
+   this branch**; the empty brain stands and the "earn their way in" rule below
+   holds.
+2. **Read and triage in a subagent.** Reading the doc set is bulky
+   scan-and-summarize work, not orchestration — dispatch it to a
+   general-purpose subagent so it doesn't flood the setup session's context (a
+   medium model like Sonnet is plenty; a large doc set means more files, not
+   harder judgment). Hand it the candidate paths plus `afk:reflect`'s routing
+   law (structure beats memory, first match wins) and three-part quality bar
+   (high-signal AND recurring AND high-impact). It returns a proposed plan —
+   one row per doc, and for every `distill` row the drafted note body so the
+   write step needs no re-read. The main session keeps the approval gate (steps
+   3–5). Four verdicts:
+
+   | Verdict | For | Lands in |
+   |---------|-----|----------|
+   | **lint/config** | mechanically checkable rules | Part 1's lint config / `.afk/config.json` |
+   | **CLAUDE.md line** | universal, true-in-every-session facts (sparingly) | Part 2's CLAUDE.md |
+   | **distill** | task-specific know-how, architectural reasoning, gotchas | a one-topic brain note |
+   | **skip** | low-signal, one-off, redundant with the code, or unreadable/binary | nothing |
+
+   - One doc, many topics → split into several distill notes; show the split.
+   - Several docs, one topic (or conflicting) → merge into one note; flag the
+     conflict in the plan for the user to resolve at approval time.
+   - A topic the brain already covers (setup re-run) → update that note, don't
+     write a near-duplicate.
+3. **Show the plan with a size signal.** Include the projected brain-index size
+   and warn if it is getting big — the index is injected into every session.
+   There is no numeric cap; the quality bar is the only filter on volume.
+4. **Gate on approval. Nothing — no brain note, CLAUDE.md line, or config
+   change — is written before the user approves the plan.** On reject or edit,
+   revise and re-present; never a partial write.
+5. **Write the approved plan.** distill → brain notes, using the bodies the
+   subagent drafted in step 2 (one topic per file, lowercase-hyphen names,
+   `[[wikilinks]]`, each citing its origin on a `Source: docs/adr/0007.md` line). lint/config and CLAUDE.md verdicts flow
+   through the Part 1 / Part 2 mechanisms (the same user approval those parts
+   already require). Then refresh the index: the PostToolUse hook regenerates it
+   on write, but where hooks don't fire (Copilot CLI) rewrite `index.md` by hand
+   in the same format.
+
+Docs are imported **as-written** — the triage does NOT verify their claims
+against the code; staleness is the team's problem, and the `Source:` line keeps
+the trail back to the original. afk never modifies or deletes a source doc under
+any verdict; retiring or redirecting the old docs afterward is the team's
+cleanup to do.
+
+Don't pre-write empty placeholder notes — a distilled import carries real
+existing knowledge and earns its place, but a blank "we'll need this later" stub
+is noise in every session. The quality bar in `afk:reflect` decides what else
+earns its way in later.
 
 ## Part 4: Team Extension Points (optional)
 
@@ -171,7 +229,7 @@ copy-pasting `.afk/` files between repos.
 | "I'll put the code style guide in CLAUDE.md" | Never send an LLM to do a linter's job. Config in Part 1, prose nowhere. |
 | "More detail in CLAUDE.md = better onboarded agent" | Non-universal content teaches the model to ignore the whole file. Pointers to brain notes, not content. |
 | "/init generated a decent draft, ship it" | CLAUDE.md is the highest-leverage file in the harness. Every line gets human review. |
-| "I'll pre-create brain notes for topics we'll need" | Empty placeholders are noise injected into every session. Notes earn their way in via afk:reflect. |
+| "I'll pre-create brain notes for topics we'll need" | Empty placeholders are noise injected into every session. Distilled imports and afk:reflect earn their way in; blank stubs don't. |
 | "Skip the example test, they'll add tests later" | Without one passing test as a template, the next agent invents its own conventions. |
 
 ## Integration

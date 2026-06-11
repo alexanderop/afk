@@ -17,6 +17,7 @@ TESTS=(
     "review:review"
     "qa:qa"
     "setup:setup"
+    "setup:import-docs"
     "refactor-pass:refactor"
     "reflect:reflect"
 )
