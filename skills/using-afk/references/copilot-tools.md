@@ -15,6 +15,7 @@ these in a skill, use your platform equivalent:
 | `WebFetch` | `web_fetch` |
 | Dispatch a subagent (e.g. the ralph implementer, review specialists) | `task` with the matching `agent_type` (plugin agents like `security-reviewer`), or `"general-purpose"` for ad-hoc prompts |
 | Multiple parallel subagents | Multiple `task` calls |
+| Model override on dispatch (a ticket's `Model:` tier) | No equivalent — `task` runs the agent on its configured default; ignore the tier |
 | Subagent status/output | `read_agent`, `list_agents` |
 | `TodoWrite` / task tracking | `sql` with the built-in `todos` table |
 | `WebSearch` | No equivalent — use `web_fetch` with a search engine URL |

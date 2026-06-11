@@ -41,6 +41,15 @@ The same cut works with no UI — a webhook-ingestion PRD becomes:
 03-retry-on-downstream  queue + retry policy + failure-injection test
 ```
 
+## Recon First
+
+The Context and Files sections need exact paths, existing endpoint shapes, and
+test conventions — don't burn the slicing context gathering them. Fan out
+parallel read-only subagents (Claude Code: Explore agents; Copilot CLI: `task`
+with `"general-purpose"`), one per area the PRD touches, each returning a
+compact map of what exists. You keep the whole PRD in view and make the cut
+from their maps.
+
 ## Ticket Format
 
 Write each slice to `docs/tickets/NN-<slug>.md`. This file is the ONLY context
@@ -48,6 +57,7 @@ the implementation loop gets besides the codebase, so it must be self-contained:
 
 ```markdown
 # Slice NN: <name>
+Model: cheap | standard | top — one-line why
 
 ## Behavior
 One paragraph: what a user can do after this slice that they couldn't before.
@@ -79,25 +89,41 @@ by an implementer mid-loop. Each task names the test that proves it and any
 interface it introduces, because a later slice will consume that interface by
 exactly the name written down now.
 
+The Model line sizes the implementation loop's model — decided here, where the
+whole PRD is in view, not by ralph mid-run: **cheap** for 1–2 files with a
+complete spec (most slices, when the ticket is good — mechanical work is what
+the format is for); **standard** for multi-file integration or
+pattern-matching across the codebase; **top** for design judgment the ticket
+can't fully pin down. When in doubt, standard. Planning and review already run
+on the most capable model; the tiers spend cheap tokens on well-specified
+work. **afk:ralph** maps tiers to harness models at dispatch.
+
 **No placeholders.** These are ticket failures, not shorthand: "TBD"/"TODO",
 "add appropriate error handling", "handle edge cases", a task with no named
 test, "similar to slice NN" (copy the details in — the loop reads only its
 own ticket).
 
-## Self-Review
+## Ticket Review
 
-After writing all tickets, re-read them against the PRD with fresh eyes:
+You wrote these tickets, so you can't read them with fresh eyes — your head
+holds exactly the context they might be missing. Dispatch fresh read-only
+subagents (Copilot CLI: `task` with `"general-purpose"`):
 
-1. **PRD coverage** — point each acceptance criterion to the slice that
-   implements it. A criterion with no slice is a missing ticket.
-2. **Placeholder scan** — hunt the failure patterns above. Fix them.
-3. **Cross-ticket consistency** — names, types, and endpoint shapes a later
-   slice consumes must match what the earlier slice defines. `POST
+1. **Dry-run each ticket** — one subagent per ticket, in parallel. Its prompt
+   is ONLY the ticket text plus: "You will implement this with no other
+   context. List every fact, path, or interface you'd need that isn't written
+   here, and every placeholder failure (TBD, unnamed test, 'similar to slice
+   NN')." This reads the ticket exactly the way the implementation loop will.
+2. **Cross-check the set** — one subagent with all tickets plus the PRD: point
+   each acceptance criterion to the slice that implements it (a criterion with
+   no slice is a missing ticket), and verify that names, types, and endpoint
+   shapes a later slice consumes match what the earlier slice defines. `POST
    /booking/draft` in slice 01 but `/bookings/draft` in slice 04 is a bug —
    cheap now, expensive three implementation loops later.
 
-Fix issues inline. Then present the slice list to the user with one line per
-slice and **get approval**. This is the last cheap moment to change direction.
+Fix what they find inline. Then present the slice list to the user with one
+line per slice and **get approval**. This is the last cheap moment to change
+direction.
 
 ## Red Flags
 
@@ -107,10 +133,12 @@ slice and **get approval**. This is the last cheap moment to change direction.
 | "Slice 1: project setup and shared types" | A slice that ships no observable behavior is not a slice. Fold setup into the first real slice. |
 | "This slice is big but splitting feels artificial" | A slice that overflows one loop's context produces exactly the mess the pipeline exists to prevent. Split it. |
 | "The tickets can reference the PRD for details" | The loop reads the ticket, not your memory. Copy the relevant details in. |
+| "I'll review the tickets myself, dispatching is overhead" | You're primed with everything the tickets are missing. Only a fresh reader finds the gaps the implementer will hit. |
+| "Every slice gets the top model, to be safe" | A 1–2 file slice with a complete spec is mechanical — making it so is what this skill is for. Cheap is the default, not the exception. |
 | "Skip user approval, the slicing is obvious" | Re-slicing after 3 loops have run costs hours. The approval costs one message. |
 
 ## Integration
 
 - Input: approved PRD from **afk:spec**.
-- Next: **afk:ralph** runs one implementation loop per ticket.
+- Next: **afk:ralph** runs one implementation loop per ticket, on the ticket's model tier.
 - Called by **afk:pipeline** as phase 2.
