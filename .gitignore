@@ -1,0 +1,4 @@
+# afk per-run working state and QA evidence — resumes from disk, verdicts
+# get inlined into the PR body; committing them is noise.
+.afk/pipeline/
+qa/
