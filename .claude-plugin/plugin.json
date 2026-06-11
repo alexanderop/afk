@@ -2,7 +2,7 @@
   "name": "afk",
   "displayName": "AFK Coding Pipeline",
   "description": "AFK coding pipeline: spec → vertical slices → TDD implementation loops → refactor pass → agentic QA → multi-agent review. Human judgment at the edges, agent execution in the middle.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": {
     "name": "Alexander Opalic"
   },
