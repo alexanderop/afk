@@ -1,9 +1,9 @@
 # AFK Testing Strategy
 
 AFK is a Markdown-first Claude Code plugin. The product surface is skill
-frontmatter, skill instructions, plugin manifests, and the way Claude Code
-loads those files. The test strategy is therefore layered by cost and
-confidence:
+frontmatter, skill instructions, plugin agent definitions, plugin manifests,
+and the way Claude Code loads those files. The test strategy is therefore
+layered by cost and confidence:
 
 1. Unit tests validate deterministic file-level rules with no model calls.
 2. Integration tests validate relationships between plugin files.
@@ -22,7 +22,7 @@ bun run test
 
 | Category | Scope | Cost | Current command | Purpose |
 |----------|-------|------|-----------------|---------|
-| Unit | One file or one deterministic rule | Zero token | `bun run test:unit` | Catch malformed manifests, invalid skill frontmatter, overlong descriptions, oversized `SKILL.md` files, and test pipeline shape regressions. |
+| Unit | One file or one deterministic rule | Zero token | `bun run test:unit` | Catch malformed manifests, invalid skill or agent frontmatter, overlong descriptions, oversized instruction files, and test pipeline shape regressions. |
 | Integration | Relationships across plugin files | Zero token | `bun run test:integration` | Catch mismatches between skill directory names, supporting files, eval specs, help catalog entries, README references, and plugin manifests. |
 | End-to-end | Claude Code loading or exercising the plugin | Model-backed | `bun run test:e2e`, `bun run test:evals` | Catch failures Claude Code would report only at runtime, such as plugin registration errors or behavioral regressions. |
 
@@ -46,6 +46,10 @@ Current unit coverage:
 - Every workflow skill has `When to Use`, `Process`, `Stop and Ask`, and
   `Output` sections.
 - Every `SKILL.md` is at most 500 lines.
+- Every `agents/**/*.md` file has valid frontmatter, a single-line
+  description, a supported model, a valid tool list, and body content.
+- The read-only implementation orchestrator excludes `Write`, `Edit`, and
+  `Bash`; the implementation worker includes edit/write-capable tools.
 - No `.sh` runners exist under `tests/`.
 
 ## Integration Checks
@@ -63,6 +67,8 @@ Current integration coverage:
 - Help catalog entries in `skills/help/afk-help.csv` match actual skill names.
 - Skill references such as `afk:implement` or `/afk:qa` point to existing
   skills.
+- Agent names referenced from skill prose point to existing `agents/*.md`
+  definitions.
 - Marketplace metadata references the same plugin name as `plugin.json`.
 - Eval spec directories under `tests/e2e/evals/specs/` match actual skill names.
 - Eval files are valid JSON and have the required shape.
@@ -103,8 +109,12 @@ agent behavior for realistic prompts and can be reviewed manually before a
 runner exists. The lint harness validates their JSON shape, but does not run
 the prompts through a model.
 
+Use [eval-quality-guide.md](eval-quality-guide.md) when adding or revising eval
+cases. Prefer deterministic artifact checks over substring-only assertions when
+the runner can verify the behavior directly.
+
 Use JSON files under `tests/e2e/evals/specs/<skill>/`. Current specs cover
-`help`, `grill`, and `ship`.
+`help`, `grill`, `implement`, and `ship`.
 Run them with:
 
 ```bash

@@ -8,8 +8,11 @@ const run = new TestRun();
 
 const maxDescriptionChars = 1024;
 const maxSkillLines = 500;
+const maxAgentLines = 250;
 const skillNamePattern = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const requiredSkillSections = ["## When to Use", "## Process", "## Stop and Ask", "## Output"];
+const supportedAgentModels = new Set(["inherit", "opus", "sonnet", "haiku", "fable"]);
+const supportedAgentTools = new Set(["Agent", "Bash", "Edit", "Glob", "Grep", "Read", "Write"]);
 
 function rel(path: string): string {
   return relative(pluginDir, path);
@@ -139,6 +142,140 @@ function checkSkillFrontmatter(file: string, expectedName: string): void {
   }
 }
 
+function parseFrontmatter(file: string, label: string): { frontmatter: string[]; body: string } | undefined {
+  const lines = readText(file).split("\n");
+
+  if (lines[0] !== "---") {
+    run.fail(`${label}: frontmatter opens on line 1`);
+    return undefined;
+  }
+
+  const closeIndex = lines.slice(1).findIndex((line) => line === "---");
+  if (closeIndex === -1) {
+    run.fail(`${label}: frontmatter is closed`);
+    return undefined;
+  }
+
+  return {
+    frontmatter: lines.slice(1, closeIndex + 1),
+    body: lines.slice(closeIndex + 2).join("\n"),
+  };
+}
+
+function frontmatterValue(frontmatter: string[], key: string): string {
+  return frontmatter.find((line) => line.startsWith(`${key}:`))?.replace(new RegExp(`^${key}:\\s*`), "") ?? "";
+}
+
+function parseTools(value: string): string[] {
+  return value
+    .split(",")
+    .map((tool) => tool.trim())
+    .filter(Boolean);
+}
+
+function checkAgents(): void {
+  run.section("agents");
+
+  const agentFiles = existsSync(fromPluginRoot("agents")) ? listFiles(fromPluginRoot("agents"), (path) => path.endsWith(".md")) : [];
+  if (agentFiles.length > 0) {
+    run.pass("agents directory has agent definitions");
+  } else {
+    run.fail("agents directory has agent definitions");
+    return;
+  }
+
+  for (const agent of agentFiles) {
+    checkAgentFrontmatter(agent);
+
+    const lineCount = readText(agent).split("\n").length - 1;
+    const label = basename(agent, ".md");
+    if (lineCount <= maxAgentLines) {
+      run.pass(`${label}: agent file within ${maxAgentLines} lines (${lineCount})`);
+    } else {
+      run.fail(`${label}: agent file within ${maxAgentLines} lines (${lineCount})`);
+    }
+  }
+}
+
+function checkAgentFrontmatter(file: string): void {
+  const expectedName = basename(file, ".md");
+  const parsed = parseFrontmatter(file, expectedName);
+  if (!parsed) {
+    return;
+  }
+
+  const name = frontmatterValue(parsed.frontmatter, "name");
+  const description = frontmatterValue(parsed.frontmatter, "description");
+  const tools = parseTools(frontmatterValue(parsed.frontmatter, "tools"));
+  const model = frontmatterValue(parsed.frontmatter, "model");
+
+  if (name === expectedName) {
+    run.pass(`${expectedName}: name matches filename`);
+  } else {
+    run.fail(`${expectedName}: name matches filename`, name || "no name: line");
+  }
+
+  if (skillNamePattern.test(name)) {
+    run.pass(`${expectedName}: name is lowercase kebab-case`);
+  } else {
+    run.fail(`${expectedName}: name is lowercase kebab-case`, name);
+  }
+
+  if (description.length > 0) {
+    run.pass(`${expectedName}: description present`);
+  } else {
+    run.fail(`${expectedName}: description present`);
+  }
+
+  if (description.length <= maxDescriptionChars) {
+    run.pass(`${expectedName}: description within ${maxDescriptionChars} chars (${description.length})`);
+  } else {
+    run.fail(`${expectedName}: description within ${maxDescriptionChars} chars (${description.length})`);
+  }
+
+  if (description.startsWith("Use when")) {
+    run.pass(`${expectedName}: description starts with 'Use when'`);
+  } else {
+    run.fail(`${expectedName}: description starts with 'Use when'`, description);
+  }
+
+  if (supportedAgentModels.has(model)) {
+    run.pass(`${expectedName}: model is supported`);
+  } else {
+    run.fail(`${expectedName}: model is supported`, model || "no model: line");
+  }
+
+  if (tools.length > 0 && tools.every((tool) => supportedAgentTools.has(tool))) {
+    run.pass(`${expectedName}: tools are supported`);
+  } else {
+    run.fail(`${expectedName}: tools are supported`, tools.join(", ") || "no tools: line");
+  }
+
+  if (parsed.body.replace(/\s/g, "").length > 0) {
+    run.pass(`${expectedName}: agent file has body content`);
+  } else {
+    run.fail(`${expectedName}: agent file has body content`);
+  }
+
+  if (expectedName === "implement-orchestrator") {
+    const denied = ["Bash", "Edit", "Write"].filter((tool) => tools.includes(tool));
+    if (denied.length === 0) {
+      run.pass("implement-orchestrator excludes write and shell tools");
+    } else {
+      run.fail("implement-orchestrator excludes write and shell tools", denied.join(", "));
+    }
+  }
+
+  if (expectedName === "implementation-worker") {
+    const required = ["Bash", "Edit", "Write"].filter((tool) => !tools.includes(tool));
+    if (required.length === 0) {
+      run.pass("implementation-worker includes edit, write, and shell tools");
+    } else {
+      run.fail("implementation-worker includes edit, write, and shell tools", required.join(", "));
+    }
+  }
+}
+
 function checkNoShellTestPipeline(): void {
   run.section("test pipeline");
 
@@ -154,6 +291,7 @@ console.log("=== Unit tests (Bun, zero-token) ===");
 
 checkPluginManifests();
 checkSkills();
+checkAgents();
 checkNoShellTestPipeline();
 
 run.summary();

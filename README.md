@@ -1,7 +1,8 @@
 # afk — a simple coding flow for Claude Code
 
-One help router, one optional end-to-end orchestrator, and four focused
-workflow skills. No config files, no hooks — just the steps that matter:
+One help router, one optional end-to-end orchestrator, focused workflow skills,
+and a packaged implementation agent pair. No hooks — just the steps that
+matter:
 
 ```
 /afk:help        Inspects the current repo state and recommends the next AFK
@@ -19,9 +20,10 @@ workflow skills. No config files, no hooks — just the steps that matter:
                  challenging it against your domain glossary and ADRs.
                  Output: docs/plans/<slug>.md
 
-/afk:implement   The lead reads the code, fixes architecture and contracts,
-                 then delegates independent TDD slices to subagents, agent
-                 teams, or dynamic workflows and reviews every diff.
+/afk:implement   The lead classifies the work. Simple edits stay local;
+                 complex plans route through an Opus read-only orchestrator
+                 and Sonnet implementation workers, then every diff is
+                 reviewed.
 
 /afk:simplify    4 cleanup agents in parallel review the diff for reuse,
                  simplification, efficiency, and altitude issues — then the
@@ -35,6 +37,13 @@ workflow skills. No config files, no hooks — just the steps that matter:
 Each skill works standalone. Run the focused skills in sequence for a feature,
 grab one on its own, or use `/afk:ship` when you want the loop driven to a
 verified verdict.
+
+AFK also ships two Claude Code subagents for implementation:
+
+- `afk:implement-orchestrator`: read-only Opus planner for complex contracts,
+  slice boundaries, and worker delegation.
+- `afk:implementation-worker`: Sonnet worker for one bounded TDD slice with
+  edit and verification tools.
 
 ## Install
 

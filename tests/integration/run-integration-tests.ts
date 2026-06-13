@@ -38,6 +38,23 @@ function hasSkill(name: string): boolean {
   return validSkills.has(name);
 }
 
+function agentNames(): string[] {
+  const agentRoot = fromPluginRoot("agents");
+  if (!existsSync(agentRoot)) {
+    return [];
+  }
+
+  return listFiles(agentRoot, (path) => path.endsWith(".md"))
+    .map((path) => basename(path, ".md"))
+    .sort();
+}
+
+const validAgents = new Set(agentNames());
+
+function hasAgent(name: string): boolean {
+  return validAgents.has(name);
+}
+
 function assertJsonFile(path: string, label: string): unknown | undefined {
   try {
     const json = readJson(path);
@@ -127,7 +144,8 @@ function checkBehavioralEvalSpec(path: string, json: unknown, evalSkill: string)
       isStringArray(assertions.required_substrings ?? []) &&
       isStringArray(assertions.forbidden_substrings ?? []) &&
       isStringArray(assertions.required_files ?? []) &&
-      isObject(assertions.required_file_substrings ?? {})
+      isObject(assertions.required_file_substrings ?? {}) &&
+      isStringArray(assertions.unchanged_files ?? [])
     );
   });
 
@@ -227,15 +245,55 @@ function checkSkillCatalog(): void {
   for (const source of refSources) {
     for (const match of readText(source).matchAll(/\/?afk:[a-z0-9-]+/g)) {
       const skillName = match[0].replace(/^\/?afk:/, "");
-      if (!hasSkill(skillName)) {
-        run.fail(`skill reference '${match[0]}' points to an existing skill`);
-        allRefsOk = false;
+      const commandRef = match[0].startsWith("/afk:");
+      if (hasSkill(skillName)) {
+        continue;
       }
+      if (!commandRef && hasAgent(skillName)) {
+        continue;
+      }
+
+      if (commandRef) {
+        run.fail(`skill reference '${match[0]}' points to an existing skill`);
+      } else {
+        run.fail(`afk reference '${match[0]}' points to an existing skill or agent`);
+      }
+      allRefsOk = false;
     }
   }
 
   if (allRefsOk) {
     run.pass("all afk: skill references resolve");
+  }
+}
+
+function checkAgentReferences(): void {
+  run.section("agent references");
+
+  const refSources = [fromPluginRoot("README.md"), ...listFiles(fromPluginRoot("docs"), (path) => path.endsWith(".md")), ...listFiles(fromPluginRoot("skills"), (path) => path.endsWith(".md"))];
+  let allRefsOk = true;
+  for (const source of refSources) {
+    for (const match of readText(source).matchAll(/`(?:afk:)?([a-z0-9]+(?:-[a-z0-9]+)*)`/g)) {
+      const agentName = match[1];
+      if (!agentName.includes("worker") && !agentName.includes("orchestrator")) {
+        continue;
+      }
+      if (!hasAgent(agentName)) {
+        run.fail(`agent reference '${match[0]}' points to an existing agent`);
+        allRefsOk = false;
+      }
+    }
+  }
+
+  if (hasAgent("implement-orchestrator") && hasAgent("implementation-worker")) {
+    run.pass("implementation agent pair exists");
+  } else {
+    run.fail("implementation agent pair exists", [...validAgents].join(", "));
+    allRefsOk = false;
+  }
+
+  if (allRefsOk) {
+    run.pass("all agent references resolve");
   }
 }
 
@@ -271,6 +329,7 @@ checkEvalSpecs();
 checkInternalFileReferences();
 checkMarkdownLinks();
 checkSkillCatalog();
+checkAgentReferences();
 checkMarketplace();
 
 run.summary();

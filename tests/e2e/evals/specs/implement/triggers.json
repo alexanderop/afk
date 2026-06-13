@@ -1,0 +1,30 @@
+[
+  {
+    "query": "Implement the plan in docs/plans/search.md",
+    "should_trigger": true
+  },
+  {
+    "query": "Fix this bug and run the tests",
+    "should_trigger": true
+  },
+  {
+    "query": "Build the checkout feature from this design",
+    "should_trigger": true
+  },
+  {
+    "query": "Make the repo changes for this refactor",
+    "should_trigger": true
+  },
+  {
+    "query": "Grill me before we build team billing",
+    "should_trigger": false
+  },
+  {
+    "query": "QA this browser flow and capture screenshots",
+    "should_trigger": false
+  },
+  {
+    "query": "Simplify the changed code without hunting bugs",
+    "should_trigger": false
+  }
+]

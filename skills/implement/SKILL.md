@@ -9,9 +9,10 @@ Load this skill before implementation starts. First decide whether the work is
 simple enough to do directly or complex enough to justify orchestration.
 
 Simple local changes belong in the main conversation. Complex work uses the
-lead-orchestrated shape: you decide the architecture, contracts, boundaries,
-file ownership, data flow, error handling, and integration order; workers run
-bounded local TDD slices inside those decisions.
+lead-orchestrated shape: the Opus `implement-orchestrator` decides the
+architecture, contracts, boundaries, file ownership, data flow, error handling,
+and integration order; Sonnet `implementation-worker` agents run bounded local
+TDD slices inside those decisions.
 
 ## When to Use
 
@@ -64,21 +65,28 @@ genuinely local work.
 
 ### 3. Orchestrated Implementation
 
-For complex work, you are the lead architect. Your expensive context is for
-reading code, deciding contracts, and reviewing diffs. Workers are for local
-TDD loops and bounded edits.
+For complex work, route through AFK's packaged agents:
 
-Plan in the lead context before dispatching:
+- `implement-orchestrator`: Opus, read-only, owns architecture, contracts,
+  slice boundaries, sequencing, and worker review.
+- `implementation-worker`: Sonnet, edit-capable, owns one fixed local TDD
+  slice at a time.
+
+The main conversation still owns final acceptance: after the orchestrator
+returns, read the diff, run verification, and decide whether the work is done.
+
+If the packaged agents are unavailable in the current Claude Code version or
+plugin loading path, keep the same shape in the main conversation: decide
+contracts first, then dispatch bounded workers manually.
+
+Before invoking `implement-orchestrator`, gather enough context to write a
+useful delegation:
 
 1. Read the plan, usually `docs/plans/<slug>.md` from `afk:grill`, or the
    plan/design the user provided.
-2. Read every file the change will touch and the neighboring code it integrates
-   with. You cannot brief what you have not read.
-3. Decide everything contestable now: file layout, names, function signatures,
-   types, error handling, existing helpers to reuse, shared boundaries, and
-   integration order.
-4. Cut the work into slices with fixed contracts: implement this behavior
-   behind this interface, in these files, with these tests.
+2. Identify the likely touched modules, tests, and verification commands.
+3. Pass the plan, relevant file paths, constraints, and known acceptance
+   criteria to `implement-orchestrator`.
 
 Never brief a worker to "figure out the architecture." If a slice brief needs
 hedging on shared design, return to the code and decide the contract first.
@@ -89,11 +97,13 @@ Use the smallest orchestration primitive that fits:
 
 | Primitive | Use for |
 |-----------|---------|
-| Plain subagents | A few self-contained implementation, test, or review slices that report back to you |
+| `implement-orchestrator` | Default for complex AFK implementation; read-only architecture and worker delegation |
+| Plain subagents | A few self-contained implementation, test, or review slices when packaged agents are unavailable |
 | Agent teams | Several long-running peers that need a shared task list, direct communication, or plan approval before edits |
 | Dynamic workflows | Dozens to hundreds of repeatable agents for repo-wide audits, migrations, or cross-checked research |
 
-Subagents start with zero context. Each brief must include:
+Subagents start with zero context unless explicitly forked. Each worker brief
+must include:
 
 - Exact file paths to create or edit and files to read first.
 - The contract: signatures, types, expected behavior, and error cases.
@@ -104,20 +114,18 @@ Subagents start with zero context. Each brief must include:
 - Hard boundaries: no neighboring refactors, no new dependencies, no renames,
   and no work outside the brief unless explicitly allowed.
 
-Pick the model by slice:
-
-| Model | Use for |
-|-------|---------|
-| `haiku` | Mechanical boilerplate, wiring, config, repetitive edits, or tests from a given spec |
-| `sonnet` | Multi-file features inside a decided design, non-trivial logic with a clear contract, or local TDD for one slice |
+Use `implementation-worker` for edit-capable implementation slices by default.
+Only choose a different worker when the task clearly needs a specialized agent
+or a cheaper model for mechanical boilerplate.
 
 Dispatch independent tasks in parallel. Run dependent tasks sequentially. Never
 let two workers edit the same file concurrently.
 
-Subagents cannot spawn subagents. If work needs hierarchy, keep the lead as
-the orchestrator and chain workers from the main conversation, create an agent
-team, or ask Claude Code to write a dynamic workflow. The supported shape is
-lead -> workers, not worker -> nested workers.
+Nested subagents are supported in modern Claude Code, but use them sparingly.
+AFK's default hierarchy is `implement` -> `implement-orchestrator` ->
+`implementation-worker`. Do not create deeper trees unless the orchestrator has
+several independent review or implementation branches and can keep their
+outputs concise.
 
 ### 5. Require Local TDD Evidence
 
@@ -170,7 +178,8 @@ context and keep moving.
 | "The subagent can explore and decide the approach" | Then the lead has delegated architecture. Decide first, brief second. |
 | "The brief is getting long, I'll just say 'follow the plan'" | The subagent has never seen the plan. Paste what it needs, verbatim. |
 | "It reported success and tests pass" | Whose tests? Read the diff. Workers can delete failing tests, hardcode fixtures, or stub the hard part with a TODO. |
-| "The parent subagent will spawn nested workers" | Claude Code subagents cannot spawn subagents. Chain from the lead, use an agent team, or use a dynamic workflow. |
+| "The orchestrator is read-only, so it verified everything" | Read-only means no shell verification. The main conversation must run final checks after workers edit. |
+| "Nested subagents are supported, so use them for every task" | Hierarchy is overhead. Keep AFK's default tree shallow unless the branches are independent and bounded. |
 | "This task is too hard for sonnet, I'll write a smarter prompt" | If it needs a smarter prompt, it needs a smarter model: do it yourself. |
 | "I'll dispatch all tasks at once" | Parallelism only belongs across genuinely independent files and contracts. |
 

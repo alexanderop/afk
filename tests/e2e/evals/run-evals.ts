@@ -17,6 +17,7 @@ type EvalAssertions = {
   forbidden_substrings?: string[];
   required_files?: string[];
   required_file_substrings?: Record<string, string[]>;
+  unchanged_files?: string[];
 };
 
 type EvalEntry = {
@@ -172,6 +173,17 @@ function checkAssertions(spec: EvalSpec, evalEntry: EvalEntry, evalDir: string, 
       } else {
         run.fail(`${spec.skill_name}/${evalEntry.id} ${filePath} contains '${required}'`);
       }
+    }
+  }
+
+  for (const filePath of assertions.unchanged_files ?? []) {
+    const expected = evalEntry.fixture?.files?.[filePath];
+    const fullPath = join(evalDir, "project", filePath);
+    const actual = existsSync(fullPath) ? readFileSync(fullPath, "utf8") : undefined;
+    if (typeof expected === "string" && actual === expected) {
+      run.pass(`${spec.skill_name}/${evalEntry.id} left ${filePath} unchanged`);
+    } else {
+      run.fail(`${spec.skill_name}/${evalEntry.id} left ${filePath} unchanged`, `see ${join(evalDir, "project", filePath)}`);
     }
   }
 }
