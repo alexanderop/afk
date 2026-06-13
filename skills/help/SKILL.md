@@ -1,0 +1,66 @@
+---
+name: help
+description: Orient the user in the AFK workflow by inspecting the project state, reading the local AFK catalog, and recommending the next skill to run. Use when the user asks for help, afk help, what to do next, where am I, or which AFK skill to use.
+---
+
+# Help
+
+Orient the user in the AFK workflow and recommend the next useful step. Be
+specific, not encyclopedic: surface only the skills relevant to the current
+state or the user's question.
+
+## Data sources
+
+- Catalog: [afk-help.csv](./afk-help.csv)
+- Domain glossary: `CONTEXT.md` or `CONTEXT-MAP.md`
+- Decisions: `docs/adr/`
+- Plans: `docs/plans/`
+- QA evidence: `qa/`
+- Current implementation state: `git status --short` and `git diff --stat`
+
+If a file or directory is missing, treat that as workflow signal. Do not invent
+project-specific progress.
+
+## How to answer
+
+1. Read the catalog.
+2. Inspect the available artifacts listed above.
+3. Classify the user intent:
+   - General orientation: explain where they are and the next step.
+   - Specific skill question: explain that skill, when to use it, and what it
+     produces.
+   - "What now?": recommend exactly one next skill unless the state is truly
+     ambiguous.
+4. Give the invocation, e.g. `afk:write-good-goal`, `afk:grill`,
+   `afk:implement`, `afk:simplify`, or `afk:qa`.
+5. If one next step is clearly right, offer to run it now.
+
+## Routing rules
+
+- The user asks for `/goal` help, objective shaping, success criteria, a
+  completion condition, or a definition of done for long-running agent work:
+  recommend `afk:write-good-goal`.
+- No concrete plan in `docs/plans/`: recommend `afk:grill`.
+- A plan exists and there is little or no implementation diff: recommend
+  `afk:implement`.
+- There is an implementation diff after a plan: recommend `afk:simplify`.
+- The user asks for verification, browser QA, API/service QA, screenshots,
+  request/response evidence, or a ship/no-ship call after implementation:
+  recommend `afk:qa`.
+- The user asks about AFK itself: answer from the catalog and this plugin's
+  README-level flow.
+- The user asks for release checks beyond browser QA: recommend the project's
+  normal tests first, then `afk:qa` for real user-flow evidence.
+
+## Response format
+
+Use this compact shape:
+
+- **Where you are:** one sentence grounded in observed files or git state.
+- **Next step:** `[menu-code] Display Name` and skill invocation.
+- **Why:** one sentence.
+- **Expected output:** the artifact or state the skill should produce.
+
+When the user asks a broad catalog question, list only the relevant skills.
+When the user asks "show me everything", show the full catalog grouped by
+phase.

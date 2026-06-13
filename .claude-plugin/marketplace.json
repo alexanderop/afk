@@ -1,6 +1,6 @@
 {
   "name": "afk",
-  "description": "Marketplace for the afk plugin — a simple four-skill coding flow for Claude Code.",
+  "description": "Marketplace for the afk plugin — a help router plus a four-step coding flow for Claude Code.",
   "owner": {
     "name": "Alexander Opalic",
     "url": "https://alexop.dev"
@@ -9,9 +9,9 @@
     {
       "name": "afk",
       "source": "./",
-      "description": "A simple four-skill coding flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel 4-angle cleanup: reuse, simplification, efficiency, altitude) → qa (real-browser verification with agent-browser).",
+      "description": "A help router plus a four-step coding flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel cleanup) → qa (frontend/backend evidence verification).",
       "category": "workflows",
-      "keywords": ["afk", "grill", "delegation", "subagents", "deduplication", "browser-qa"]
+      "keywords": ["afk", "help", "grill", "delegation", "subagents", "deduplication", "browser-qa"]
     }
   ]
 }

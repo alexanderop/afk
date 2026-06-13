@@ -1,0 +1,7 @@
+skill,display-name,menu-code,description,phase,preceded-by,followed-by,required,output-location,outputs
+afk:help,AFK Help,H,Orient the user in the AFK flow and recommend the next skill.,anytime,,,false,,
+afk:write-good-goal,Write Good Goal,O,Turn a vague objective into a concrete /goal condition with verification and bounds.,0-goal,,afk:grill,false,conversation,recommended /goal text
+afk:grill,Grill,G,Interview and stress-test a non-trivial idea using repo context plus fetched docs or blogs when relevant.,1-plan,,afk:implement,true,docs/plans,docs/plans/<slug>.md
+afk:implement,Implement,I,Read the code, fix architecture and contracts, then delegate independent TDD slices and review every diff.,2-build,afk:grill,afk:simplify,true,working tree,code changes and passing local verification
+afk:simplify,Simplify,S,Run a focused cleanup pass over the implementation diff for reuse simplification efficiency and altitude issues.,3-cleanup,afk:implement,afk:qa,false,working tree,simplification fixes or a no-change report
+afk:qa,QA,Q,Route by project shape: dogfood-style browser QA for frontends and contract-level service QA for backends.,4-verify,afk:simplify,,false,qa,QA report plus screenshots or request-response evidence

@@ -1,13 +1,13 @@
 {
   "name": "afk",
   "displayName": "AFK",
-  "description": "A simple four-skill coding flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel 4-angle cleanup: reuse, simplification, efficiency, altitude) → qa (real-browser verification with agent-browser).",
-  "version": "1.0.0",
+  "description": "A help router plus a four-step coding flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel cleanup) → qa (frontend/backend evidence verification).",
+  "version": "1.0.1",
   "author": {
     "name": "Alexander Opalic"
   },
   "homepage": "https://alexop.dev",
   "repository": "https://github.com/alexanderop/afk",
   "license": "MIT",
-  "keywords": ["afk", "grill", "delegation", "subagents", "deduplication", "browser-qa"]
+  "keywords": ["afk", "help", "grill", "delegation", "subagents", "deduplication", "browser-qa"]
 }

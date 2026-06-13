@@ -1,8 +1,8 @@
 # afk
 
-A Claude Code plugin: a simple four-skill coding flow — grill (plan
-interview) → implement (lead plans, workers run bounded TDD slices) →
-simplify (parallel 4-angle cleanup pass) → qa (agent-browser verification).
+A Claude Code plugin: a help router plus a four-step coding flow — grill
+(plan interview) → implement (lead plans, workers run bounded TDD slices) →
+simplify (parallel 4-angle cleanup pass) → qa (frontend/backend evidence verification).
 The product is the markdown itself.
 
 ## Stack
@@ -12,7 +12,7 @@ harness. No build step, no dependencies beyond `jq` and `shellcheck`.
 
 ## Map
 
-- `skills/` — the 4 skills, one directory each (`SKILL.md` + supporting files)
+- `skills/` — the skills, one directory each (`SKILL.md` + supporting files)
 - `tests/lint/` — zero-token structural lint; `tests/smoke/` — headless plugin-load check (~$0.01)
 - `.claude-plugin/` — plugin manifest (version lives here) and marketplace manifest
 

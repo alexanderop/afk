@@ -1,9 +1,16 @@
-# afk — a simple four-skill coding flow for Claude Code
+# afk — a simple four-step coding flow for Claude Code
 
-Four skills, one idea each. No pipeline orchestration, no config files, no
-hooks — just the four steps that matter, in order:
+One help router plus four workflow skills. No pipeline orchestration, no
+config files, no hooks — just the steps that matter:
 
 ```
+/afk:help        Inspects the current repo state and recommends the next AFK
+                 skill to run, with a short explanation.
+
+/afk:write-good-goal
+                 Turns a vague objective into a concrete /goal condition with
+                 verification evidence, constraints, and optional stop bounds.
+
 /afk:grill       AI interviews YOU about the plan, one question at a time,
                  challenging it against your domain glossary and ADRs.
                  Output: docs/plans/<slug>.md
@@ -16,9 +23,9 @@ hooks — just the four steps that matter, in order:
                  simplification, efficiency, and altitude issues — then the
                  fixes get applied. Quality only, no bug hunting.
 
-/afk:qa          Drives the real UI with agent-browser — screenshots,
-                 console errors, evidence-backed pass/fail report with a
-                 ship recommendation.
+/afk:qa          Routes by project shape: dogfood-style browser QA for
+                 frontend apps, contract-level API/service QA for backend
+                 apps, and both for hybrids. Output: evidence-backed report.
 ```
 
 Each skill works standalone. Run them in sequence for a feature, or grab one
@@ -43,7 +50,8 @@ git clone https://github.com/alexanderop/afk
 claude --plugin-dir ./afk
 ```
 
-`/afk:qa` additionally needs the [agent-browser](https://github.com/vercel-labs/agent-browser) CLI on your PATH.
+`/afk:qa` needs the [agent-browser](https://github.com/vercel-labs/agent-browser)
+CLI on your PATH when it routes to frontend browser QA.
 
 ## What lands in your repo
 
