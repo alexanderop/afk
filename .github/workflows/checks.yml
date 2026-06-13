@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Hook tests + lint + shellcheck
+    name: Lint + shellcheck
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,12 +21,10 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
-      - name: Hook tests (zero-token)
-        run: tests/hooks/run-hook-tests.sh
       - name: Markdown lint (zero-token)
         run: tests/lint/run-lint-tests.sh
       - name: Shellcheck
-        run: find hooks tests -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR
+        run: find tests -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR
 
   # One cheap headless turn (~$0.01) asserting Claude Code actually loads the
   # plugin — catches manifest/frontmatter/hook-wiring breakage the static lint

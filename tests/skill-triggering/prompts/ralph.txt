@@ -1,1 +1,0 @@
-The slice tickets for the booking feature are written and approved, they're in .afk/tickets/. Start implementing them.

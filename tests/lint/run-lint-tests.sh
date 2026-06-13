@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Zero-token structural lint for the plugin's markdown and manifests.
-# Pure bash + jq, no LLM calls — safe to run on every edit, like tests/hooks/.
+# Pure bash + jq, no LLM calls — safe to run on every edit.
 #
 # The product IS the markdown, so this is the unit-test layer for it:
 # frontmatter shape, name/description budgets, line budgets, dead internal
-# file references, and manifest/hook wiring validity.
+# file references, and manifest validity.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -45,23 +45,6 @@ for manifest in "$PLUGIN_DIR/.claude-plugin/"*.json; do
     fail "$base is valid JSON"
   fi
 done
-
-if jq -e .hooks "$PLUGIN_DIR/hooks/hooks.json" >/dev/null 2>&1; then
-  pass "hooks.json is valid JSON with a hooks key"
-else
-  fail "hooks.json is valid JSON with a hooks key"
-fi
-
-# Every command wired in hooks.json must point at an executable script.
-while IFS= read -r cmd; do
-  script="${cmd//\$\{CLAUDE_PLUGIN_ROOT\}/$PLUGIN_DIR}"
-  script="${script//\"/}"
-  if [ -x "$script" ]; then
-    pass "hook command exists and is executable: $(basename "$script")"
-  else
-    fail "hook command exists and is executable: $cmd"
-  fi
-done < <(jq -r '.. | .command? // empty' "$PLUGIN_DIR/hooks/hooks.json" 2>/dev/null)
 
 # --- frontmatter -------------------------------------------------------------
 
@@ -116,22 +99,13 @@ for skill in "$PLUGIN_DIR"/skills/*/SKILL.md; do
   fi
 done
 
-echo ""
-echo "agents:"
-for agent in "$PLUGIN_DIR"/agents/*.agent.md; do
-  agent_name="$(basename "$agent" .agent.md)"
-  check_frontmatter "$agent" "$agent_name" "$agent_name"
-done
-
 # --- internal file references --------------------------------------------------
 
 echo ""
 echo "internal file references:"
 
-# Any skills/agents prose mentioning a plugin-internal path (references/,
-# skills/, agents/, hooks/ ... .md|.sh) must point at a file that exists —
-# relative to the mentioning file, the plugin root, or any skill dir (prose
-# like "using-afk's references/copilot-tools.md" is qualified, not relative).
+# Any skill prose mentioning a plugin-internal path must point at a file that
+# exists — relative to the mentioning file, the plugin root, or any skill dir.
 REFS_OK=1
 while IFS=: read -r src ref; do
   [ -z "$ref" ] && continue
@@ -147,8 +121,8 @@ while IFS=: read -r src ref; do
     fail "dead reference in ${src#"$PLUGIN_DIR"/}: $ref"
     REFS_OK=0
   fi
-done < <(grep -rnoE '(references|skills|agents|hooks)(/[A-Za-z0-9._-]+)+\.(md|sh)' \
-  "$PLUGIN_DIR/skills" "$PLUGIN_DIR/agents" --include='*.md' | \
+done < <(grep -rnoE '(references|skills)(/[A-Za-z0-9._-]+)+\.(md|sh)' \
+  "$PLUGIN_DIR/skills" --include='*.md' | \
   sed -E 's/:[0-9]+:/:/' | sort -u)
 if [ "$REFS_OK" -eq 1 ]; then
   pass "all internal file references resolve"

@@ -1,4 +1,3 @@
-# afk per-run working state and QA evidence — resumes from disk, verdicts
-# get inlined into the PR body; committing them is noise.
-.afk/pipeline/
+# QA reports and evidence are per-run artifacts — verdicts belong in the PR
+# body, not the repo.
 qa/

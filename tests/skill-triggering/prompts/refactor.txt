@@ -1,1 +1,0 @@
-I just finished implementing all four slices of the checkout feature on this branch. Everything works and the tests pass, but each slice was built by a separate loop so I suspect there's duplicated logic and inconsistent naming between them. Clean up the branch before we ship it.

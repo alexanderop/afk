@@ -1,6 +1,6 @@
 {
   "name": "afk",
-  "description": "Marketplace for the afk plugin — the AFK coding pipeline for Claude Code.",
+  "description": "Marketplace for the afk plugin — a simple four-skill coding flow for Claude Code.",
   "owner": {
     "name": "Alexander Opalic",
     "url": "https://alexop.dev"
@@ -9,9 +9,9 @@
     {
       "name": "afk",
       "source": "./",
-      "description": "AFK coding pipeline: spec → vertical slices → TDD implementation loops → refactor pass → agentic QA → multi-agent review. Human judgment at the edges, agent execution in the middle.",
+      "description": "A simple four-skill coding flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel 4-angle cleanup: reuse, simplification, efficiency, altitude) → qa (real-browser verification with agent-browser).",
       "category": "workflows",
-      "keywords": ["afk", "pipeline", "tdd", "vertical-slices", "code-review", "agents", "spec-driven"]
+      "keywords": ["afk", "grill", "delegation", "subagents", "deduplication", "browser-qa"]
     }
   ]
 }

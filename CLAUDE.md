@@ -1,61 +1,32 @@
 # afk
 
-A Claude Code plugin (also runs on Copilot CLI) implementing the AFK coding
-pipeline: spec → vertical slices → TDD loops → refactor pass → agentic QA →
-multi-agent review. The product is the markdown itself — skills, agent
-definitions, and hooks that steer other agents.
+A Claude Code plugin: a simple four-skill coding flow — grill (plan
+interview) → implement (lead plans, workers run bounded TDD slices) →
+simplify (parallel 4-angle cleanup pass) → qa (agent-browser verification).
+The product is the markdown itself.
 
 ## Stack
 
-Markdown skills + YAML frontmatter (Claude Code plugin format), bash hooks,
-bash test harness. No build step, no package manager, no dependencies beyond
-`jq` and `shellcheck`.
+Markdown skills + YAML frontmatter (Claude Code plugin format), bash test
+harness. No build step, no dependencies beyond `jq` and `shellcheck`.
 
 ## Map
 
-- `skills/` — the 9 pipeline skills, one directory each (`SKILL.md` + supporting files)
-- `agents/` — 6 subagent definitions (`*.agent.md`) that `ralph` and `review` dispatch
-- `hooks/` — SessionStart sizing-gate injection, brain auto-indexer (`hooks.json` wires them)
-- `tests/` — six suites with very different costs; read `tests/README.md` before running anything
+- `skills/` — the 4 skills, one directory each (`SKILL.md` + supporting files)
+- `tests/lint/` — zero-token structural lint; `tests/smoke/` — headless plugin-load check (~$0.01)
 - `.claude-plugin/` — plugin manifest (version lives here) and marketplace manifest
 
 ## Commands
 
-- Test: `tests/hooks/run-hook-tests.sh && tests/lint/run-lint-tests.sh` (zero tokens, run on every edit)
-- Lint: `find hooks tests -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR`
-- Run the plugin: `claude --plugin-dir . -p "<prompt>"` (your working tree, no install needed)
+- Test: `tests/lint/run-lint-tests.sh` (zero tokens, run on every edit)
+- Lint: `find tests -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR`
+- Run the plugin: `claude --plugin-dir . -p "<prompt>"` (working tree, no install)
 
 ## Rules
 
-- The LLM-in-the-loop suites (`tests/skill-triggering/`, `tests/claude-code/`,
-  `tests/parity/`) cost real tokens and minutes — run them deliberately, never
-  as a reflex. The hook tests + markdown lint + shellcheck are the every-edit check.
-- The severity rubric must stay in sync between `skills/review/reviewer-shared.md`
-  and all four reviewer agents — a hook test enforces this; change them together.
-- Every skill must work on both Claude Code and Copilot CLI. Don't rely on
-  hooks firing (Copilot doesn't execute them); the CLAUDE.md-template backstop
-  and parity suite exist for this.
-- Skill/agent prose is the product: instruction-budget rules apply to it too.
-  Tight scope, no redundant instructions, pointers over copies.
-
-## Ticket-sizing gate (afk)
-
-Before implementing any feature or fix, size it first:
-
-- **Small (1–3 points)** — one concern, few files, clear requirements: implement
-  directly in this session. TDD still applies.
-- **Big (5+ points)** — frontend + backend, multi-step flows, vague requirements:
-  do NOT implement in one pass. Route to the `afk:pipeline` skill (or `afk:spec`
-  if no spec exists).
-- If `.afk/brain/index.md` exists and is not already in your context, read it
-  before acting.
-- Dispatched afk subagents (implementer, reviewers): this gate does not apply
-  to you — sizing already happened. Do the task in your dispatch prompt.
-
-## Go deeper
-
-Project docs and learnings live in `.afk/brain/` (index injected at session
-start). Before working in an area below, read its note first:
-
-- `.afk/brain/shellcheck-invocation.md` — before changing the lint command or adding scripts that `source` files
-- `tests/README.md` — suite layout, costs, and how to add tests
+- `tests/smoke/plugin-load.sh` makes a real LLM call — run it before release,
+  not on every edit. The lint + shellcheck are the every-edit check.
+- Skill prose is the product: instruction-budget rules apply. Tight scope, no
+  redundant instructions, pointers over copies. SKILL.md stays under 500 lines;
+  descriptions under 1024 chars (the lint enforces both).
+- Skill frontmatter `name:` must match its directory name (lint enforces it).

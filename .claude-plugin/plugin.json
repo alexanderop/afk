@@ -1,13 +1,13 @@
 {
   "name": "afk",
-  "displayName": "AFK Coding Pipeline",
-  "description": "AFK coding pipeline: spec → vertical slices → TDD implementation loops → refactor pass → agentic QA → multi-agent review. Human judgment at the edges, agent execution in the middle.",
-  "version": "0.6.0",
+  "displayName": "AFK",
+  "description": "A simple four-skill coding flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel 4-angle cleanup: reuse, simplification, efficiency, altitude) → qa (real-browser verification with agent-browser).",
+  "version": "1.0.0",
   "author": {
     "name": "Alexander Opalic"
   },
   "homepage": "https://alexop.dev",
   "repository": "https://github.com/alexanderop/afk",
   "license": "MIT",
-  "keywords": ["afk", "pipeline", "tdd", "vertical-slices", "code-review", "agents", "spec-driven"]
+  "keywords": ["afk", "grill", "delegation", "subagents", "deduplication", "browser-qa"]
 }

@@ -1,1 +1,0 @@
-That pipeline run had a lot of friction — the agent kept trying to use npm even though this project uses bun, and QA sent the same validation bug back twice. Before we wrap up, make sure the next run doesn't repeat these mistakes.

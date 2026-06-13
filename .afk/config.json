@@ -1,9 +1,0 @@
-{
-  "commands": {
-    "test": "tests/hooks/run-hook-tests.sh",
-    "lint": "find hooks tests -name '*.sh' -print0 | xargs -0 shellcheck -x -P SCRIPTDIR",
-    "dev": "claude --plugin-dir . -p"
-  },
-  "qa": { "mode": "cli" },
-  "backpressure": "green"
-}

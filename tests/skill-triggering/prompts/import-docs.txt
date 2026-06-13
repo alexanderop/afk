@@ -1,1 +1,0 @@
-Our team already has an architecture doc and a folder of ADRs we wrote over the last year. Can afk pull those into the project so the agents actually use them?
