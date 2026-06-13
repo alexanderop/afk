@@ -48,7 +48,16 @@ Use lead-orchestrated slices when any of these are true:
   separately.
 - The task involves migrations, security-sensitive code, data flow, external
   APIs, complex tests, or risk that is hard to see in one diff.
+- A shared abstraction (component, type, helper, endpoint shape) is introduced
+  or changed and then applied across several call sites.
 - A plan from `afk:grill` exists or the user provides a worked-out design.
+
+Per-edit size does not downgrade the triage. Many small, near-identical edits
+spread across many files is multi-file work — orchestrate it; do not collapse
+it into the lead just because each individual diff looks trivial. The fact that
+you, the lead, must design the shared contract first is the signal to
+orchestrate, not to do it all yourself: freeze the contract, then fan the
+mechanical application out to workers (see the refactor recipe below).
 
 ### 2. Direct Implementation
 
@@ -90,6 +99,25 @@ useful delegation:
 
 Never brief a worker to "figure out the architecture." If a slice brief needs
 hedging on shared design, return to the code and decide the contract first.
+
+#### Shared-abstraction refactor (freeze, then fan out)
+
+When the work is "introduce a shared X and apply it across N files" — a new
+component, type, helper, or endpoint shape with many call sites — this is the
+default orchestration shape, not a direct edit:
+
+1. In the lead, build and freeze the shared abstraction itself, including its
+   tests. This is the architecture; it stays in the lead.
+2. Once the contract is frozen, write one parameterized brief and dispatch one
+   `implementation-worker` per call site (or per small group). Each worker gets
+   the frozen signature, the exact file, and a concrete migrated example to
+   mimic.
+3. Workers run in parallel once the contract is frozen — the file contention
+   that blocked them is gone because nobody is still changing the shared file.
+
+Do not skip orchestration here on the grounds that "each edit is tiny" or "the
+brief is longer than the diff." Across N files the brief is written once and
+reused; the per-file diff is the wrong unit to measure.
 
 ### 4. Dispatch Workers
 
@@ -160,7 +188,10 @@ diff end-to-end for integration issues that slice reviews could not see.
 STOP before dispatching workers when:
 
 - Shared interfaces, ownership, or integration order are undecided.
-- Two workers would need to edit the same file at the same time.
+- Two workers would need to edit the same file at the same time. If the shared
+  file is a contract still being designed, that is a sequencing problem, not a
+  reason to abandon orchestration: freeze it in the lead first, then fan the
+  call-site edits out.
 - The requested change depends on product intent, credentials, private data,
   or an external source of truth that is not available.
 - The task is a migration, security-sensitive change, or destructive action
@@ -182,6 +213,10 @@ context and keep moving.
 | "Nested subagents are supported, so use them for every task" | Hierarchy is overhead. Keep AFK's default tree shallow unless the branches are independent and bounded. |
 | "This task is too hard for sonnet, I'll write a smarter prompt" | If it needs a smarter prompt, it needs a smarter model: do it yourself. |
 | "I'll dispatch all tasks at once" | Parallelism only belongs across genuinely independent files and contracts. |
+| "The edits are tiny, so I'll just do all N inline" | Per-edit size doesn't change the triage. N near-identical edits across N files is multi-file work: freeze the shared contract, then fan out. |
+| "The brief would be longer than the diff" | True for one-off local work, not a fan-out. Across N files you write one parameterized brief and reuse it — the per-file diff is the wrong unit. |
+| "The shared component keeps changing, so workers would collide" | That's a sequencing problem, not a reason to stay direct. Freeze the shared file in the lead, then dispatch the call-site edits in parallel. |
+| "I designed the contract myself, so I may as well finish it myself" | Designing the contract is the lead's job and is the signal to orchestrate, not to absorb the whole fan-out. Hand the mechanical application to workers. |
 
 ## Output
 
