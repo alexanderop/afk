@@ -29,19 +29,35 @@ obvious cause, or execution of an already-written `docs/plans/` plan.
 1. Ground yourself before asking the first question. Read the relevant code,
    tests, configs, routes, schemas, package manifests, README instructions,
    and any nearby plans or specs.
-2. Read the domain context. Start with `CONTEXT.md`; if `CONTEXT-MAP.md`
-   exists, follow the map. Read relevant files in `docs/adr/`.
-3. If the work depends on external behavior, fetch and read relevant primary
-   sources before asking: official docs, maintainer posts, migration guides,
-   RFCs, product announcements, architecture posts, or named blog posts. Prefer
-   current official and maintainer-authored sources.
+2. Read the domain context and project memory. Start with `CONTEXT.md`; if
+   `CONTEXT-MAP.md` exists, follow the map. Read relevant files in `docs/adr/`.
+   Then read the brain's principles if the vault has them: `brain/index.md`,
+   then `brain/principles.md` and each principle file it links. The SessionStart
+   hook surfaces the index; ground your questions and the plan in those
+   principles, and do not ask the user to restate anything the brain already
+   records. A fresh project may have no principles yet — that is fine; do not
+   invent them.
+3. Research real documentation automatically whenever the work touches a
+   library, framework, SDK, API, CLI, or cloud service — before asking, and
+   before writing any technical contract into the plan. Do not rely on training
+   data for version-specific behavior, method signatures, config keys, or
+   request/response shapes; it drifts and is often wrong. Use a documentation
+   tool when one is available (a docs MCP server such as Context7, or the
+   project's configured doc lookup); otherwise fetch the current official docs,
+   migration guides, RFCs, or maintainer-authored sources by URL. Verify every
+   API name, parameter, and version detail against what you fetched, and record
+   the source URL plus version so it can go in the plan. Prefer current
+   official and maintainer sources over blogs. Treat this as a hard
+   prerequisite, not a fallback: never make the user ask you to check the docs.
 4. For broad or unfamiliar work, dispatch bounded read-only subagents in
    parallel:
    - Codebase scout: inspect entrypoints, neighboring files, tests, schemas,
      configs, and existing patterns. Report file paths, current behavior,
      contradictions, and open questions.
-   - Research scout: read relevant external primary sources. Report source
-     URLs, version notes, recommendations, and risks that affect the plan.
+   - Research scout: read relevant external primary sources and library/API
+     documentation (via a docs MCP server such as Context7 when available, else
+     fetched official docs). Report source URLs, version notes, exact API
+     shapes, recommendations, and risks that affect the plan.
    - Domain scout, when useful: read `CONTEXT.md`, `CONTEXT-MAP.md`, and ADRs.
      Report glossary conflicts, prior decisions, and terms needing precision.
 5. Synthesize the research yourself. Verify important claims against files or
@@ -68,8 +84,14 @@ obvious cause, or execution of an already-written `docs/plans/` plan.
     contracts are clear, ambiguous terms are defined, key edge cases have an
     agreed answer, and source-of-truth conflicts are settled.
 14. Write the agreed plan to `docs/plans/<slug>.md`. Include decisions made,
-    contracts between parts, relevant glossary or ADR updates, source URLs that
-    shaped decisions, and an ordered implementation task list.
+    contracts between parts, relevant glossary or ADR updates, and the
+    implementation task list grouped into parallel waves (see Output). Decide the
+    schedule here so `afk:implement` does not have to re-derive it: mark which
+    slices are independent (disjoint files, no shared contract) so they run
+    concurrently, and which depend on earlier slices; give every slice the files
+    it owns and what it depends on. Every contract that depends on a library,
+    SDK, or API must be doc-verified (not written from memory) and cite the
+    source URL and version it was checked against.
 
 ## Stop and Ask
 
@@ -95,6 +117,8 @@ fetched primary sources.
 | "I'll batch glossary updates at the end." | Update `CONTEXT.md` when the term is resolved so later questions use the canonical meaning. |
 | "This decision feels important, so it needs an ADR." | ADRs are only for decisions that are hard to reverse, surprising without context, and trade-off driven. |
 | "A subagent report is enough." | The lead must synthesize and verify important claims before asking or planning. |
+| "I know this library/API well enough to write the contract." | Training data drifts. Fetch the current docs and verify every API name, parameter, and version before it goes in the plan. |
+| "I'll check the docs if the user asks." | Doc research is automatic the moment external libraries/APIs are involved — don't wait to be told. |
 
 ## Output
 
@@ -117,9 +141,25 @@ Create `docs/plans/<slug>.md` with this shape:
 - <Known follow-up that does not block implementation>
 
 ## Tasks
-1. <Ordered implementation task>
-2. <Verification task>
+
+Group implementation into waves so the orchestrator can delegate the schedule
+without re-deriving it. Slices in one wave touch disjoint files and share no
+contract, so they run in parallel; each later wave depends on earlier ones. For
+every slice, give the files it **owns** and what it **depends on**.
+
+- **Wave 1 — parallel:**
+  - <slice> · owns `<file(s)>` · depends: none
+  - <slice> · owns `<file(s)>` · depends: none
+- **Wave 2 — parallel:**
+  - <slice> · owns `<file>` · depends: <slice or contract from Wave 1>
+- **Wave 3:**
+  - <slice> · owns `<file>` · depends: <earlier slices>
+
+**Verification**
+1. <Verification task or command>
 ```
 
 End the session by telling the user the plan is ready, naming the exact
-`docs/plans/<slug>.md` path, and stating that it is the input to `afk:implement`.
+`docs/plans/<slug>.md` path, and stating that it is the input to `afk:implement`
+(or `afk:batch` when the plan splits into many independently-mergeable units the
+user wants implemented as parallel PRs).

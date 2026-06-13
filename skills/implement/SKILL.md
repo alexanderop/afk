@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Use when the agent is about to implement, edit code, execute a plan, fix a bug, build a feature, or make repo changes, especially when task complexity or orchestration needs are unclear.
+description: Use when the agent is about to implement, edit code, execute a plan, fix a bug, build a feature, or make repo changes, especially when task complexity or orchestration needs are unclear. Do not start editing code, writing tests, or running build or test commands directly — load this skill first to triage and route.
 ---
 
 # Implement
@@ -32,15 +32,24 @@ touching files.
 
 Before editing, classify the task.
 
-Do the work directly when all of these are true:
+The default for any real code change is to orchestrate. Doing it yourself in the
+lead is the narrow exception, reserved for changes with no behavior logic to
+test.
 
-- The change is small, localized, and easy to review end-to-end.
+Do the work directly only when all of these are true:
+
+- The change carries no new or changed behavior that needs a test: docs,
+  comments, copy, config values, formatting, or a literal one-line fix.
 - It touches one or two files with no unsettled shared interface.
-- The expected behavior and verification command are clear.
-- A mistake would be obvious in the diff or test output.
+- The expected result is obvious on its face from reading the diff alone.
 
 Use lead-orchestrated slices when any of these are true:
 
+- The change adds or modifies behavior that should be covered by a test. The
+  moment the task needs a test written — a new function, a bug fix with a
+  regression test, an edge case, a branch — route it through the orchestrator
+  and let a worker run the TDD slice. Do not write the implementation and its
+  tests yourself in the lead.
 - The work spans multiple files, modules, packages, workflows, or UI states.
 - The task needs architecture decisions, contracts, sequencing, or integration
   planning.
@@ -50,74 +59,86 @@ Use lead-orchestrated slices when any of these are true:
   APIs, complex tests, or risk that is hard to see in one diff.
 - A shared abstraction (component, type, helper, endpoint shape) is introduced
   or changed and then applied across several call sites.
-- A plan from `afk:grill` exists or the user provides a worked-out design.
+- A plan from `afk:grill` (`docs/plans/`) or `afk:plan` (`brain/plans/`) exists,
+  or the user provides a worked-out design.
 
 Per-edit size does not downgrade the triage. Many small, near-identical edits
 spread across many files is multi-file work — orchestrate it; do not collapse
 it into the lead just because each individual diff looks trivial. The fact that
-you, the lead, must design the shared contract first is the signal to
-orchestrate, not to do it all yourself: freeze the contract, then fan the
-mechanical application out to workers (see the refactor recipe below).
+a shared contract must be designed first is the signal to orchestrate, not to do
+it all yourself: hand the plan to the orchestrator, which freezes the contract
+and then fans the mechanical application out to workers (see the refactor recipe
+below).
 
 ### 2. Direct Implementation
 
-For simple work:
+For genuinely test-free work (docs, config, copy, formatting, a literal
+one-liner):
 
 1. Read the target file and its immediate neighbors.
-2. Make the smallest behavior-preserving or behavior-adding change that
-   satisfies the request.
+2. Make the smallest change that satisfies the request.
 3. Run the narrowest meaningful verification command.
 4. Read the diff before reporting completion.
 
 Do not create fake slices, dispatch subagents, or write a heavyweight plan for
-genuinely local work.
+genuinely local work. Conversely, if the change needs a test, it is not this
+case — go to orchestrated implementation, even when it is one file.
 
 ### 3. Orchestrated Implementation
 
-For complex work, route through AFK's packaged agents:
+For complex work, hand the plan directly to AFK's read-only orchestrator and
+let it do the research and the design:
 
-- `implement-orchestrator`: Opus, read-only, owns architecture, contracts,
-  slice boundaries, sequencing, and worker review.
+- `implement-orchestrator`: Opus, read-only, reads the source, decides
+  architecture, contracts, slice boundaries, sequencing, and reviews workers.
 - `implementation-worker`: Sonnet, edit-capable, owns one fixed local TDD
   slice at a time.
+
+Do not research or design first. The lead does not read the source, decide
+which files or modules to change, write a delegation analysis, or build any
+part of the implementation before delegating — all of that is the
+orchestrator's job. The lead's only inputs to `implement-orchestrator` are:
+
+1. The plan itself, usually `docs/plans/<slug>.md` from `afk:grill` or
+   `brain/plans/<slug>/` from `afk:plan`, or the plan/design the user provided —
+   locate it (check both plan locations) and pass it directly.
+2. Any constraints or acceptance criteria the user stated that are not already
+   captured in the plan.
+
+The orchestrator then reads the source, decides the contracts and slice
+boundaries, and briefs the workers. Hand it the plan and let it design; do not
+pre-chew the architecture for it.
 
 The main conversation still owns final acceptance: after the orchestrator
 returns, read the diff, run verification, and decide whether the work is done.
 
 If the packaged agents are unavailable in the current Claude Code version or
-plugin loading path, keep the same shape in the main conversation: decide
-contracts first, then dispatch bounded workers manually.
-
-Before invoking `implement-orchestrator`, gather enough context to write a
-useful delegation:
-
-1. Read the plan, usually `docs/plans/<slug>.md` from `afk:grill`, or the
-   plan/design the user provided.
-2. Identify the likely touched modules, tests, and verification commands.
-3. Pass the plan, relevant file paths, constraints, and known acceptance
-   criteria to `implement-orchestrator`.
-
-Never brief a worker to "figure out the architecture." If a slice brief needs
-hedging on shared design, return to the code and decide the contract first.
+plugin loading path, keep the same shape in the main conversation: read the
+plan, decide contracts first, then dispatch bounded workers manually.
 
 #### Shared-abstraction refactor (freeze, then fan out)
 
 When the work is "introduce a shared X and apply it across N files" — a new
 component, type, helper, or endpoint shape with many call sites — this is the
-default orchestration shape, not a direct edit:
+default orchestration shape, not a direct edit. Hand it to the orchestrator
+like any other plan; do not build or freeze the shared abstraction in the lead.
+The orchestrator:
 
-1. In the lead, build and freeze the shared abstraction itself, including its
-   tests. This is the architecture; it stays in the lead.
-2. Once the contract is frozen, write one parameterized brief and dispatch one
-   `implementation-worker` per call site (or per small group). Each worker gets
-   the frozen signature, the exact file, and a concrete migrated example to
-   mimic.
-3. Workers run in parallel once the contract is frozen — the file contention
-   that blocked them is gone because nobody is still changing the shared file.
+1. Freezes the shared abstraction's contract, then sequences a worker to build
+   it (with its tests) first. The shared file is the architecture; the
+   orchestrator owns the decision, and a worker writes it.
+2. Once the contract is frozen, writes one parameterized brief and dispatches
+   one `implementation-worker` per call site (or per small group). Each worker
+   gets the frozen signature, the exact file, and a concrete migrated example
+   to mimic.
+3. Runs the call-site workers in parallel once the contract is frozen — the
+   file contention that blocked them is gone because nobody is still changing
+   the shared file.
 
-Do not skip orchestration here on the grounds that "each edit is tiny" or "the
-brief is longer than the diff." Across N files the brief is written once and
-reused; the per-file diff is the wrong unit to measure.
+Do not collapse this into the lead on the grounds that "each edit is tiny" or
+"the brief is longer than the diff." Across N files the brief is written once
+and reused; the per-file diff is the wrong unit to measure. The lead's job is
+to recognize the shape and route it, not to design or build the abstraction.
 
 ### 4. Dispatch Workers
 
@@ -130,9 +151,14 @@ Use the smallest orchestration primitive that fits:
 | Agent teams | Several long-running peers that need a shared task list, direct communication, or plan approval before edits |
 | Dynamic workflows | Dozens to hundreds of repeatable agents for repo-wide audits, migrations, or cross-checked research |
 
-Subagents start with zero context unless explicitly forked. Each worker brief
-must include:
+Subagents start with zero context unless explicitly forked. The orchestrator
+writes the worker briefs; in the manual fallback the lead does. Each worker
+brief must include:
 
+- The full spec or plan for the overall change, in addition to the worker's
+  specific slice task. Always include it verbatim — the worker has never seen
+  the plan and needs the whole spec to see how its slice fits, even though its
+  edits stay inside the boundaries below.
 - Exact file paths to create or edit and files to read first.
 - The contract: signatures, types, expected behavior, and error cases.
 - Code conventions to follow, with a concrete existing file to mimic.
@@ -146,8 +172,10 @@ Use `implementation-worker` for edit-capable implementation slices by default.
 Only choose a different worker when the task clearly needs a specialized agent
 or a cheaper model for mechanical boilerplate.
 
-Dispatch independent tasks in parallel. Run dependent tasks sequentially. Never
-let two workers edit the same file concurrently.
+Maximize parallelism: dispatch independent slices (disjoint files, no shared
+contract) concurrently, in the waves the plan provides when it has them. Run
+dependent slices sequentially. Never let two workers edit the same file
+concurrently.
 
 Nested subagents are supported in modern Claude Code, but use them sparingly.
 AFK's default hierarchy is `implement` -> `implement-orchestrator` ->
@@ -206,8 +234,9 @@ context and keep moving.
 |---------|---------|
 | "I'll start coding and load the skill if it gets complicated" | This skill is the gate before implementation. Triage first, then act. |
 | "Any implementation task should use subagents" | Simple local work is faster and safer in the main conversation. Orchestrate only when complexity justifies it. |
-| "The subagent can explore and decide the approach" | Then the lead has delegated architecture. Decide first, brief second. |
-| "The brief is getting long, I'll just say 'follow the plan'" | The subagent has never seen the plan. Paste what it needs, verbatim. |
+| "It's one file, I'll just write the code and the test myself" | A test means behavior worth verifying. One file or not, route it through `implement-orchestrator` and let a worker run the TDD slice. Only test-free changes stay in the lead. |
+| "A worker can explore and decide the approach" | Workers get decided contracts. The orchestrator reads the source and decides architecture first, then briefs — workers never explore and pick the approach themselves. |
+| "The brief is getting long, I'll just say 'follow the plan'" | The subagent has never seen the plan. Always paste the full spec verbatim, alongside the slice task. |
 | "It reported success and tests pass" | Whose tests? Read the diff. Workers can delete failing tests, hardcode fixtures, or stub the hard part with a TODO. |
 | "The orchestrator is read-only, so it verified everything" | Read-only means no shell verification. The main conversation must run final checks after workers edit. |
 | "Nested subagents are supported, so use them for every task" | Hierarchy is overhead. Keep AFK's default tree shallow unless the branches are independent and bounded. |
@@ -215,8 +244,8 @@ context and keep moving.
 | "I'll dispatch all tasks at once" | Parallelism only belongs across genuinely independent files and contracts. |
 | "The edits are tiny, so I'll just do all N inline" | Per-edit size doesn't change the triage. N near-identical edits across N files is multi-file work: freeze the shared contract, then fan out. |
 | "The brief would be longer than the diff" | True for one-off local work, not a fan-out. Across N files you write one parameterized brief and reuse it — the per-file diff is the wrong unit. |
-| "The shared component keeps changing, so workers would collide" | That's a sequencing problem, not a reason to stay direct. Freeze the shared file in the lead, then dispatch the call-site edits in parallel. |
-| "I designed the contract myself, so I may as well finish it myself" | Designing the contract is the lead's job and is the signal to orchestrate, not to absorb the whole fan-out. Hand the mechanical application to workers. |
+| "The shared component keeps changing, so workers would collide" | That's a sequencing problem, not a reason to stay direct. The orchestrator freezes the shared file first, then dispatches the call-site edits in parallel. |
+| "I'll design the shared contract in the lead and just hand workers the call sites" | Contract design is the orchestrator's job. Designing it yourself is delegated architecture in reverse. Hand it the plan; let it freeze the contract and fan out the work. |
 
 ## Output
 

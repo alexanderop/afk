@@ -42,6 +42,10 @@ Rules:
 - Use third-person trigger language because descriptions are injected into
   agent context.
 
+For the full list of frontmatter fields (the optional `context: fork`, every
+agent option, and which ones are ignored or unreliable in AFK's plugin context),
+see [skills-and-agents-reference.md](./skills-and-agents-reference.md).
+
 Good:
 
 ```yaml

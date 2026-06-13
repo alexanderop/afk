@@ -1,6 +1,6 @@
 ---
 name: qa
-description: Use when implementation is done, before shipping, or when the user asks to QA, verify, dogfood, check whether a change actually works, or make a ship/no-ship call.
+description: Use when implementation is done, before shipping, or when the user asks to QA, verify, dogfood, check whether a change actually works, or make a ship/no-ship call on a specific change.
 context: fork
 ---
 
@@ -23,10 +23,14 @@ actually works", or "can this ship?"
 ## Process
 
 1. Orient on the target.
-   - Identify the flow under test from the `afk:grill` plan in
-     `docs/plans/<slug>.md`, the recent diff, or the user's named target.
+   - Identify the flow under test from the plan (`docs/plans/<slug>.md` from
+     `afk:grill` or `brain/plans/<slug>/` from `afk:plan`), the recent diff, or
+     the user's named target.
    - Read local run instructions from `README`, `CLAUDE.md`, package scripts,
      Procfile or compose files, Makefile, and framework config.
+   - If the vault has principles, skim `brain/principles.md` for any that set an
+     evidence bar (e.g. prove-it-works) and let them shape what counts as proof
+     in the verdict.
    - Classify the changed system:
      - **Frontend:** browser-rendered screens, routes, forms, navigation,
        client-side state, visual changes, or accessibility changes.

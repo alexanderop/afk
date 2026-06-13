@@ -1,6 +1,7 @@
 ---
 name: simplify
 description: Use when afk:implement has landed, when the user asks to simplify or clean up changed code, or when they ask to deduplicate, DRY, or review quality without hunting for bugs
+context: fork
 ---
 
 # Simplify

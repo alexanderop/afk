@@ -37,8 +37,28 @@
         "Asks which definition should be authoritative"
       ],
       "assertions": {
-        "required_substrings": ["login identity", "billing workspace", "CONTEXT.md"],
-        "forbidden_substrings": ["docs/plans/"]
+        "required_substrings": ["login identity", "billing workspace", "CONTEXT.md"]
+      }
+    },
+    {
+      "id": "grill-researches-docs",
+      "prompt": "Grill me on adding a chat endpoint that streams responses from an external LLM SDK in this app.",
+      "expected_output": "Researches the SDK's real documentation before committing to or asking about API specifics, instead of relying on memory.",
+      "max_budget_usd": 2.5,
+      "fixture": {
+        "files": {
+          "README.md": "# App\n\nA TypeScript web app. We want to add a server route that streams chat responses from a third-party LLM SDK.\n",
+          "package.json": "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"some-llm-sdk\": \"^3.0.0\"\n  }\n}\n"
+        }
+      },
+      "expectations": [
+        "Attempts to research the SDK's real documentation (via an available docs tool such as a Context7-style MCP server, or by fetching official docs) without the user asking",
+        "Does not invent or assert API method names, parameters, or version-specific behavior from memory",
+        "Flags API/contract details as needing doc verification when documentation is unavailable, rather than guessing",
+        "Treats documentation research as a prerequisite to writing technical contracts"
+      ],
+      "assertions": {
+        "required_substrings": ["doc"]
       }
     },
     {
@@ -56,6 +76,25 @@
         "required_files": ["docs/plans/team-billing.md"],
         "required_file_substrings": {
           "docs/plans/team-billing.md": ["## Context", "## Decisions", "## Contracts", "## Tasks"]
+        }
+      }
+    },
+    {
+      "id": "grill-plan-groups-parallel-waves",
+      "prompt": "We have resolved the decisions. Finish the grill session by writing docs/plans/notifications.md. Decisions: add a notifications feature with a shared Notifier interface in src/notify/types.ts, three independent channel adapters that each implement it (email in src/notify/email.ts, sms in src/notify/sms.ts, push in src/notify/push.ts), and a dispatcher in src/notify/dispatcher.ts that fans a message out to all three adapters. Contracts: every adapter exports send(message): Promise<Result> matching the Notifier interface; the dispatcher imports all three and aggregates their results. The three adapters share no files and no contract with each other; they only depend on the Notifier interface; the dispatcher depends on all three adapters.",
+      "expected_output": "Writes a docs/plans/<slug>.md whose task list is grouped into parallel waves, with each slice's owned files and dependencies, so the orchestrator can delegate the schedule without re-deriving it.",
+      "expectations": [
+        "Creates a docs/plans/<slug>.md artifact with the standard sections",
+        "Groups implementation into ordered waves rather than a single flat list",
+        "Marks the three channel adapters as independent work that can run in parallel in the same wave",
+        "Places the shared Notifier interface before the adapters and the dispatcher in a later wave that depends on them",
+        "States, per slice, which files it owns and what it depends on"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:implement", "parallel"],
+        "required_files": ["docs/plans/notifications.md"],
+        "required_file_substrings": {
+          "docs/plans/notifications.md": ["Wave", "parallel", "owns", "depends"]
         }
       }
     }

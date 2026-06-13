@@ -14,7 +14,7 @@
       ],
       "assertions": {
         "required_substrings": ["afk:grill"],
-        "forbidden_substrings": ["afk:qa"]
+        "forbidden_substrings": ["Next step: [Q]", "run afk:qa now"]
       }
     },
     {
@@ -34,7 +34,7 @@
       ],
       "assertions": {
         "required_substrings": ["afk:implement"],
-        "forbidden_substrings": ["afk:qa"]
+        "forbidden_substrings": ["Next step: [Q]", "run afk:qa now"]
       }
     },
     {

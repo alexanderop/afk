@@ -18,8 +18,29 @@
       ],
       "assertions": {
         "required_substrings": ["direct", "README.md", "diff"],
-        "forbidden_substrings": ["implementation-worker", "Agent teams", "dynamic workflows"],
+        "forbidden_substrings": ["dispatch implementation-worker", "Agent teams", "dynamic workflows"],
         "unchanged_files": ["README.md"]
+      }
+    },
+    {
+      "id": "implement-single-file-with-tests-orchestrates",
+      "prompt": "Fix the off-by-one bug in src/pagination.ts so the last page is included, and add a regression test for it. Eval mode: do not edit files or invoke subagents; inspect state and explain the AFK Implement route.",
+      "expected_output": "Routes a one-file behavior change that needs a test through implement-orchestrator and an implementation-worker TDD slice instead of doing it directly in the lead.",
+      "fixture": {
+        "files": {
+          "src/pagination.ts": "export function pageCount(total: number, perPage: number): number {\n  return Math.floor(total / perPage);\n}\n"
+        }
+      },
+      "expectations": [
+        "Recognizes that the fix needs a regression test, so it is not a test-free direct change",
+        "Routes through implement-orchestrator even though it is a single file",
+        "Names implementation-worker for the bounded TDD slice",
+        "Does not say it will write the fix and the test itself in the lead"
+      ],
+      "assertions": {
+        "required_substrings": ["src/pagination.ts", "implement-orchestrator", "implementation-worker", "test"],
+        "forbidden_substrings": ["direct implementation is enough", "no orchestration needed", "simple enough to do directly"],
+        "unchanged_files": ["src/pagination.ts"]
       }
     },
     {
@@ -35,15 +56,37 @@
       },
       "expectations": [
         "Reads the supplied docs/plans/team-billing.md plan",
-        "Classifies the work as complex",
+        "Classifies the work as needing orchestration",
         "Routes through implement-orchestrator",
         "Names implementation-worker for bounded TDD slices",
         "Describes exact files, contracts, tests, and verification in worker briefs"
       ],
       "assertions": {
-        "required_substrings": ["docs/plans/team-billing.md", "complex", "implement-orchestrator", "implementation-worker", "TDD", "verification"],
+        "required_substrings": ["docs/plans/team-billing.md", "orchestrate", "implement-orchestrator", "implementation-worker", "TDD", "verification"],
         "forbidden_substrings": ["direct implementation is enough"],
         "unchanged_files": ["docs/plans/team-billing.md", "src/billing.md", "src/invoices.md"]
+      }
+    },
+    {
+      "id": "implement-hands-plan-directly-to-orchestrator",
+      "prompt": "Implement docs/plans/inbox-search.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain how AFK Implement routes it. Be specific about what the lead (main conversation) does before the orchestrator is involved, and about who reads the source files and decides the architecture and contracts.",
+      "expected_output": "Hands the plan straight to implement-orchestrator and assigns source reading plus architecture and contract decisions to the orchestrator. The lead does not gather context, research the touched modules, or implement anything itself before delegating; it only hands over the plan and owns final acceptance.",
+      "fixture": {
+        "files": {
+          "docs/plans/inbox-search.md": "# Inbox Search Plan\n\n## Context\nThe inbox in src/inbox.ts lists messages but has no search.\n\n## Decisions\nAdd full-text search over message subject and body, ranked by recency.\n\n## Contracts\nsearchInbox(query) returns matching messages newest-first. Empty query returns the full list. Indexing lives in src/search.ts.\n\n## Tasks\n1. Add a search index module in src/search.ts.\n2. Wire searchInbox into src/inbox.ts.\n3. Render the search box in src/inbox-view.ts.\n",
+          "src/inbox.ts": "export function listInbox() {\n  return [];\n}\n"
+        }
+      },
+      "expectations": [
+        "Passes the plan directly to implement-orchestrator without doing its own research or context-gathering first",
+        "Assigns reading the source files and deciding the architecture and contracts to the orchestrator, not the lead",
+        "States the lead does not implement or research the touched modules itself before delegating",
+        "Limits the lead's role to handing over the plan and final acceptance after workers edit"
+      ],
+      "assertions": {
+        "required_substrings": ["docs/plans/inbox-search.md", "implement-orchestrator"],
+        "forbidden_substrings": ["gather enough context", "touched modules", "build and freeze the shared abstraction"],
+        "unchanged_files": ["docs/plans/inbox-search.md", "src/inbox.ts"]
       }
     },
     {
@@ -57,7 +100,7 @@
         "States that final diff review and verification happen after workers edit"
       ],
       "assertions": {
-        "required_substrings": ["implement-orchestrator", "read-only", "cannot edit", "diff", "verification"],
+        "required_substrings": ["implement-orchestrator", "read-only", "edit files", "diff", "verification"],
         "forbidden_substrings": ["orchestrator can edit", "orchestrator runs the final test suite"]
       }
     },
@@ -79,8 +122,30 @@
       ],
       "assertions": {
         "required_substrings": ["src/settings.ts", "same file", "sequential"],
-        "forbidden_substrings": ["run in parallel", "dispatch all tasks at once"],
+        "forbidden_substrings": ["workers can run in parallel", "dispatch all tasks at once"],
         "unchanged_files": ["docs/plans/settings-refactor.md", "src/settings.ts"]
+      }
+    },
+    {
+      "id": "implement-parallelizes-independent-slices",
+      "prompt": "Implement docs/plans/notifications.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain how AFK Implement would schedule the worker slices — what runs in parallel and what runs after, and why.",
+      "expected_output": "Routes through the orchestrator and schedules the three disjoint adapter slices to run in parallel in one wave, with the shared interface first and the dispatcher last, instead of running every slice one at a time.",
+      "fixture": {
+        "files": {
+          "docs/plans/notifications.md": "# Notifications Plan\n\n## Context\nAdd a notifications feature that fans a message out to email, sms, and push.\n\n## Decisions\nA shared Notifier interface; three independent channel adapters; a dispatcher that calls all three.\n\n## Contracts\nEvery adapter exports send(message): Promise<Result> matching Notifier. The dispatcher imports all three and aggregates results.\n\n## Tasks\n\n- **Wave 1:**\n  - Notifier interface · owns `src/notify/types.ts` · depends: none\n- **Wave 2 — parallel:**\n  - email adapter · owns `src/notify/email.ts` · depends: Notifier interface\n  - sms adapter · owns `src/notify/sms.ts` · depends: Notifier interface\n  - push adapter · owns `src/notify/push.ts` · depends: Notifier interface\n- **Wave 3:**\n  - dispatcher · owns `src/notify/dispatcher.ts` · depends: all three adapters\n"
+        }
+      },
+      "expectations": [
+        "Routes the work through implement-orchestrator with implementation-worker slices",
+        "Schedules the email, sms, and push adapter slices to run in parallel because they own disjoint files and share no contract",
+        "Builds the shared Notifier interface before the adapters",
+        "Runs the dispatcher slice after the adapters because it depends on all three",
+        "Does not propose running every slice sequentially one at a time"
+      ],
+      "assertions": {
+        "required_substrings": ["implement-orchestrator", "parallel", "src/notify"],
+        "forbidden_substrings": ["one at a time", "must run sequentially", "cannot run in parallel"],
+        "unchanged_files": ["docs/plans/notifications.md"]
       }
     },
     {
@@ -101,7 +166,7 @@
       ],
       "assertions": {
         "required_substrings": ["seat", "invoice", "undecided", "stop"],
-        "forbidden_substrings": ["implementation-worker", "direct implementation is enough", "Verdict: SHIP"],
+        "forbidden_substrings": ["dispatch implementation-worker", "direct implementation is enough", "Verdict: SHIP"],
         "unchanged_files": ["README.md", "src/billing.md"]
       }
     },
@@ -122,7 +187,7 @@
       ],
       "assertions": {
         "required_substrings": ["destructive", "migration", "rollback", "stop"],
-        "forbidden_substrings": ["implementation-worker", "ready to implement"],
+        "forbidden_substrings": ["dispatch implementation-worker", "ready to implement"],
         "unchanged_files": ["docs/plans/delete-legacy-users.md", "db/schema.sql"]
       }
     }

@@ -1,7 +1,8 @@
 # afk — a simple coding flow for Claude Code
 
 One help router, one optional end-to-end orchestrator, focused workflow skills,
-and a packaged implementation agent pair. No hooks — just the steps that
+a packaged implementation agent pair, and a persistent `brain/` memory vault the
+flow reads before acting and writes back to as it learns. Just the steps that
 matter:
 
 ```
@@ -25,6 +26,10 @@ matter:
                  and Sonnet implementation workers, then every diff is
                  reviewed.
 
+/afk:batch       The fan-out alternative to implement: splits an
+                 independently-mergeable plan into many units and runs one
+                 parallel worktree worker per unit, each opening its own PR.
+
 /afk:simplify    4 cleanup agents in parallel review the diff for reuse,
                  simplification, efficiency, and altitude issues — then the
                  fixes get applied. Quality only, no bug hunting.
@@ -37,6 +42,40 @@ matter:
 Each skill works standalone. Run the focused skills in sequence for a feature,
 grab one on its own, or use `/afk:ship` when you want the loop driven to a
 verified verdict.
+
+## Memory: the brain vault
+
+AFK keeps a persistent `brain/` vault — an Obsidian-compatible markdown store of
+your project's engineering principles, codebase gotchas, and decisions. Two
+hooks run the plumbing: a SessionStart hook injects `brain/index.md` so every
+session knows what's there, and a PostToolUse hook rebuilds the index when
+`brain/` files change. The flow is wired to use it: `/afk:grill`, the implement
+orchestrator, and `/afk:qa` read the brain's principles before acting, and
+`/afk:ship` calls `/afk:reflect` to persist learnings afterward.
+
+```
+/afk:init-brain  Scaffold the brain/ vault in a project (optional — the vault
+                 is also created on demand the first time something writes to it).
+
+/afk:brain       Read or write the vault directly.
+
+/afk:reflect     Capture this session's learnings into the brain. Most brain
+                 content comes from here.
+
+/afk:ruminate    Mine past Claude Code conversations for patterns reflect missed.
+
+/afk:meditate    Audit and prune the vault; distill cross-cutting principles.
+
+/afk:plan        Break a medium-to-large task into phased, principle-grounded
+                 plans under brain/plans/. Planning only.
+
+/afk:review      Principle-grounded review of code or plans, ending in a verdict.
+                 Review only — no changes.
+```
+
+The brain skills and hooks are derived from
+[brainmaxxing](https://github.com/poteto/brainmaxxing) by Lauren Tan (MIT) and
+rewritten to AFK's skill conventions.
 
 AFK also ships two Claude Code subagents for implementation:
 
@@ -68,6 +107,18 @@ claude --plugin-dir ./afk
 [agent-browser](https://github.com/vercel-labs/agent-browser) CLI installed and
 available on your PATH when it routes to frontend browser QA.
 
+### If the skills don't auto-trigger
+
+AFK works by letting Claude pick a skill from its description. If a skill
+doesn't fire on its own (some Claude Code versions don't auto-discover plugin
+skills, and crowded installs can drop less-used ones from the listing), invoke
+it directly: `/afk:help`, `/afk:grill`, `/afk:implement`, `/afk:batch`,
+`/afk:simplify`, `/afk:qa`, `/afk:ship`, `/afk:write-good-goal`, and the memory
+skills `/afk:brain`, `/afk:init-brain`, `/afk:reflect`, `/afk:ruminate`,
+`/afk:meditate`, `/afk:plan`, `/afk:review`. Run `/doctor` to check plugin
+loading, and raise `skillListingBudgetFraction` in settings to keep more skill
+descriptions listed.
+
 ## What lands in your repo
 
 ```
@@ -75,6 +126,7 @@ CONTEXT.md            # domain glossary, grown by /afk:grill
 docs/adr/NNNN-*.md    # decisions worth recording, offered sparingly by grill
 docs/plans/<slug>.md  # the agreed plan, input to /afk:implement
 qa/                   # QA reports + screenshots (gitignored)
+brain/                # persistent memory vault: principles, gotchas, plans
 ```
 
 ## Testing the plugin
@@ -102,3 +154,7 @@ login that works with `claude -p`.
   ADR awareness.
 - Skill structure and red-flags tables borrowed from
   [obra/superpowers](https://github.com/obra/superpowers).
+- The `brain/` memory vault — its skills (`brain`, `init-brain`, `reflect`,
+  `ruminate`, `meditate`, `plan`, `review`) and hooks — is derived from
+  [brainmaxxing](https://github.com/poteto/brainmaxxing) by Lauren Tan (MIT),
+  rewritten to AFK's skill conventions.

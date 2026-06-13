@@ -1,9 +1,17 @@
 # afk
 
 A Claude Code plugin: a help router plus a four-step coding flow — grill
-(plan interview) → implement (lead plans, workers run bounded TDD slices) →
+(plan interview) → implement (orchestrator plans, workers run bounded TDD slices) →
 simplify (parallel 4-angle cleanup pass) → qa (frontend/backend evidence verification).
-The product is the markdown itself.
+`batch` is the fan-out alternative to implement: many independent units run as
+parallel worktree workers, one PR each. The product is the markdown itself.
+
+It also ships a persistent `brain/` memory vault (the `brain`, `init-brain`,
+`reflect`, `ruminate`, `meditate`, `plan`, and `review` skills, plus two hooks):
+the flow reads the brain's principles before acting (grill, the implement
+orchestrator, qa) and writes learnings back via `reflect` after a run (ship).
+The brain skills are derived from brainmaxxing by Lauren Tan (MIT) — see
+`LICENSE`.
 
 ## Stack
 
@@ -13,6 +21,7 @@ test runners. No build step for the plugin itself.
 ## Map
 
 - `skills/` — the skills, one directory each (`SKILL.md` + supporting files)
+- `hooks/` — `hooks.json` plus the brain hooks: `inject-brain.sh` (SessionStart, injects `brain/index.md`) and `auto-index-brain.sh` (PostToolUse, rebuilds the index on `brain/` writes). Auto-discovered from `hooks/hooks.json` at plugin root
 - `tests/unit/` — file-level checks; `tests/integration/` — cross-file checks; `tests/e2e/` — model-backed smoke and evals; `tests/lib/` — shared Bun test helpers
 - `.claude-plugin/` — plugin manifest (version lives here) and marketplace manifest
 
@@ -33,3 +42,6 @@ test runners. No build step for the plugin itself.
 - Skill frontmatter `name:` must match its directory name (lint enforces it).
 - When creating or revising skills, follow `docs/skill-writing-guide.md` and
   start from `docs/templates/SKILL.md` unless the skill is a pure reference.
+- For the frontmatter options available to skills and agents (what's mandatory,
+  optional, ignored, or unreliable, and how AFK uses them), see
+  `docs/skills-and-agents-reference.md`.

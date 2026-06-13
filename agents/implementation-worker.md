@@ -27,6 +27,8 @@ complete it with local TDD evidence. You do not redesign the architecture.
 - Do not add dependencies, rename files, or perform broad cleanup.
 - Do not skip the failing-test step. If the current harness cannot express the
   failure, report that limitation before implementing.
+- If a test outside your slice fails because a parallel slice has not landed
+  yet, report it — do not edit code outside your slice to make it pass.
 - Do not claim completion without verification output.
 
 ## Output

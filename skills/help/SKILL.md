@@ -22,7 +22,7 @@ explanation of AFK itself.
 - Catalog: [afk-help.csv](./afk-help.csv)
 - Domain glossary: `CONTEXT.md` or `CONTEXT-MAP.md`
 - Decisions: `docs/adr/`
-- Plans: `docs/plans/`
+- Plans: `docs/plans/` (from `afk:grill`) and `brain/plans/` (from `afk:plan`)
 - QA evidence: `qa/`
 - Current implementation state: `git status --short` and `git diff --stat`
 
@@ -38,7 +38,7 @@ explanation of AFK itself.
    - "What now?": recommend exactly one next skill unless the state is truly
      ambiguous.
 4. Give the invocation, e.g. `afk:write-good-goal`, `afk:grill`,
-   `afk:ship`, `afk:implement`, `afk:simplify`, or `afk:qa`.
+   `afk:ship`, `afk:implement`, `afk:batch`, `afk:simplify`, or `afk:qa`.
 5. If one next step is clearly right, offer to run it now.
 
 ## Routing rules
@@ -49,13 +49,23 @@ explanation of AFK itself.
 - The user asks to run the whole AFK flow, ship a feature, resume an AFK
   lifecycle, or get from idea/plan to a ship/no-ship verdict: recommend
   `afk:ship`.
-- No concrete plan in `docs/plans/`: recommend `afk:grill`.
+- No concrete plan in `docs/plans/` or `brain/plans/`: recommend `afk:grill` to
+  interview a vague idea into a plan, or `afk:plan` to decompose an
+  already-clear task into phased plans. Both feed `afk:implement`.
 - A plan exists and there is little or no implementation diff: recommend
-  `afk:implement`.
+  `afk:implement`. If that plan splits into many independently-mergeable units
+  (a codebase-wide migration, rename, or repeated pattern change) and the user
+  wants parallel PRs, recommend `afk:batch` instead.
 - There is an implementation diff after a plan: recommend `afk:simplify`.
 - The user asks for verification, browser QA, API/service QA, screenshots,
   request/response evidence, or a ship/no-ship call after implementation:
   recommend `afk:qa`.
+- The user asks about persistent memory, project principles, capturing
+  learnings, or the `brain/` vault: recommend the memory skills — `afk:reflect`
+  to capture a session, `afk:ruminate` to mine past conversations, `afk:meditate`
+  to audit and prune, `afk:brain` for direct read/write, `afk:init-brain` to
+  scaffold, `afk:plan` for phased plans, and `afk:review` for a principle-grounded
+  review. These run anytime, not as a fixed flow phase.
 - The user asks about AFK itself: answer from the catalog and this plugin's
   README-level flow.
 - The user asks for release checks beyond browser QA: recommend the project's
@@ -69,6 +79,19 @@ project-specific progress, decisions, plans, implementation, or QA evidence.
 When the catalog is missing or unreadable, STOP and say that the help catalog is
 unavailable. Give only the recommendation that can be justified from the
 observed project state.
+
+## If AFK skills don't auto-trigger
+
+AFK relies on Claude Code injecting each skill's description so it fires on
+intent. On some Claude Code versions plugin skills are not auto-discovered, or a
+crowded install drops less-used descriptions from the skill listing. When a
+skill does not trigger on its own, invoke it explicitly:
+
+`/afk:help`, `/afk:write-good-goal`, `/afk:grill`, `/afk:implement`,
+`/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:ship`.
+
+If auto-trigger keeps failing, run `/doctor` to check plugin/skill loading, and
+raise `skillListingBudgetFraction` in settings so more descriptions stay listed.
 
 ## Stop and Ask
 

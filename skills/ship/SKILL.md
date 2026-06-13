@@ -27,14 +27,16 @@ Do not use this skill for:
 
 - A specific phase request such as "grill me", "implement this plan",
   "simplify the diff", or "QA this"; use that named skill directly.
-- PR creation, branch management, release notes, deployment monitoring, or
-  knowledge capture after shipping. AFK Ship stops at verified local evidence.
+- PR creation, branch management, release notes, or deployment monitoring. AFK
+  Ship stops at verified local evidence plus a brain reflection; it does not
+  push, deploy, or manage releases.
 
 ## Process
 
 1. Inspect current state before routing.
    - Read the user's request, `git status --short`, `git diff --stat`,
-     available `docs/plans/`, and available `qa/` reports.
+     available plans (`docs/plans/` from `afk:grill` and `brain/plans/` from
+     `afk:plan`), and available `qa/` reports.
    - If the user supplied a plan path, use that plan as the source of truth.
      Do not route back to `afk:grill` merely because the plan is terse; ask
      only when a specific missing decision blocks implementation.
@@ -76,11 +78,19 @@ Do not use this skill for:
    - For pure prose, metadata, or non-behavioral cleanup, skip QA with the
      specific reason and cite the verification used instead.
 
-6. Finish with a ship report.
+6. Persist learnings to the brain.
+   - Once the verdict is known, invoke `afk:reflect` to capture durable
+     learnings from the run — corrections, gotchas, decisions, and rationale —
+     into `brain/` (or route skill-process fixes into the relevant skill).
+   - Skip only when the run produced nothing durable (a tiny mechanical change
+     with no new knowledge); say so. Reflection persists knowledge; it never
+     changes the ship verdict.
+
+7. Finish with a ship report.
    - Summarize the phase route taken, changed files, verification, QA report,
-     and final verdict.
-   - Always include the `Route`, `Plan`, `Verification`, and `QA` fields even
-     when phases were skipped.
+     final verdict, and what was reflected into the brain.
+   - Always include the `Route`, `Plan`, `Verification`, `QA`, and `Memory`
+     fields even when phases were skipped.
    - If any phase could not run, report the blocker as a caveat or
      `DO NOT SHIP`; do not soften missing evidence into success.
 
@@ -113,11 +123,12 @@ Return this compact shape:
 
 ```markdown
 Verdict: SHIP | DO NOT SHIP | SHIP WITH CAVEATS
-Route: grill skipped/used -> implement -> simplify skipped/used -> qa skipped/used
+Route: grill skipped/used -> implement -> simplify skipped/used -> qa skipped/used -> reflect skipped/used
 Plan: docs/plans/<slug>.md or "none, reason"
 Changed: <files or summary>
 Verification: <commands/results>
 QA: qa/<slug>.md or "skipped, reason"
+Memory: <brain files written/updated, or "skipped, reason">
 Caveat: <one sentence, only if needed>
 ```
 
