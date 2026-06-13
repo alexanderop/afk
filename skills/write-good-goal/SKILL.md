@@ -1,15 +1,25 @@
 ---
 name: write-good-goal
-description: Help the user turn a vague intention into a concrete /goal condition for Codex or Claude Code. Use when the user asks to write, refine, improve, validate, or draft a goal, completion condition, objective, success criteria, or definition of done for long-running agent work.
+description: Use when the user asks to write, refine, improve, validate, or draft a /goal, completion condition, objective, success criteria, definition of done, or bounded outcome for long-running agent work
 ---
 
 # Write Good Goal
 
-Help the user write a high-quality `/goal` condition. The skill produces the
-goal text; it does not start implementation work.
+Turn the user's intent into a concrete `/goal` condition that an agent can
+evaluate from its own transcript.
 
-Do not run `/goal` yourself unless the user explicitly approves the final
-wording and asks you to set it.
+Core principle: write the goal text only. Do not start the goal, run `/goal`,
+or begin implementation unless the user explicitly approves the final wording
+and asks you to set it.
+
+## When to Use
+
+Use this skill for requests to draft, tighten, validate, or repair:
+
+- a `/goal` command
+- an objective or completion condition
+- success criteria or a definition of done
+- bounded outcomes for long-running Codex or Claude Code work
 
 ## Process
 
@@ -27,6 +37,7 @@ wording and asks you to set it.
    locally and the outcome is user-visible. For backend, CLI, library, or docs
    work, prefer the narrow contract, test, build, or artifact proof that best
    matches the change.
+7. Present the recommended goal without starting the work.
 
 ## Good Goal Shape
 
@@ -37,6 +48,23 @@ Achieve [specific outcome]. Prove it by [verification]. Preserve [constraints]. 
 ```
 
 If a shorter form is clearer, keep the same information but remove labels.
+
+## Stop and Ask
+
+Ask one to three focused questions only when the goal cannot be made
+verifiable from the user's message.
+
+STOP before drafting if any of these are missing and cannot be inferred:
+
+- Product intent: what outcome should exist when the work is done.
+- Scope boundary: which repo, feature, file set, issue, plan, or artifact owns
+  the work.
+- Source of truth: which plan, ticket, acceptance criteria, screenshot, or
+  failing command defines success.
+- Verification: which observable evidence should prove completion when no
+  reasonable default fits the project shape.
+
+Do not ask when the user gave enough detail. Draft the goal directly.
 
 ## Quality Checks
 
@@ -52,31 +80,15 @@ Before presenting the final goal, check that it is:
 - Non-ambiguous: avoids words like "better", "clean", "done", or "complete"
   unless they are defined by concrete evidence.
 
-## Strong Examples
+## Red Flags
 
-```text
-/goal Migrate the auth package to the new token verifier. Prove it by running `pnpm test auth` and `pnpm run typecheck` successfully. Preserve the public login API and do not modify unrelated tests. Stop after 12 turns if the verifier migration is still blocked.
-```
-
-```text
-/goal Reduce the dashboard initial load time below 1 second in the local production build. Prove it with a Lighthouse or browser timing report captured after `pnpm run build && pnpm run preview`. Preserve existing dashboard features and visual layout.
-```
-
-```text
-/goal Implement the checkout empty-cart state. Prove it by running the relevant tests and using `agent-browser` against the local app to capture PASS evidence for the empty-cart route, continue-shopping action, and mobile layout. Preserve existing checkout routes and payment behavior. Stop after 12 turns if local browser QA is blocked by missing secrets or services.
-```
-
-```text
-/goal Implement every acceptance criterion in `docs/plans/billing-retry.md`. Prove it by listing each criterion with PASS evidence and running the plan's verification commands successfully. Do not change payment provider credentials or production config. Stop after 20 turns.
-```
-
-## Weak Patterns To Repair
-
-- "Make this better" -> define what better means and how to prove it.
-- "Finish the migration" -> name the migration scope and verification command.
-- "Fix all bugs" -> name the bug source, queue, issue label, failing command,
-  or maximum number of issues.
-- "Clean up the code" -> define target files and measurable cleanup criteria.
+| Thought | Reality |
+|---------|---------|
+| "Make this better" | Define what "better" means and how to prove it. |
+| "Finish the migration" | Name the migration scope and verification command. |
+| "Fix all bugs" | Name the bug source, queue, issue label, failing command, or maximum number of issues. |
+| "Clean up the code" | Define target files and measurable cleanup criteria. |
+| "The agent will know when it is done" | The goal must include transcript-observable proof. |
 
 ## Output
 
@@ -96,5 +108,5 @@ Optional tighter version:
 <only include when a safer or more bounded variant is useful>
 ```
 
-If the user gave enough detail, do not interview them. Produce the goal
-directly.
+Omit `Optional tighter version` when it does not add a safer or more bounded
+alternative.

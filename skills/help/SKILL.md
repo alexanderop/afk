@@ -1,15 +1,23 @@
 ---
 name: help
-description: Orient the user in the AFK workflow by inspecting the project state, reading the local AFK catalog, and recommending the next skill to run. Use when the user asks for help, afk help, what to do next, where am I, or which AFK skill to use.
+description: Use when the user asks for help, afk help, what to do next, where am I, which AFK skill to use, AFK workflow orientation, or a broad catalog explanation
 ---
 
 # Help
 
-Orient the user in the AFK workflow and recommend the next useful step. Be
-specific, not encyclopedic: surface only the skills relevant to the current
-state or the user's question.
+Orient the user in the AFK workflow and recommend the next useful step.
 
-## Data sources
+Core principle: be specific, not encyclopedic. Ground the answer in observed
+project state and surface only the skills relevant to the current state or the
+user's question.
+
+## When to Use
+
+Use this skill when the user asks for AFK help, workflow orientation, the next
+AFK step, where they are in the process, which AFK skill to run, or an
+explanation of AFK itself.
+
+## Sources
 
 - Catalog: [afk-help.csv](./afk-help.csv)
 - Domain glossary: `CONTEXT.md` or `CONTEXT-MAP.md`
@@ -18,10 +26,7 @@ state or the user's question.
 - QA evidence: `qa/`
 - Current implementation state: `git status --short` and `git diff --stat`
 
-If a file or directory is missing, treat that as workflow signal. Do not invent
-project-specific progress.
-
-## How to answer
+## Process
 
 1. Read the catalog.
 2. Inspect the available artifacts listed above.
@@ -52,7 +57,32 @@ project-specific progress.
 - The user asks for release checks beyond browser QA: recommend the project's
   normal tests first, then `afk:qa` for real user-flow evidence.
 
-## Response format
+## Missing Artifacts
+
+If a file or directory is missing, treat that as workflow signal. Do not invent
+project-specific progress, decisions, plans, implementation, or QA evidence.
+
+When the catalog is missing or unreadable, STOP and say that the help catalog is
+unavailable. Give only the recommendation that can be justified from the
+observed project state.
+
+## Stop and Ask
+
+STOP and ask a clarifying question when two or more next skills are equally
+plausible and the project state does not break the tie.
+
+Ask only for the missing intent or source of truth needed to choose the next
+AFK step.
+
+## Red Flags
+
+| Thought | Reality |
+|---------|---------|
+| "The user asked for help, so list every skill." | List only relevant skills unless they ask to show everything. |
+| "The plan probably exists somewhere." | Inspect `docs/plans/`; missing artifacts are workflow signal. |
+| "There is a diff, so QA is next." | After a plan plus implementation diff, recommend `afk:simplify` before QA unless the user explicitly asks for verification. |
+
+## Output
 
 Use this compact shape:
 

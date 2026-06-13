@@ -1,96 +1,125 @@
 ---
 name: grill
-description: Interview the user relentlessly about a plan until shared understanding is reached, grounding questions in the codebase plus fetched docs or blog posts when relevant, and challenging it against CONTEXT.md and ADRs. Use before implementing anything non-trivial, or when the user says "grill me", "stress-test this plan", or hands you a vague feature idea.
+description: Use when the user says "grill me", asks to stress-test a plan, offers a vague feature idea, or wants grounded planning before non-trivial implementation
 ---
 
 # Grill
 
-Interview the user relentlessly about every aspect of the plan until you reach
-a shared understanding. Walk down each branch of the design tree, resolving
-dependencies between decisions one by one. For each question, provide your
-recommended answer.
+Grill turns unclear intent into an implementation-ready plan by interviewing
+the user one decision at a time. The core principle is: ask only questions the
+repo, docs, glossary, ADRs, or fetched primary sources cannot answer.
 
-Ask the questions **one at a time**, waiting for an answer before continuing.
+## When to Use
 
-If a question can be answered by exploring the codebase, explore the codebase
-instead of asking.
+Use this skill when:
 
-## Ground yourself first
+- The user says `grill me`, `stress-test this plan`, or asks for a planning
+  interview.
+- The user proposes a non-trivial implementation and shared understanding is
+  not yet strong enough to code.
+- A feature idea, migration, architecture change, domain model, or integration
+  has unresolved product intent, trade-offs, boundaries, contracts, or source
+  of truth.
 
-Before the first question, gather enough context to ask informed questions:
+Do not use this skill for tiny mechanical edits, direct bug fixes with an
+obvious cause, or execution of an already-written `docs/plans/` plan.
 
-- `CONTEXT.md` at the repo root — the domain glossary. If `CONTEXT-MAP.md`
-  exists instead, the repo has multiple contexts; follow the map.
-- `docs/adr/` — recorded decisions.
-- Relevant source files, configs, package manifests, route definitions,
-  schemas, tests, and README instructions.
+## Process
 
-Create these lazily — only when you have something to write. Formats:
-[CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md), [ADR-FORMAT.md](./ADR-FORMAT.md).
+1. Ground yourself before asking the first question. Read the relevant code,
+   tests, configs, routes, schemas, package manifests, README instructions,
+   and any nearby plans or specs.
+2. Read the domain context. Start with `CONTEXT.md`; if `CONTEXT-MAP.md`
+   exists, follow the map. Read relevant files in `docs/adr/`.
+3. If the work depends on external behavior, fetch and read relevant primary
+   sources before asking: official docs, maintainer posts, migration guides,
+   RFCs, product announcements, architecture posts, or named blog posts. Prefer
+   current official and maintainer-authored sources.
+4. For broad or unfamiliar work, dispatch bounded read-only subagents in
+   parallel:
+   - Codebase scout: inspect entrypoints, neighboring files, tests, schemas,
+     configs, and existing patterns. Report file paths, current behavior,
+     contradictions, and open questions.
+   - Research scout: read relevant external primary sources. Report source
+     URLs, version notes, recommendations, and risks that affect the plan.
+   - Domain scout, when useful: read `CONTEXT.md`, `CONTEXT-MAP.md`, and ADRs.
+     Report glossary conflicts, prior decisions, and terms needing precision.
+5. Synthesize the research yourself. Verify important claims against files or
+   fetched sources before using them.
+6. Ask the next best question, one at a time, and wait for the answer before
+   continuing. Include your recommended answer and the reason for it.
+7. Challenge glossary conflicts immediately. If the user uses a term
+   differently from `CONTEXT.md`, say what the glossary says and ask which
+   meaning is authoritative.
+8. Sharpen fuzzy or overloaded language. Propose canonical terms when concepts
+   such as `account`, `user`, `customer`, `order`, or `cancellation` may mean
+   different things.
+9. Stress-test decisions with concrete scenarios, edge cases, failure modes,
+   permission boundaries, lifecycle states, and cross-system contracts.
+10. Cross-reference user claims against code and fetched sources. Surface
+    contradictions explicitly and ask which source should win.
+11. Update `CONTEXT.md` immediately when a glossary term is resolved. Use it
+    only as a glossary: no implementation details, specs, scratch notes, or
+    plan content. If creating it, use [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+12. Offer an ADR only when the decision is hard to reverse, surprising without
+    context, and the result of a real trade-off. If creating one, use
+    [ADR-FORMAT.md](./ADR-FORMAT.md).
+13. Continue until the decision tree is resolved enough for implementation:
+    contracts are clear, ambiguous terms are defined, key edge cases have an
+    agreed answer, and source-of-truth conflicts are settled.
+14. Write the agreed plan to `docs/plans/<slug>.md`. Include decisions made,
+    contracts between parts, relevant glossary or ADR updates, source URLs that
+    shaped decisions, and an ordered implementation task list.
 
-For broad or unfamiliar work, use subagents to accelerate discovery before
-interviewing the user. Dispatch independent read-only subagents in parallel:
+## Stop and Ask
 
-- Codebase scout: inspect likely entrypoints, neighboring files, tests,
-  schemas, configs, and existing patterns. Report concrete file paths,
-  current behavior, contradictions, and open questions.
-- Research scout: fetch and read relevant official docs, maintainer posts,
-  migration guides, RFCs, or named blog posts. Report source URLs, version
-  notes, recommendations, and risks that affect the plan.
-- Optional domain scout: read `CONTEXT.md`, `CONTEXT-MAP.md`, and ADRs to
-  identify glossary conflicts, prior decisions, and terms that need precision.
+STOP and ask the user when:
 
-Keep subagent briefs read-only and bounded. Do not let subagents ask the user
-questions or write files. The lead must synthesize their reports, verify the
-important claims against files or fetched sources when needed, then ask the
-next best question.
+- Product intent, priority, or acceptable trade-off cannot be inferred from the
+  repo, glossary, ADRs, or docs.
+- Multiple sources of truth conflict and choosing one would change behavior.
+- A required external source, credential, account, environment, or proprietary
+  document is unavailable.
+- Continuing would require making a business, legal, security, data retention,
+  privacy, or rollout decision without an owner.
 
-If the request depends on external behavior, fetch and read the relevant docs
-or blog posts before asking. Use fetch for framework/library/API docs, upgrade
-or migration guides, product announcements, RFCs, architecture posts, or other
-primary sources that affect the plan. Prefer official documentation and
-maintainer-authored posts; use third-party posts only when they are the named
-source or fill a gap. Cite the fetched URLs in the final plan when they shaped
-a decision.
+Do not ask the user about facts that can be discovered by reading the repo or
+fetched primary sources.
 
-Do not ask the user questions that the codebase or fetched sources can answer.
-Ask only for product intent, preferences, trade-offs, credentials/access, or
-which ambiguous source/version to treat as authoritative.
+## Red Flags
 
-## During the session
-
-**Challenge against the glossary.** When the user uses a term that conflicts
-with `CONTEXT.md`, call it out immediately: "Your glossary defines
-'cancellation' as X, but you seem to mean Y — which is it?"
-
-**Sharpen fuzzy language.** When a term is vague or overloaded, propose a
-precise canonical one: "You're saying 'account' — do you mean the Customer or
-the User? Those are different things."
-
-**Stress-test with concrete scenarios.** Invent scenarios that probe edge
-cases and force precision about the boundaries between concepts.
-
-**Cross-reference with code.** When the user states how something works, check
-whether the code agrees. Surface contradictions: "Your code cancels entire
-Orders, but you just said partial cancellation is possible — which is right?"
-
-**Cross-reference with fetched sources.** When a proposed plan relies on a
-library, platform, API, migration guide, or current best practice, check the
-source before locking the plan. Surface contradictions: "The docs now
-recommend X, but this plan assumes Y — should we follow the current docs or
-preserve the existing pattern?"
-
-**Update CONTEXT.md inline.** When a term is resolved, update `CONTEXT.md`
-right there — don't batch. `CONTEXT.md` is a glossary and nothing else: no
-implementation details, no spec content, no scratch notes.
-
-**Offer ADRs sparingly.** Only when all three hold: hard to reverse,
-surprising without context, and the result of a real trade-off. If any is
-missing, skip the ADR.
+| Thought | Reality |
+|---------|---------|
+| "I can ask the user how the code works." | Read the code first and ask only when the code conflicts with intent or another source. |
+| "The plan is mostly obvious." | Non-trivial work needs explicit contracts, edge cases, and source-of-truth decisions before implementation. |
+| "I'll batch glossary updates at the end." | Update `CONTEXT.md` when the term is resolved so later questions use the canonical meaning. |
+| "This decision feels important, so it needs an ADR." | ADRs are only for decisions that are hard to reverse, surprising without context, and trade-off driven. |
+| "A subagent report is enough." | The lead must synthesize and verify important claims before asking or planning. |
 
 ## Output
 
-When the tree is resolved, write the agreed plan to `docs/plans/<slug>.md`:
-the decisions made, the contracts between parts, and an ordered task list.
-This file is the input to **afk:implement**. End by telling the user the plan
-is ready and where it lives.
+Create `docs/plans/<slug>.md` with this shape:
+
+```markdown
+# <Plan Title>
+
+## Context
+- <What is being changed and why>
+- <Relevant code, glossary, ADR, or external source constraints>
+
+## Decisions
+- <Resolved decision and rationale>
+
+## Contracts
+- <Interface, data, lifecycle, permission, or ownership contract>
+
+## Open Non-Blocking Notes
+- <Known follow-up that does not block implementation>
+
+## Tasks
+1. <Ordered implementation task>
+2. <Verification task>
+```
+
+End the session by telling the user the plan is ready, naming the exact
+`docs/plans/<slug>.md` path, and stating that it is the input to `afk:implement`.

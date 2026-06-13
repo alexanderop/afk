@@ -30,3 +30,5 @@ harness. No build step, no dependencies beyond `jq` and `shellcheck`.
   redundant instructions, pointers over copies. SKILL.md stays under 500 lines;
   descriptions under 1024 chars (the lint enforces both).
 - Skill frontmatter `name:` must match its directory name (lint enforces it).
+- When creating or revising skills, follow `docs/skill-writing-guide.md` and
+  start from `docs/templates/SKILL.md` unless the skill is a pure reference.

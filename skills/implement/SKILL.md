@@ -1,113 +1,186 @@
 ---
 name: implement
-description: Implement a plan through bounded orchestration — the lead owns architecture and contracts, then delegates independent TDD slices to subagents, agent teams, or dynamic workflows. Use after afk:grill produced a plan, or when the user says "implement the plan" or hands you a worked-out design to build.
+description: Use when the agent is about to implement, edit code, execute a plan, fix a bug, build a feature, or make repo changes, especially when task complexity or orchestration needs are unclear.
 ---
 
 # Implement
 
-You are the lead architect. You own cross-slice decisions: boundaries,
-interfaces, file ownership, data flow, error handling, and integration order.
-Workers may run local TDD inside the slice you assign them, but they must not
-change the architecture or renegotiate shared contracts.
+Load this skill before implementation starts. First decide whether the work is
+simple enough to do directly or complex enough to justify orchestration.
 
-The economics: your context and reasoning are expensive — spend them on
-reading code, deciding contracts, and reviewing diffs. Local TDD loops and
-keystrokes are cheap — delegate them to sonnet/haiku via the Agent tool
-(`Task` in older Claude Code configs). For larger fan-out, use an agent team
-or a dynamic workflow; do not rely on subagents spawning subagents.
+Simple local changes belong in the main conversation. Complex work uses the
+lead-orchestrated shape: you decide the architecture, contracts, boundaries,
+file ownership, data flow, error handling, and integration order; workers run
+bounded local TDD slices inside those decisions.
 
-## Step 1: Plan (you, no subagents)
+## When to Use
 
-1. Read the plan — `docs/plans/<slug>.md` from **afk:grill** if it exists,
-   otherwise whatever the user gave you.
-2. Read every file the change will touch and the neighbours they integrate
+Use this skill before any repo-changing implementation work, including:
+
+- Implementing a written plan or a plan from `afk:grill`.
+- Editing code, tests, workflows, configuration, docs-as-product, or generated
+  artifacts.
+- Fixing bugs, building features, refactoring, or wiring integrations.
+
+Do not wait until the task feels complicated. This skill is the gate before
+touching files.
+
+## Process
+
+### 1. Triage Complexity
+
+Before editing, classify the task.
+
+Do the work directly when all of these are true:
+
+- The change is small, localized, and easy to review end-to-end.
+- It touches one or two files with no unsettled shared interface.
+- The expected behavior and verification command are clear.
+- A mistake would be obvious in the diff or test output.
+
+Use lead-orchestrated slices when any of these are true:
+
+- The work spans multiple files, modules, packages, workflows, or UI states.
+- The task needs architecture decisions, contracts, sequencing, or integration
+  planning.
+- Independent slices can be assigned with fixed boundaries and verified
+  separately.
+- The task involves migrations, security-sensitive code, data flow, external
+  APIs, complex tests, or risk that is hard to see in one diff.
+- A plan from `afk:grill` exists or the user provides a worked-out design.
+
+### 2. Direct Implementation
+
+For simple work:
+
+1. Read the target file and its immediate neighbors.
+2. Make the smallest behavior-preserving or behavior-adding change that
+   satisfies the request.
+3. Run the narrowest meaningful verification command.
+4. Read the diff before reporting completion.
+
+Do not create fake slices, dispatch subagents, or write a heavyweight plan for
+genuinely local work.
+
+### 3. Orchestrated Implementation
+
+For complex work, you are the lead architect. Your expensive context is for
+reading code, deciding contracts, and reviewing diffs. Workers are for local
+TDD loops and bounded edits.
+
+Plan in the lead context before dispatching:
+
+1. Read the plan, usually `docs/plans/<slug>.md` from `afk:grill`, or the
+   plan/design the user provided.
+2. Read every file the change will touch and the neighboring code it integrates
    with. You cannot brief what you have not read.
-3. Decide everything contestable NOW: file layout, names, function signatures,
-   types, error handling, which existing helpers to reuse. If two tasks share
-   a boundary, write the interface down before splitting them.
-4. Cut the work into slices. A good slice has fixed boundaries and contracts:
-   "implement X behind this interface, with these behaviours and tests" —
-   never "figure out the architecture…". If you can't write the brief without
-   hedging on shared design, the thinking isn't done; go back to the code.
+3. Decide everything contestable now: file layout, names, function signatures,
+   types, error handling, existing helpers to reuse, shared boundaries, and
+   integration order.
+4. Cut the work into slices with fixed contracts: implement this behavior
+   behind this interface, in these files, with these tests.
 
-## Step 2: Dispatch via Agent, teams, or workflows
+Never brief a worker to "figure out the architecture." If a slice brief needs
+hedging on shared design, return to the code and decide the contract first.
 
-Subagents start with **zero context** — they haven't seen this conversation,
-the plan, or your reasoning. Each brief must be self-contained:
-
-- Exact file paths to create or edit, and which files to read first.
-- The contract: signatures, types, expected behaviour, error cases.
-- Code conventions to follow (point at a concrete existing file to mimic).
-- The TDD loop to run: write failing tests, implement the smallest passing
-  change, refactor locally, then report test evidence.
-- The verify command (test/typecheck/lint) and the instruction to run it
-  before reporting back.
-- What NOT to do: no refactoring of neighbouring code, no new dependencies,
-  no renaming beyond the brief.
-
-Pick the model per task:
-
-| Model | Use for |
-|-------|---------|
-| `haiku` | Truly mechanical: boilerplate, wiring, config, repetitive edits across files, tests from a given spec |
-| `sonnet` | Multi-file features within a decided design, non-trivial logic with a clear contract, local TDD for one slice |
-
-Dispatch **independent tasks in parallel** (multiple Agent/Task calls in one
-message). Dependent tasks run sequentially — never let two subagents edit the
-same file concurrently.
-
-### Orchestration options
+### 4. Dispatch Workers
 
 Use the smallest orchestration primitive that fits:
 
-- **Plain subagents:** a few self-contained workers that report back to you.
-  Best for focused tests, implementation slices, and review passes.
-- **Agent teams:** several long-running peers that need a shared task list,
-  direct communication, or plan approval before edits.
-- **Dynamic workflows:** dozens to hundreds of repeatable agents coordinated
-  by a script, useful for repo-wide audits, migrations, and cross-checked
-  research.
+| Primitive | Use for |
+|-----------|---------|
+| Plain subagents | A few self-contained implementation, test, or review slices that report back to you |
+| Agent teams | Several long-running peers that need a shared task list, direct communication, or plan approval before edits |
+| Dynamic workflows | Dozens to hundreds of repeatable agents for repo-wide audits, migrations, or cross-checked research |
 
-Subagents cannot spawn subagents. If you want hierarchical work, keep the lead
-as the orchestrator and chain subagents from the main conversation, create an
-agent team, or ask Claude Code to write a dynamic workflow. The supported
-shape is lead -> workers, not worker -> nested workers.
+Subagents start with zero context. Each brief must include:
 
-For implementation work, make every worker run local red-green-refactor:
+- Exact file paths to create or edit and files to read first.
+- The contract: signatures, types, expected behavior, and error cases.
+- Code conventions to follow, with a concrete existing file to mimic.
+- The local TDD loop: write the failing test, implement the smallest passing
+  change, refactor locally, and report evidence.
+- The verification command to run before reporting back.
+- Hard boundaries: no neighboring refactors, no new dependencies, no renames,
+  and no work outside the brief unless explicitly allowed.
 
-- Write or update the failing test for its assigned behaviour.
-- Implement the smallest passing change inside its file boundary.
-- Refactor locally without changing the public contract.
-- Run the slice verify command and report the TDD evidence: failing test
-  observed, passing test observed, refactor verification.
+Pick the model by slice:
 
-Do **not** fan out work when tasks share unsettled interfaces, need
-architectural choices, involve data migrations/security-sensitive logic, or a
-mistake would be hard to see in diff review. In those cases, work in the main
-conversation or require plan approval before edits.
+| Model | Use for |
+|-------|---------|
+| `haiku` | Mechanical boilerplate, wiring, config, repetitive edits, or tests from a given spec |
+| `sonnet` | Multi-file features inside a decided design, non-trivial logic with a clear contract, or local TDD for one slice |
 
-## Step 3: Review every result (you)
+Dispatch independent tasks in parallel. Run dependent tasks sequentially. Never
+let two workers edit the same file concurrently.
 
-A subagent's "done" report is a claim, not a fact. After each task:
+Subagents cannot spawn subagents. If work needs hierarchy, keep the lead as
+the orchestrator and chain workers from the main conversation, create an agent
+team, or ask Claude Code to write a dynamic workflow. The supported shape is
+lead -> workers, not worker -> nested workers.
 
-1. Read the actual diff (`git diff`), not the summary.
-2. Run the verify command yourself.
-3. If it's wrong: re-dispatch **once** with the diff quoted and the specific
-   correction. If it's wrong twice, the brief was the problem or the task was
-   too hard for the tier — fix it yourself, in your context.
+### 5. Require Local TDD Evidence
 
-When all tasks land, run the full test suite and read the complete diff
-end-to-end for integration seams the per-task reviews couldn't see.
+For implementation slices, every worker must run red-green-refactor inside its
+boundary:
 
-## Red flags
+1. Write or update the failing test for the assigned behavior.
+2. Implement the smallest passing change.
+3. Refactor locally without changing the public contract.
+4. Run the slice verification command.
+5. Report evidence: failing test observed, passing test observed, and refactor
+   verification.
+
+### 6. Review Every Result
+
+A worker's "done" report is a claim, not a fact.
+
+After each worker returns:
+
+1. Read the actual diff with `git diff`, not just the summary.
+2. Run the verification command yourself.
+3. If the result is wrong, re-dispatch once with the relevant diff and a
+   specific correction.
+4. If it is wrong twice, treat the brief or model choice as the problem and
+   finish the fix in the lead context.
+
+When all slices land, run the full relevant test suite and read the complete
+diff end-to-end for integration issues that slice reviews could not see.
+
+## Stop and Ask
+
+STOP before dispatching workers when:
+
+- Shared interfaces, ownership, or integration order are undecided.
+- Two workers would need to edit the same file at the same time.
+- The requested change depends on product intent, credentials, private data,
+  or an external source of truth that is not available.
+- The task is a migration, security-sensitive change, or destructive action
+  and the safe boundary is unclear.
+
+Ask only for the missing decision or permission. Otherwise, decide in the lead
+context and keep moving.
+
+## Red Flags
 
 | Thought | Reality |
 |---------|---------|
-| "The subagent can explore and decide the approach" | Then you've delegated the thinking. Decisions made in a haiku context are decisions made badly. Decide first, brief second. |
+| "I'll start coding and load the skill if it gets complicated" | This skill is the gate before implementation. Triage first, then act. |
+| "Any implementation task should use subagents" | Simple local work is faster and safer in the main conversation. Orchestrate only when complexity justifies it. |
+| "The subagent can explore and decide the approach" | Then the lead has delegated architecture. Decide first, brief second. |
 | "The brief is getting long, I'll just say 'follow the plan'" | The subagent has never seen the plan. Paste what it needs, verbatim. |
-| "It reported success and tests pass" | Whose tests? Read the diff. Subagents delete failing tests, hardcode fixtures, and stub the hard part with a TODO. |
+| "It reported success and tests pass" | Whose tests? Read the diff. Workers can delete failing tests, hardcode fixtures, or stub the hard part with a TODO. |
 | "The parent subagent will spawn nested workers" | Claude Code subagents cannot spawn subagents. Chain from the lead, use an agent team, or use a dynamic workflow. |
 | "This task is too hard for sonnet, I'll write a smarter prompt" | If it needs a smarter prompt, it needs a smarter model: do it yourself. |
-| "I'll dispatch all ten tasks at once" | Tasks 4–10 depend on the interfaces 1–3 create. Parallelism only across genuinely independent files. |
+| "I'll dispatch all tasks at once" | Parallelism only belongs across genuinely independent files and contracts. |
 
-When everything is green, suggest **afk:simplify** as the next step.
+## Output
+
+Final responses after implementation should include:
+
+- Changed files.
+- What changed and why.
+- Verification commands and results.
+- Any known gaps, follow-up risks, or blocked checks.
+
+When everything is green, suggest `afk:simplify` as the next step.

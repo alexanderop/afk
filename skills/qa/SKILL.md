@@ -1,158 +1,177 @@
 ---
 name: qa
-description: Route QA by project shape: use dogfood-style browser QA for frontend apps, API/service QA for backend apps, and both for hybrids. Produce evidence-backed pass/fail reports with a ship recommendation. Use after implementation or when the user says "qa this", "verify it", "dogfood this", or "check it actually works".
+description: Use after implementation, before shipping, or when the user asks to QA, verify, dogfood, check whether a change actually works, or make a ship/no-ship call.
 context: fork
 ---
 
 # QA
 
-QA is a router. First identify what kind of system changed, then use the
-evidence loop that matches it.
+QA proves whether the intended user or client can complete the changed flow.
+Route by project shape, verify with direct evidence, and end with a clear
+SHIP, DO NOT SHIP, or SHIP WITH CAVEATS verdict.
 
-Tests prove code paths work; QA proves the intended user or client can finish
-the flow. **A claim without evidence is not a finding.**
+**Core principle:** tests are supporting evidence; QA is the observed behavior
+of the real UI, API, CLI, worker, or service contract. A claim without evidence
+is not a finding.
 
-## Step 1: Orient
+## When to Use
 
-- Identify the flow under test: the plan from **afk:grill**
-  (`docs/plans/<slug>.md`), the recent diff, or what the user named.
-- Read the local run instructions (`README`, `CLAUDE.md`, package scripts,
-  Procfile/compose files, Makefile, framework config).
-- Classify the target:
-  - **Frontend:** browser-rendered screens, routes, forms, navigation,
-    client-side state, visual or accessibility changes.
-  - **Backend:** APIs, workers, CLIs, persistence, auth, queues, webhooks, or
-    service contracts with no meaningful browser surface.
-  - **Hybrid:** backend behavior visible through a frontend flow.
-- Pick the route:
-  - Frontend -> run **Frontend QA**.
-  - Backend -> run **Backend QA**.
-  - Hybrid -> run Backend QA for the service contract, then Frontend QA for
-    the user-visible integration.
+Use this skill after `afk:implement`, after any meaningful code change, or when
+the user says phrases like "qa this", "verify it", "dogfood this", "check it
+actually works", or "can this ship?"
 
-If the project cannot be run locally because required services or secrets are
-missing, report the blocker with the exact command/error. Do not replace QA
-with "tests pass".
+## Process
 
-## Frontend QA
+1. Orient on the target.
+   - Identify the flow under test from the `afk:grill` plan in
+     `docs/plans/<slug>.md`, the recent diff, or the user's named target.
+   - Read local run instructions from `README`, `CLAUDE.md`, package scripts,
+     Procfile or compose files, Makefile, and framework config.
+   - Classify the changed system:
+     - **Frontend:** browser-rendered screens, routes, forms, navigation,
+       client-side state, visual changes, or accessibility changes.
+     - **Backend:** APIs, workers, CLIs, persistence, auth, queues, webhooks,
+       or service contracts without a meaningful browser surface.
+     - **Hybrid:** backend behavior that must also be proven through a
+       user-visible frontend flow.
 
-Use dogfood-style browser QA: drive the real UI through the flow a user would
-walk, capture screenshots and console evidence, and write a ship/no-ship call.
+2. Choose the QA route.
+   - Frontend: run Frontend QA.
+   - Backend: run Backend QA.
+   - Hybrid: run Backend QA for the service contract, then Frontend QA for the
+     user-visible integration.
+   - If the app cannot run locally because services, migrations, seeds, or
+     secrets are missing, capture the exact command and error. Do not replace
+     QA with "tests pass".
 
-### Bring the app up
+3. Run Frontend QA when the changed flow has a browser surface.
+   - Start the dev server in the background. Wait for its ready banner and use
+     the real port it prints. If a server already runs on that port, reuse it.
+   - Open a named browser session so state survives across commands:
 
-Start the dev server in the background; wait for its ready banner and use the
-**real** port it prints. If a server already runs on that port, reuse it.
+     ```bash
+     agent-browser --session-name afk-qa open http://localhost:<port>
+     export AGENT_BROWSER_SESSION=afk-qa
+     ```
 
-Open a named session so state survives across commands:
+   - If `agent-browser --help` fails, say so and stop. Do not silently fall
+     back to unit tests for browser QA.
+   - Derive cases from the plan and expected user behavior, not from the
+     implementation: happy path, every acceptance criterion, invalid input,
+     empty submit, refresh mid-flow, back button, and double-click submit.
+   - For each step:
+     1. Wait for a reliable signal with `wait --load networkidle` or
+        `wait --text "..."`.
+     2. Run `snapshot -i -u`; act on `@eN` refs, not CSS selectors.
+        Re-snapshot after every DOM-changing action because refs expire.
+     3. Capture screenshots at each state transition under
+        `qa/evidence/<slug>/`.
+     4. Check what screenshots cannot show: uncaught `errors`, `[error]`
+        console lines, relevant input values, and `window.location.href`.
+     5. Round-trip created or edited data when possible by navigating away and
+        confirming the downstream view updated.
+   - Treat a rendered success screen with a 500, uncaught exception, or
+     relevant console error as a failure.
+   - When a screen looks broken, triage before reporting: confirm the URL,
+     whether `open` landed on `about:blank`, whether the error is a product bug
+     or missing local key, and whether direct-loading a client-routed URL needs
+     router navigation.
+   - When scope allows, also dogfood navigation entry points, empty states,
+     loading and error states, mobile viewport, keyboard-only interaction, form
+     validation, and basic accessibility signals such as labels, names, focus,
+     headings, and image alternatives.
 
-```bash
-agent-browser --session-name afk-qa open http://localhost:<port>
-export AGENT_BROWSER_SESSION=afk-qa   # set on every subsequent call
-```
+4. Run Backend QA when the changed flow is an API, service, CLI, worker, or
+   contract.
+   - Start the app with the project's normal local command. Start documented
+     local dependencies only when the repo requires them.
+   - Record the command, base URL, port, environment, and dependency setup.
+   - Find the contract from OpenAPI, GraphQL schema, protobuf definitions,
+     route files, controllers, handlers, CLI help, README examples, or the
+     plan. Prefer public contracts over implementation internals.
+   - Exercise the contract with evidence for:
+     1. Health, readiness, or a harmless read endpoint.
+     2. Happy path with the smallest realistic payload.
+     3. Validation failures: missing required fields, malformed types, invalid
+        enum values, and boundary sizes.
+     4. Auth or permission failures when auth exists.
+     5. Not-found, conflict, or idempotency behavior where the contract implies
+        it.
+     6. Persistence round trip: create or update, fetch or list, restart or
+        refresh if cheap, then verify state remains correct.
+     7. Side effects: jobs, emails, webhooks, files, metrics, or audit logs
+        when the feature owns them.
+   - Capture request and response transcripts in `qa/evidence/<slug>/api/`.
+     Redact tokens, cookies, secrets, and personal data. Include status code,
+     relevant headers, request body, response body, and the exact command used.
+     For GraphQL, include the query or mutation text and variables.
+   - After each failure-looking result, triage before reporting: wrong base
+     URL, missing migration, missing seed data, absent local secret, clock
+     skew, or a contract mismatch. Check logs for stack traces, 5xxs, unhandled
+     promise rejections, failed jobs, and unexpected retries.
+   - For backend-only work, run the narrow relevant automated test command
+     after manual contract checks and include the command and result as
+     supporting evidence.
 
-If `agent-browser --help` fails, say so and stop. Do not silently fall back to
-unit tests for browser QA.
+5. Clean up.
+   - Close browser sessions or stop background services you started.
+   - Keep evidence files that support the report.
 
-### Walk the flow
+## Stop and Ask
 
-Derive test cases from the plan, not from the implementation: the happy path,
-each acceptance criterion, the obvious negative paths (invalid input, empty
-submit, refresh mid-flow, back button, double-click submit).
+STOP and ask before continuing when:
 
-Per step:
+- The target flow or source of truth is ambiguous and cannot be inferred from
+  the plan, diff, or user's request.
+- Local QA requires credentials, secrets, paid services, destructive production
+  actions, or external state the repo does not document.
+- The only available path would mutate real user data or send real external
+  communications.
+- A missing dependency, migration, seed, or service blocks running the app and
+  the repo gives no safe local substitute.
 
-1. `wait --load networkidle` (or `wait --text "..."` when you know the signal).
-2. `snapshot -i -u` — act on `@eN` refs, never CSS selectors. Refs die on any
-   DOM change: re-snapshot after every action.
-3. `screenshot qa/evidence/<slug>/tc01-<step>.png` at every state transition.
-4. Check what screenshots can't show: `errors` (uncaught exceptions — the
-   cleanest signal), `console` for `[error]` lines, `eval` for input values
-   and `window.location.href`. A rendered success screen with a 500 in the
-   console is a FAIL.
-5. Round-trip when possible: after creating/editing something, navigate back
-   and confirm the downstream view actually updated.
+If blocked, report the exact command, error, and missing prerequisite. Do not
+invent QA coverage from tests or static inspection.
 
-When a screen looks broken, triage before reporting: is the URL what you
-expect? Did `open` land on `about:blank`? Is the console error a product bug
-or a missing local API key? Client-routed URLs that 404 on direct load need
-router navigation
-(`eval "window.history.pushState({}, '', '/route'); window.dispatchEvent(new PopStateEvent('popstate'))"`).
+## Red Flags
 
-Dogfood beyond the named path when scope allows: navigation entry points,
-empty states, loading/error states, mobile viewport, keyboard-only interaction,
-form validation, and basic accessibility signals such as labels, names, focus,
-headings, and image alternatives.
+| Thought | Reality |
+|---------|---------|
+| "Tests passed, so QA passed." | Tests are supporting evidence; QA needs observed user or contract behavior. |
+| "The page showed success, so it worked." | Check console, network-visible failures, persisted state, and downstream views. |
+| "The endpoint returned 200 once." | Verify validation, errors, persistence, permissions, and side effects where relevant. |
+| "The local setup is broken, but the code looks fine." | That is a blocker or caveat, not a ship verdict. |
+| "A finding seems obvious." | Reproduce it and cite evidence from the report. |
 
-## Backend QA
+## Output
 
-Use contract-level QA: prove that a real client can call the service and that
-state, validation, errors, and logs behave correctly.
-
-### Bring the service up
-
-Start the app with the project's normal local command. Start required local
-dependencies only when the repo documents them (`docker compose`, test DB,
-emulator, queue). Record the actual base URL, port, environment, and command.
-
-Find the contract surface from OpenAPI/GraphQL schema/protobuf definitions,
-route files, controllers, handlers, CLI help, README examples, or the plan.
-Prefer public contracts over implementation internals.
-
-### Exercise the contract
-
-Derive test cases from the plan and contract:
-
-1. Health/readiness or a harmless read endpoint.
-2. Happy path with the smallest realistic payload.
-3. Validation failures: missing required fields, malformed types, invalid enum
-   values, boundary sizes.
-4. Auth/permission failures when auth exists.
-5. Not-found/conflict/idempotency behavior where the contract implies it.
-6. Persistence round trip: create/update, fetch/list, restart or refresh if
-   cheap, then verify state remains correct.
-7. Side effects: emitted jobs, emails, webhooks, files, metrics, or audit logs
-   when the feature owns them.
-
-Capture evidence as request/response transcripts in
-`qa/evidence/<slug>/api/`, redacting tokens, cookies, secrets, and personal
-data. Include status code, relevant headers, request body, response body, and
-the exact command used (`curl`, `http`, `grpcurl`, project CLI, or test
-client). For GraphQL, include query/mutation text and variables.
-
-After each failure-looking result, triage before reporting: wrong base URL,
-missing migration, missing seed data, absent local secret, clock skew, or a
-contract mismatch. Check application logs for stack traces, 5xxs, unhandled
-promise rejections, failed jobs, and unexpected retries.
-
-For backend-only work, automated tests are supporting evidence, not the QA
-itself. Run the narrow relevant test command after manual contract checks and
-include the command/result in Observations.
-
-## Report
-
-Close browser sessions or stop background services you started, then write
-`qa/<slug>.md`:
+Write the QA report to `qa/<slug>.md` using exactly this shape:
 
 ```markdown
-# QA: <feature> — <date>
+# QA: <feature> - <date>
 
 ## Verdict: SHIP | DO NOT SHIP | SHIP WITH CAVEATS
 
 ## Route
 Frontend | Backend | Hybrid, with the reason for that choice.
 
-## TC-01: <name> — PASS/FAIL
+## TC-01: <name> - PASS/FAIL
 Steps:    (numbered, exactly what you did)
 Expected: (from the plan)
-Actual:   (what happened; quote DOM text, console errors)
+Actual:   (what happened; quote DOM text, console errors, status codes, or logs)
 Evidence: qa/evidence/<slug>/...
 
 ## Observations
-(environmental noise — local 500s from missing keys etc. — kept out of the
-defect list so the report doesn't cry wolf)
+(environmental noise, local setup caveats, missing keys, and supporting test
+commands/results that should not be treated as product defects)
 ```
 
-Failures must be reproducible from the report alone. Tell the user the
-verdict, the report path, and any caveat in two sentences — don't recap the
-report body.
+Failures must be reproducible from the report alone.
+
+Final user response:
+
+```markdown
+Verdict: SHIP | DO NOT SHIP | SHIP WITH CAVEATS
+Report: qa/<slug>.md
+Caveat: <one sentence, only if needed>
+```

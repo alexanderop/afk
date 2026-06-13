@@ -1,63 +1,114 @@
 ---
 name: simplify
-description: Review the changed code for reuse, simplification, efficiency, and altitude cleanups, then apply the fixes. Quality only — it does not hunt for bugs. Use after afk:implement lands, or when the user says "simplify", "clean up the changed code", "deduplicate", or "DRY this up". An optional argument (PR number, branch, or file path) overrides the review target.
+description: Use when afk:implement has landed, when the user asks to simplify or clean up changed code, or when they ask to deduplicate, DRY, or review quality without hunting for bugs
 ---
 
 # Simplify
 
-`/simplify → 4 cleanup agents in parallel → apply the fixes`
+Improve changed code quality by finding and fixing reuse, simplification,
+efficiency, and altitude issues. This is not a correctness review: do not hunt
+for bugs or broaden the scope beyond the reviewed changes.
 
-You are improving the quality of the changed code, not hunting for bugs. Review
-it for reuse, simplification, efficiency, and altitude issues, then fix what you
-find. Do not look for correctness bugs — that is a code review's job.
+Core principle: review the target diff from four independent cleanup angles,
+deduplicate the findings, then apply only fixes that preserve intended behavior.
 
-## Phase 0 — Gather the diff
+## When to Use
 
-Run `git diff @{upstream}...HEAD` (or `git diff main...HEAD` / `git diff HEAD~1`
-if there's no upstream) to get the unified diff under review. If there are
-uncommitted changes, or the range diff is empty, also run `git diff HEAD` and
-include the working-tree changes in scope — the review often runs before the
-commit. If a PR number, branch name, or file path was passed as an argument,
-review that target instead. Treat this diff as the review scope.
+Use this after `afk:implement` lands or when the user asks for changed code to
+be simplified, cleaned up, deduplicated, or made DRY.
 
-## Phase 1 — Review (4 cleanup agents in parallel)
+If the user passes a PR number, branch name, or file path, use that argument as
+the review target. Otherwise, review the current changed-code diff.
 
-Launch **4 independent review agents** via the Task tool, all in a
-single message so they run concurrently. Pass each agent the diff and one of
-the four angles below. Each returns its findings with `file`, `line`, a
-one-line `summary`, and the concrete cost (what is duplicated, wasted, or
-harder to maintain).
+## Process
 
-### Reuse
-Flag new code that re-implements something the codebase
-already has — Grep shared/utility modules and files adjacent to the change,
-and name the existing helper to call instead.
+1. Gather the review scope.
 
-### Simplification
-Flag unnecessary complexity the diff adds: redundant or derivable state,
-copy-paste with slight variation, deep nesting, dead code left behind. Name
-the simpler form that does the same job.
+   Run `git diff @{upstream}...HEAD` to get the unified diff under review. If
+   there is no upstream, use `git diff main...HEAD` or `git diff HEAD~1`.
 
-### Efficiency
-Flag wasted work the diff introduces: redundant computation or repeated I/O,
-independent operations run sequentially, blocking work added to startup or
-hot paths. Also flag long-lived objects built from closures or captured
-environments — they keep the entire enclosing scope alive for the object's
-lifetime (a memory leak when that scope holds large values); prefer a
-class/struct that copies only the fields it needs. Name the cheaper
-alternative.
+   If there are uncommitted changes, or the range diff is empty, also run
+   `git diff HEAD` and include working-tree changes in scope. This review often
+   runs before the commit.
 
-### Altitude
-Check that each change is implemented at the right depth, not as a fragile
-bandaid. Special cases layered on shared infrastructure are a sign the fix
-isn't deep enough — prefer generalizing the underlying mechanism over adding
-special cases.
+   If the user supplied a PR number, branch name, or file path, review that
+   target instead.
 
-## Phase 2 — Apply the fixes
+2. Launch four independent review agents in parallel.
 
-Wait for all four agents to complete, dedup findings that point at the same
-line or mechanism, and fix each remaining one directly. Skip any finding whose
-fix would change intended behavior, require changes well outside the reviewed
-diff, or that you judge to be a false positive — note the skip rather than
-arguing with it. Finish with a brief summary of what was fixed and what was
-skipped (or confirm the code was already clean).
+   Use the Task tool in a single message so all four run concurrently. Pass
+   each agent the diff and exactly one cleanup angle: reuse, simplification,
+   efficiency, or altitude.
+
+   Require each agent to return findings with `file`, `line`, a one-line
+   `summary`, and the concrete cost: what is duplicated, wasted, or harder to
+   maintain.
+
+3. Review from the four cleanup angles.
+
+   Reuse: Flag new code that re-implements something the codebase already has.
+   Grep shared or utility modules and files adjacent to the change, then name
+   the existing helper to call instead.
+
+   Simplification: Flag unnecessary complexity added by the diff: redundant or
+   derivable state, copy-paste with slight variation, deep nesting, or dead
+   code left behind. Name the simpler form that does the same job.
+
+   Efficiency: Flag wasted work added by the diff: redundant computation,
+   repeated I/O, independent operations run sequentially, or blocking work
+   added to startup or hot paths. Also flag long-lived objects built from
+   closures or captured environments because they keep the enclosing scope
+   alive for the object's lifetime; prefer a class or struct that copies only
+   the fields it needs. Name the cheaper alternative.
+
+   Altitude: Check that each change is implemented at the right depth, not as a
+   fragile bandaid. Special cases layered on shared infrastructure indicate the
+   fix may not be deep enough; prefer generalizing the underlying mechanism over
+   adding special cases.
+
+4. Apply the fixes.
+
+   Wait for all four agents to complete. Deduplicate findings that point at the
+   same line or mechanism. Fix each remaining valid finding directly.
+
+   Skip findings whose fix would change intended behavior, require changes well
+   outside the reviewed diff, or appear to be false positives. Note each skip
+   instead of arguing with it.
+
+## Stop and Ask
+
+STOP and ask when the intended behavior is ambiguous and the cleanup would pick
+between product outcomes.
+
+STOP and ask when the only plausible fix requires changing files or systems far
+outside the reviewed diff.
+
+Do not ask before skipping a finding that is clearly a false positive or clearly
+outside this skill's quality-only scope; note the skip in the output.
+
+## Red Flags
+
+| Thought | Reality |
+|---------|---------|
+| "This looks buggy." | Correctness review is out of scope. Only fix it if the cleanup is behavior-preserving. |
+| "The helper could be generalized later." | If the diff duplicated an existing helper now, use the existing helper now. |
+| "The special case is small." | Small special cases on shared infrastructure may be altitude issues. Check whether the mechanism should be generalized. |
+| "One agent found it, so apply it." | Deduplicate and judge findings before editing. Skip behavior changes, broad rewrites, and false positives. |
+
+## Output
+
+Finish with a brief summary in this shape:
+
+```markdown
+Changed:
+- [reuse/simplification/efficiency/altitude] What was fixed.
+
+Skipped:
+- Finding skipped and why.
+
+Verification:
+- Commands run, or "Not run" with the reason.
+```
+
+If the code was already clean, say that no cleanup changes were needed and
+include any verification run.
