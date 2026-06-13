@@ -50,8 +50,9 @@ git clone https://github.com/alexanderop/afk
 claude --plugin-dir ./afk
 ```
 
-`/afk:qa` needs the [agent-browser](https://github.com/vercel-labs/agent-browser)
-CLI on your PATH when it routes to frontend browser QA.
+`/afk:qa` needs Vercel's
+[agent-browser](https://github.com/vercel-labs/agent-browser) CLI installed and
+available on your PATH when it routes to frontend browser QA.
 
 ## What lands in your repo
 

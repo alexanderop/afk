@@ -22,6 +22,11 @@ wording and asks you to set it.
    work could run too long.
 5. Avoid goals that depend on hidden state, unstated preferences, or subjective
    quality judgment.
+6. Match verification to the project shape. For frontend work, include
+   end-to-end browser evidence with `agent-browser` when the app can be run
+   locally and the outcome is user-visible. For backend, CLI, library, or docs
+   work, prefer the narrow contract, test, build, or artifact proof that best
+   matches the change.
 
 ## Good Goal Shape
 
@@ -41,6 +46,8 @@ Before presenting the final goal, check that it is:
 - Measurable: has a test, command, metric, count, artifact, checklist, or
   observable acceptance criterion.
 - Agent-observable: the agent can surface proof in the transcript.
+- Evidence-shaped: frontend goals ask for real browser verification when it
+  makes sense, while non-frontend goals use contract or command evidence.
 - Bounded: includes scope and, when useful, turn or time limits.
 - Non-ambiguous: avoids words like "better", "clean", "done", or "complete"
   unless they are defined by concrete evidence.
@@ -53,6 +60,10 @@ Before presenting the final goal, check that it is:
 
 ```text
 /goal Reduce the dashboard initial load time below 1 second in the local production build. Prove it with a Lighthouse or browser timing report captured after `pnpm run build && pnpm run preview`. Preserve existing dashboard features and visual layout.
+```
+
+```text
+/goal Implement the checkout empty-cart state. Prove it by running the relevant tests and using `agent-browser` against the local app to capture PASS evidence for the empty-cart route, continue-shopping action, and mobile layout. Preserve existing checkout routes and payment behavior. Stop after 12 turns if local browser QA is blocked by missing secrets or services.
 ```
 
 ```text
