@@ -57,6 +57,14 @@ else
   fail "no plugin_errors reported" "$(printf '%s' "$INIT" | jq -c '.plugin_errors')"
 fi
 
+RESULT="$(jq -c 'select(.type == "result")' "$LOG" | tail -1)"
+if printf '%s' "$RESULT" | jq -e '.is_error == false' >/dev/null; then
+  pass "headless run completed without Claude error"
+else
+  fail "headless run completed without Claude error" \
+    "$(printf '%s' "$RESULT" | jq -r '.result // empty')"
+fi
+
 COST="$(jq -r 'select(.type == "result") | .total_cost_usd // empty' "$LOG" | head -1)"
 [ -n "$COST" ] && echo "  (cost: \$${COST})"
 

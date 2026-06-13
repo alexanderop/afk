@@ -1,0 +1,65 @@
+{
+  "skill_name": "ship",
+  "evals": [
+    {
+      "id": "ship-existing-plan",
+      "prompt": "Run AFK Ship for docs/plans/checkout.md. Eval mode: do not invoke child AFK skills or edit files; inspect state and explain the route you would take.",
+      "expected_output": "Recognizes the supplied plan path and routes through implement, simplify, and QA without asking planning questions.",
+      "fixture": {
+        "files": {
+          "docs/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n2. Verify checkout.\n"
+        }
+      },
+      "expectations": [
+        "Reads the supplied docs/plans/checkout.md plan",
+        "Treats the supplied plan path as satisfying the planning gate",
+        "Names afk:implement as the implementation phase",
+        "Includes simplify and QA gates before a final ship verdict"
+      ],
+      "assertions": {
+        "required_substrings": ["docs/plans/checkout.md", "afk:implement", "afk:simplify", "afk:qa", "Route:"],
+        "forbidden_substrings": ["Next AFK skill to run: afk:grill"]
+      }
+    },
+    {
+      "id": "ship-vague-feature",
+      "prompt": "Ship a new team billing feature. The app has user billing today, but I have not decided who owns seats or invoices. Eval mode: do not invoke child AFK skills or ask blocking questions; inspect state and explain the route only.",
+      "expected_output": "Routes unresolved product intent to afk:grill before implementation.",
+      "fixture": {
+        "files": {
+          "README.md": "# Billing Fixture\n\nCurrent billing is user-scoped.\n"
+        }
+      },
+      "expectations": [
+        "Detects unresolved ownership and invoice decisions",
+        "Routes to afk:grill before implementation",
+        "Does not pretend implementation can start immediately",
+        "Explains that Ship resumes after the plan exists"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:grill", "seat", "invoice", "Route:"],
+        "forbidden_substrings": ["Verdict: SHIP", "afk:implement ->"]
+      }
+    },
+    {
+      "id": "ship-clear-doc-change",
+      "prompt": "Run AFK Ship to add a short README note that /afk:qa needs agent-browser. This is documentation only. Eval mode: do not invoke child AFK skills or edit files; inspect state and explain the route only.",
+      "expected_output": "Skips grill for clear local work, routes to implement, and skips QA with a documentation-only reason.",
+      "fixture": {
+        "files": {
+          "README.md": "# AFK\n\nQA checks browser flows.\n"
+        }
+      },
+      "expectations": [
+        "Skips planning because the documentation scope is clear",
+        "Routes implementation through afk:implement",
+        "Treats simplify as conditional",
+        "Skips QA with a documentation-only or non-behavioral reason"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:implement", "skip", "documentation", "Route:"],
+        "forbidden_substrings": ["Next AFK skill to run: afk:grill"]
+      }
+    }
+  ]
+}

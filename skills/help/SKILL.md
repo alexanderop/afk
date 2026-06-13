@@ -34,10 +34,11 @@ explanation of AFK itself.
    - General orientation: explain where they are and the next step.
    - Specific skill question: explain that skill, when to use it, and what it
      produces.
+   - End-to-end lifecycle request: recommend `afk:ship`.
    - "What now?": recommend exactly one next skill unless the state is truly
      ambiguous.
 4. Give the invocation, e.g. `afk:write-good-goal`, `afk:grill`,
-   `afk:implement`, `afk:simplify`, or `afk:qa`.
+   `afk:ship`, `afk:implement`, `afk:simplify`, or `afk:qa`.
 5. If one next step is clearly right, offer to run it now.
 
 ## Routing rules
@@ -45,6 +46,9 @@ explanation of AFK itself.
 - The user asks for `/goal` help, objective shaping, success criteria, a
   completion condition, or a definition of done for long-running agent work:
   recommend `afk:write-good-goal`.
+- The user asks to run the whole AFK flow, ship a feature, resume an AFK
+  lifecycle, or get from idea/plan to a ship/no-ship verdict: recommend
+  `afk:ship`.
 - No concrete plan in `docs/plans/`: recommend `afk:grill`.
 - A plan exists and there is little or no implementation diff: recommend
   `afk:implement`.
@@ -81,6 +85,7 @@ AFK step.
 | "The user asked for help, so list every skill." | List only relevant skills unless they ask to show everything. |
 | "The plan probably exists somewhere." | Inspect `docs/plans/`; missing artifacts are workflow signal. |
 | "There is a diff, so QA is next." | After a plan plus implementation diff, recommend `afk:simplify` before QA unless the user explicitly asks for verification. |
+| "The user said ship, so recommend QA only." | `afk:ship` owns the full route to a verdict; QA is just the final evidence phase. |
 
 ## Output
 

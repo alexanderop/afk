@@ -1,11 +1,15 @@
-# afk — a simple four-step coding flow for Claude Code
+# afk — a simple coding flow for Claude Code
 
-One help router plus four workflow skills. No pipeline orchestration, no
-config files, no hooks — just the steps that matter:
+One help router, one optional end-to-end orchestrator, and four focused
+workflow skills. No config files, no hooks — just the steps that matter:
 
 ```
 /afk:help        Inspects the current repo state and recommends the next AFK
                  skill to run, with a short explanation.
+
+/afk:ship        Runs the AFK loop to evidence: plans when needed, implements,
+                 simplifies when useful, QA-checks behavior, and ends with a
+                 ship/no-ship verdict.
 
 /afk:write-good-goal
                  Turns a vague objective into a concrete /goal condition with
@@ -28,8 +32,9 @@ config files, no hooks — just the steps that matter:
                  apps, and both for hybrids. Output: evidence-backed report.
 ```
 
-Each skill works standalone. Run them in sequence for a feature, or grab one
-on its own.
+Each skill works standalone. Run the focused skills in sequence for a feature,
+grab one on its own, or use `/afk:ship` when you want the loop driven to a
+verified verdict.
 
 ## Install
 
@@ -66,9 +71,19 @@ qa/                   # QA reports + screenshots (gitignored)
 ## Testing the plugin
 
 ```bash
+tests/check.sh                   # zero-token local checks: lint plus shellcheck when available
 tests/lint/run-lint-tests.sh    # zero-token markdown/manifest lint — run on every edit
 tests/smoke/plugin-load.sh      # one cheap headless turn (~$0.01): plugin actually loads
+tests/evals/run-evals.sh        # model-backed behavioral evals via claude -p
 ```
+
+The testing approach is split into unit, integration, and end-to-end checks in
+[docs/testing-strategy.md](docs/testing-strategy.md). Static lint also validates
+behavioral eval specs under `evals/`.
+
+`tests/smoke/plugin-load.sh` and `tests/evals/run-evals.sh` require Claude Code
+non-interactive auth, such as `ANTHROPIC_API_KEY` in CI or a local Claude Code
+login that works with `claude -p`.
 
 ## Credits
 

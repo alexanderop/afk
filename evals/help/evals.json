@@ -1,0 +1,55 @@
+{
+  "skill_name": "help",
+  "evals": [
+    {
+      "id": "help-no-plan",
+      "prompt": "What should I do next?",
+      "expected_output": "Recommends afk:grill when no docs/plans artifact exists.",
+      "expectations": [
+        "Inspects project state before answering",
+        "Treats missing docs/plans as workflow signal",
+        "Recommends exactly one next skill",
+        "Names afk:grill",
+        "Does not list every AFK skill"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:grill"],
+        "forbidden_substrings": ["afk:qa"]
+      }
+    },
+    {
+      "id": "help-after-plan",
+      "prompt": "What now? Assume docs/plans/checkout.md exists and there is no implementation diff.",
+      "expected_output": "Recommends afk:implement as the next step.",
+      "fixture": {
+        "files": {
+          "docs/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n"
+        }
+      },
+      "expectations": [
+        "Recognizes the existing plan as input to implementation",
+        "Names afk:implement",
+        "Explains that implementation should execute the written plan",
+        "Does not recommend afk:qa before implementation"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:implement"],
+        "forbidden_substrings": ["afk:qa"]
+      }
+    },
+    {
+      "id": "help-specific-skill-question",
+      "prompt": "When should I use afk:simplify?",
+      "expected_output": "Explains simplify, when to use it, and what it produces.",
+      "expectations": [
+        "Answers from the AFK catalog and simplify skill contract",
+        "States that simplify runs after implementation or for cleanup requests",
+        "Says it focuses on quality cleanup rather than bug hunting",
+        "Names the expected output as simplification fixes or a no-change report"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:simplify", "diff"]
+      }
+    }
+  ]
+}

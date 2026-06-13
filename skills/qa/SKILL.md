@@ -1,6 +1,6 @@
 ---
 name: qa
-description: Use after implementation, before shipping, or when the user asks to QA, verify, dogfood, check whether a change actually works, or make a ship/no-ship call.
+description: Use when implementation is done, before shipping, or when the user asks to QA, verify, dogfood, check whether a change actually works, or make a ship/no-ship call.
 context: fork
 ---
 

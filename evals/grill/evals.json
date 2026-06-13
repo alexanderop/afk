@@ -1,0 +1,63 @@
+{
+  "skill_name": "grill",
+  "evals": [
+    {
+      "id": "grill-reads-before-asking",
+      "prompt": "Grill me on adding team billing to this app.",
+      "expected_output": "Reads relevant repo context before asking the first planning question.",
+      "fixture": {
+        "files": {
+          "README.md": "# Billing Fixture\n\nA tiny SaaS app with users and workspaces.\n",
+          "src/billing.md": "# Billing\n\nCurrent billing is user-scoped. Team billing does not exist yet.\n"
+        }
+      },
+      "expectations": [
+        "Inspects relevant code, docs, tests, and existing plans before asking",
+        "Does not ask the user how the codebase works before reading available files",
+        "Asks one question at a time",
+        "Includes a recommended answer and rationale with the question"
+      ],
+      "assertions": {
+        "required_substrings": ["workspace", "user-scoped", "CONTEXT.md"]
+      }
+    },
+    {
+      "id": "grill-glossary-conflict",
+      "prompt": "Grill me on changing account cancellation. Assume CONTEXT.md defines account as a billing workspace, but the user uses account to mean login identity.",
+      "expected_output": "Challenges the glossary conflict and asks which meaning is authoritative.",
+      "fixture": {
+        "files": {
+          "CONTEXT.md": "# Context\n\n## Glossary\n\n- Account: a billing workspace that owns subscriptions, invoices, and seats.\n- User: a login identity that can belong to one or more accounts.\n"
+        }
+      },
+      "expectations": [
+        "Reads CONTEXT.md when present",
+        "Identifies the term conflict",
+        "Does not silently choose one meaning",
+        "Asks which definition should be authoritative"
+      ],
+      "assertions": {
+        "required_substrings": ["login identity", "billing workspace", "CONTEXT.md"],
+        "forbidden_substrings": ["docs/plans/"]
+      }
+    },
+    {
+      "id": "grill-plan-output",
+      "prompt": "We have resolved the decisions. Finish the grill session by writing docs/plans/team-billing.md. Decisions: team billing belongs to workspaces, workspace owners manage seats, existing user billing remains unchanged for personal workspaces, and rollout is behind a feature flag. Contracts: subscription owner is workspace_id, seat count comes from active memberships, and invoices must include workspace name.",
+      "expected_output": "Writes a docs/plans/<slug>.md plan with context, decisions, contracts, notes, and tasks.",
+      "expectations": [
+        "Creates a docs/plans/<slug>.md artifact",
+        "Includes Context, Decisions, Contracts, Open Non-Blocking Notes, and Tasks",
+        "Includes relevant glossary, ADR, and source URL constraints when they shaped decisions",
+        "States that the plan is ready for afk:implement"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:implement"],
+        "required_files": ["docs/plans/team-billing.md"],
+        "required_file_substrings": {
+          "docs/plans/team-billing.md": ["## Context", "## Decisions", "## Contracts", "## Tasks"]
+        }
+      }
+    }
+  ]
+}
