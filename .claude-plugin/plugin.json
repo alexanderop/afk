@@ -2,7 +2,7 @@
   "name": "afk",
   "displayName": "AFK",
   "description": "A help router plus an optional ship orchestrator for the AFK flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel cleanup) → qa (frontend/backend evidence verification).",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "author": {
     "name": "Alexander Opalic"
   },
