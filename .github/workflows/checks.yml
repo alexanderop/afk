@@ -13,16 +13,17 @@ concurrency:
 
 jobs:
   checks:
-    name: Lint + shellcheck
+    name: Bun static checks
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read # checkout
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
-          persist-credentials: false
+          persist-credentials: false # don't leave the git token on disk
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
       - name: Static checks (zero-token)
-        run: tests/check.sh
+        run: bun run test
 
   # One cheap headless turn (~$0.01) asserting Claude Code actually loads the
   # plugin — catches manifest/frontmatter/hook-wiring breakage the static lint
@@ -31,19 +32,20 @@ jobs:
     name: Plugin-load smoke
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read # checkout
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
-          persist-credentials: false
+          persist-credentials: false # don't leave the git token on disk
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
       - name: Install Claude Code CLI
         if: env.ANTHROPIC_API_KEY != ''
-        run: npm install -g @anthropic-ai/claude-code
+        run: bun install --global @anthropic-ai/claude-code
       - name: Plugin loads with no plugin_errors
         if: env.ANTHROPIC_API_KEY != ''
-        run: tests/smoke/plugin-load.sh
+        run: bun run test:e2e
       - name: Skipped (ANTHROPIC_API_KEY secret not configured)
         if: env.ANTHROPIC_API_KEY == ''
         run: echo "no ANTHROPIC_API_KEY secret — smoke test skipped"

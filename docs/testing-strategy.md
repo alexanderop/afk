@@ -15,16 +15,16 @@ registration or user-visible behavior may have changed.
 Local zero-token entrypoint:
 
 ```bash
-tests/check.sh
+bun run test
 ```
 
 ## Test Categories
 
 | Category | Scope | Cost | Current command | Purpose |
 |----------|-------|------|-----------------|---------|
-| Unit | One file or one deterministic rule | Zero token | `tests/lint/run-lint-tests.sh` | Catch malformed manifests, invalid skill frontmatter, overlong descriptions, oversized `SKILL.md` files, and broken local references. |
-| Integration | Relationships across plugin files | Zero token | `tests/lint/run-lint-tests.sh` | Catch mismatches between skill directory names, frontmatter names, supporting files, eval specs, help catalog entries, README references, and plugin manifests. |
-| End-to-end | Claude Code loading the plugin | One cheap headless turn | `tests/smoke/plugin-load.sh` | Catch failures Claude Code would report only at runtime, such as plugin registration errors or silently dropped plugin metadata. |
+| Unit | One file or one deterministic rule | Zero token | `bun run test:unit` | Catch malformed manifests, invalid skill frontmatter, overlong descriptions, oversized `SKILL.md` files, and test pipeline shape regressions. |
+| Integration | Relationships across plugin files | Zero token | `bun run test:integration` | Catch mismatches between skill directory names, supporting files, eval specs, help catalog entries, README references, and plugin manifests. |
+| End-to-end | Claude Code loading or exercising the plugin | Model-backed | `bun run test:e2e`, `bun run test:evals` | Catch failures Claude Code would report only at runtime, such as plugin registration errors or behavioral regressions. |
 
 ## Unit Checks
 
@@ -46,7 +46,7 @@ Current unit coverage:
 - Every workflow skill has `When to Use`, `Process`, `Stop and Ask`, and
   `Output` sections.
 - Every `SKILL.md` is at most 500 lines.
-- Markdown links with relative paths resolve.
+- No `.sh` runners exist under `tests/`.
 
 ## Integration Checks
 
@@ -56,15 +56,15 @@ cross-file breakage rather than one malformed file.
 
 Current integration coverage:
 
-- Skill frontmatter names match skill directory names.
 - Plugin-internal references from skill prose resolve relative to the source
   file, plugin root, or skill directories.
+- Markdown links with relative paths resolve.
 - README-listed skills match actual `skills/*/SKILL.md` files.
 - Help catalog entries in `skills/help/afk-help.csv` match actual skill names.
 - Skill references such as `afk:implement` or `/afk:qa` point to existing
   skills.
 - Marketplace metadata references the same plugin name as `plugin.json`.
-- Eval spec directories under `evals/` match actual skill names.
+- Eval spec directories under `tests/e2e/evals/specs/` match actual skill names.
 - Eval files are valid JSON and have the required shape.
 - Plugin manifests and skill files are checked together in CI.
 
@@ -81,7 +81,7 @@ path. They cost money and require authentication, so they should stay small.
 
 Current end-to-end coverage:
 
-- `tests/smoke/plugin-load.sh` runs one headless Claude Code turn with
+- `bun run test:e2e` runs one headless Claude Code turn with
   `--plugin-dir`.
 - The stream JSON `system/init` event is produced.
 - `afk` appears in the loaded plugin list.
@@ -103,11 +103,12 @@ agent behavior for realistic prompts and can be reviewed manually before a
 runner exists. The lint harness validates their JSON shape, but does not run
 the prompts through a model.
 
-Use JSON files under `evals/<skill>/`. Current specs cover `help` and `grill`.
+Use JSON files under `tests/e2e/evals/specs/<skill>/`. Current specs cover
+`help`, `grill`, and `ship`.
 Run them with:
 
 ```bash
-tests/evals/run-evals.sh
+bun run test:evals
 ```
 
 This requires Claude Code non-interactive auth. In CI, set
@@ -139,9 +140,8 @@ Add a runner only after the expectations are stable.
 
 CI should keep the same shape as local checks:
 
-- Always run `tests/check.sh`, which includes unit and integration checks plus
-  ShellCheck when available.
-- Run end-to-end smoke only when `ANTHROPIC_API_KEY` is configured.
+- Always run `bun run test`, which includes unit and integration checks.
+- Run end-to-end checks only when `ANTHROPIC_API_KEY` is configured.
 - Skip smoke cleanly for forks or unauthenticated environments.
 
 The current GitHub workflow follows this policy in

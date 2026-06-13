@@ -71,17 +71,18 @@ qa/                   # QA reports + screenshots (gitignored)
 ## Testing the plugin
 
 ```bash
-tests/check.sh                   # zero-token local checks: lint plus shellcheck when available
-tests/lint/run-lint-tests.sh    # zero-token markdown/manifest lint — run on every edit
-tests/smoke/plugin-load.sh      # one cheap headless turn (~$0.01): plugin actually loads
-tests/evals/run-evals.sh        # model-backed behavioral evals via claude -p
+bun run test              # zero-token unit + integration checks
+bun run test:unit         # file-level markdown/manifest checks
+bun run test:integration  # cross-file plugin structure checks
+bun run test:e2e          # one cheap headless turn (~$0.01): plugin actually loads
+bun run test:evals        # model-backed behavioral evals via claude -p
 ```
 
 The testing approach is split into unit, integration, and end-to-end checks in
 [docs/testing-strategy.md](docs/testing-strategy.md). Static lint also validates
-behavioral eval specs under `evals/`.
+behavioral eval specs under `tests/e2e/evals/specs/`.
 
-`tests/smoke/plugin-load.sh` and `tests/evals/run-evals.sh` require Claude Code
+`bun run test:e2e` and `bun run test:evals` require Claude Code
 non-interactive auth, such as `ANTHROPIC_API_KEY` in CI or a local Claude Code
 login that works with `claude -p`.
 
