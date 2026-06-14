@@ -14,3 +14,4 @@ afk:ruminate,Ruminate,U,Mine past Claude Code conversations for uncaptured brain
 afk:meditate,Meditate,D,Audit and prune the brain vault and distill cross-cutting principles.,memory,,,false,brain/,pruned notes plus new principles and a meditate summary
 afk:plan,Plan,L,Break a medium-to-large task into phased principle-grounded plans in brain/plans/.,memory,,,false,brain/plans,brain/plans/<slug> overview and phase files
 afk:review,Review,V,Principle-grounded review of code or plans with numbered findings and a verdict.,memory,,,false,conversation,numbered findings plus accept or revise verdict
+afk:write-evals,Write Evals,E,Generate failing behavioral evals for a skill agent or feature and scaffold a Bun eval harness when the repo has none.,anytime,,,false,evals,eval spec cases plus a scaffolded runner when missing

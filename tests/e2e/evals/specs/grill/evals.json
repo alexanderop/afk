@@ -97,6 +97,31 @@
           "docs/plans/notifications.md": ["Wave", "parallel", "owns", "depends"]
         }
       }
+    },
+    {
+      "id": "grill-plan-records-reference-repo",
+      "prompt": "Earlier in this session we cloned the GitHub repo https://github.com/acme/awesome-streamer into reference/awesome-streamer so we could copy its SSE streaming pattern — I want to do the chat endpoint like that repo. We have resolved the decisions. Finish the grill session by writing docs/plans/streaming.md. Decisions: add a GET /chat SSE endpoint that follows the awesome-streamer pattern, reuse its event framing, and keep our existing JSON routes unchanged. Contracts: the endpoint streams text/event-stream and emits one `data:` frame per token like the reference implementation in reference/awesome-streamer/src/stream.ts.",
+      "expected_output": "Writes docs/plans/streaming.md that records the cloned reference repo the user pointed at — both its GitHub origin and its local path — so implementation reads the real source instead of a remembered pattern.",
+      "fixture": {
+        "files": {
+          "package.json": "{\n  \"name\": \"app\",\n  \"dependencies\": {}\n}\n",
+          "reference/awesome-streamer/README.md": "# awesome-streamer\n\nSource: https://github.com/acme/awesome-streamer\n\nA minimal Server-Sent Events streaming pattern. See `src/stream.ts`.\n",
+          "reference/awesome-streamer/src/stream.ts": "// Reference SSE pattern: one `data:` frame per token.\nexport function streamTokens(res, tokens) {\n  res.setHeader('Content-Type', 'text/event-stream');\n  for (const token of tokens) res.write(`data: ${token}\\n\\n`);\n  res.end();\n}\n"
+        }
+      },
+      "expectations": [
+        "Records in the plan that a reference repo was cloned to copy a pattern for this work",
+        "Names the reference repo's local path (reference/awesome-streamer) in the plan",
+        "Cites the reference repo's GitHub origin (github.com/acme/awesome-streamer) in the plan",
+        "Points implementation at the real cloned source rather than reconstructing the pattern from memory"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:implement"],
+        "required_files": ["docs/plans/streaming.md"],
+        "required_file_substrings": {
+          "docs/plans/streaming.md": ["reference/awesome-streamer", "github.com/acme/awesome-streamer"]
+        }
+      }
     }
   ]
 }

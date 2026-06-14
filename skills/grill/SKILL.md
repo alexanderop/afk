@@ -62,28 +62,40 @@ obvious cause, or execution of an already-written `docs/plans/` plan.
      Report glossary conflicts, prior decisions, and terms needing precision.
 5. Synthesize the research yourself. Verify important claims against files or
    fetched sources before using them.
-6. Ask the next best question, one at a time, and wait for the answer before
+6. Open with a Background written like a product owner, before any question.
+   In a few sentences, restate what the user is asking for as a product owner
+   framing the work: the problem, who it is for, the outcome they want, and the
+   scope as you currently understand it from the request and your grounding.
+   Ground it in what you read — do not invent requirements. End by stating your
+   read of the intent and inviting the user to correct it, then begin the
+   interview. This gives the user something concrete to react to instead of a
+   cold first question.
+7. Ask the next best question, one at a time, and wait for the answer before
    continuing. Include your recommended answer and the reason for it.
-7. Challenge glossary conflicts immediately. If the user uses a term
+8. Challenge glossary conflicts immediately. If the user uses a term
    differently from `CONTEXT.md`, say what the glossary says and ask which
    meaning is authoritative.
-8. Sharpen fuzzy or overloaded language. Propose canonical terms when concepts
+9. Sharpen fuzzy or overloaded language. Propose canonical terms when concepts
    such as `account`, `user`, `customer`, `order`, or `cancellation` may mean
    different things.
-9. Stress-test decisions with concrete scenarios, edge cases, failure modes,
-   permission boundaries, lifecycle states, and cross-system contracts.
-10. Cross-reference user claims against code and fetched sources. Surface
+10. Stress-test decisions with concrete scenarios, edge cases, failure modes,
+    permission boundaries, lifecycle states, and cross-system contracts.
+11. Cross-reference user claims against code and fetched sources. Surface
     contradictions explicitly and ask which source should win.
-11. Update `CONTEXT.md` immediately when a glossary term is resolved. Use it
+12. Update `CONTEXT.md` immediately when a glossary term is resolved. Use it
     only as a glossary: no implementation details, specs, scratch notes, or
     plan content. If creating it, use [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
-12. Offer an ADR only when the decision is hard to reverse, surprising without
+13. Offer an ADR only when the decision is hard to reverse, surprising without
     context, and the result of a real trade-off. If creating one, use
     [ADR-FORMAT.md](./ADR-FORMAT.md).
-13. Continue until the decision tree is resolved enough for implementation:
+14. Continue until the decision tree is resolved enough for implementation:
     contracts are clear, ambiguous terms are defined, key edge cases have an
     agreed answer, and source-of-truth conflicts are settled.
-14. Write the agreed plan to `docs/plans/<slug>.md`. Include decisions made,
+15. If during the interview the user pointed you at a reference repo they cloned
+    locally ("do it like that repo", "see the pattern in Y"), read it and record
+    it in the plan: its origin (GitHub URL or name) and its local path, so
+    implementation reads the real source instead of a remembered pattern.
+16. Write the agreed plan to `docs/plans/<slug>.md`. Include decisions made,
     contracts between parts, relevant glossary or ADR updates, and the
     implementation task list grouped into parallel waves (see Output). Decide the
     schedule here so `afk:implement` does not have to re-derive it: mark which
@@ -130,6 +142,7 @@ Create `docs/plans/<slug>.md` with this shape:
 ## Context
 - <What is being changed and why>
 - <Relevant code, glossary, ADR, or external source constraints>
+- <Reference repos the user cloned to copy a pattern: origin (GitHub URL) and local path>
 
 ## Decisions
 - <Resolved decision and rationale>
