@@ -1,5 +1,7 @@
-import { existsSync, readFileSync } from "node:fs";
-import { basename, dirname, relative } from "node:path";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, dirname, join, relative } from "node:path";
 import { listFiles } from "../lib/fs";
 import { fromPluginRoot, pluginDir } from "../lib/paths";
 import { TestRun } from "../lib/runner";
@@ -431,6 +433,58 @@ function checkAgentFrontmatter(file: string): void {
   }
 }
 
+function checkBrainIndexHook(): void {
+  run.section("brain index hook");
+
+  const hook = fromPluginRoot("hooks", "auto-index-brain.sh");
+  const dir = mkdtempSync(join(tmpdir(), "afk-brain-"));
+  try {
+    mkdirSync(join(dir, "brain", "principles"), { recursive: true });
+    mkdirSync(join(dir, "brain", "codebase"), { recursive: true });
+    // A note with a summary line under its title.
+    writeFileSync(join(dir, "brain", "principles", "prove-it-works.md"), "# Prove It Works\n\nNever claim done without evidence the change runs.\n\n- Show output\n");
+    // A note whose first content is a bullet (marker should be stripped).
+    writeFileSync(join(dir, "brain", "codebase", "deploy-gotchas.md"), "# Deploy Gotchas\n- Staging mirrors prod env vars\n");
+    // A note with only a title — no description available.
+    writeFileSync(join(dir, "brain", "principles.md"), "# Principles\n");
+
+    const indexPath = join(dir, "brain", "index.md");
+    const exec = () => execFileSync("bash", [hook], { input: "{}", env: { ...process.env, CLAUDE_PROJECT_DIR: dir } });
+
+    exec();
+    const index = readFileSync(indexPath, "utf8");
+
+    if (index.includes("[[principles/prove-it-works]] — Never claim done without evidence the change runs.")) {
+      run.pass("brain index: summary line becomes the entry description");
+    } else {
+      run.fail("brain index: summary line becomes the entry description", index);
+    }
+
+    if (index.includes("[[codebase/deploy-gotchas]] — Staging mirrors prod env vars")) {
+      run.pass("brain index: leading list marker stripped from description");
+    } else {
+      run.fail("brain index: leading list marker stripped from description", index);
+    }
+
+    if (/- \[\[principles\]\]\s*$/m.test(index)) {
+      run.pass("brain index: title-only note stays a bare wikilink");
+    } else {
+      run.fail("brain index: title-only note stays a bare wikilink", index);
+    }
+
+    exec();
+    if (readFileSync(indexPath, "utf8") === index) {
+      run.pass("brain index: rebuild is idempotent");
+    } else {
+      run.fail("brain index: rebuild is idempotent");
+    }
+  } catch (error) {
+    run.fail("brain index hook runs", String(error));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 function checkNoShellTestPipeline(): void {
   run.section("test pipeline");
 
@@ -447,6 +501,7 @@ console.log("=== Unit tests (Bun, zero-token) ===");
 checkPluginManifests();
 checkSkills();
 checkAgents();
+checkBrainIndexHook();
 checkNoShellTestPipeline();
 
 run.summary();

@@ -21,9 +21,9 @@ or run shell commands.
 - Read the brain's principles first if the vault has them: `brain/principles.md`
   and each principle file it links. These are the project's standing engineering
   principles — your architecture, contracts, and slice boundaries must honor
-  them, and worker briefs should carry any principle that constrains the slice.
-  A fresh project may have no principles yet; then proceed without them — do not
-  invent principles.
+  them, and every worker brief must carry any principle that constrains its slice
+  (see the Worker Brief Contract). A fresh project may have no principles yet;
+  then proceed without them — do not invent principles.
 - Decide shared boundaries yourself: file ownership, names, signatures, data
   flow, error handling, integration order, and verification commands.
 - Do not ask workers to figure out architecture.
@@ -54,6 +54,12 @@ Each implementation-worker brief must include:
 - Exact files to create or edit.
 - The behavior contract, including signatures, types, and error cases.
 - Existing code conventions or nearby files to mimic.
+- Constraints from the brain: every `brain/` principle or codebase gotcha that
+  governs this slice, copied verbatim into the brief as a frozen constraint. The
+  worker starts with zero context and never reads the brain itself, so a
+  governing principle reaches it only if you bake it in — keeping the brief
+  reproducible and you the single relevance filter. Omit this field only when no
+  brain note constrains the slice.
 - The required TDD loop: failing test, smallest passing implementation,
   local refactor, and final verification.
 - The exact verification command, scoped to the files the slice owns. Tell the

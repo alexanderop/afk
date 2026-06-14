@@ -74,8 +74,12 @@ path, then vault root. Heading anchors (`[[file#heading]]`) are stripped.
 
 ### Writing style
 
-- Bullets over prose. No preamble.
-- Plain markdown with `# Title`. No Obsidian frontmatter.
+- Open with `# Title`, then a one-line summary sentence, then bullets. The
+  summary line becomes this note's description in `brain/index.md` (the
+  PostToolUse hook extracts it), so write it as a relevance hint a future
+  session can scan — what the note is about, not "Notes on X".
+- Bullets over prose after the summary. No other preamble.
+- Plain markdown. No Obsidian frontmatter.
 - Keep notes under ~50 lines. Split if longer.
 
 ## Stop and Ask

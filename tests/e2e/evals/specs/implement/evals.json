@@ -190,6 +190,32 @@
         "forbidden_substrings": ["dispatch implementation-worker", "ready to implement"],
         "unchanged_files": ["docs/plans/delete-legacy-users.md", "db/schema.sql"]
       }
+    },
+    {
+      "id": "implement-carries-brain-constraint-into-worker-brief",
+      "prompt": "Implement docs/plans/add-invoice-totals.md. Eval mode: do not edit files or invoke subagents; inspect the plan and the brain/ vault, then explain the AFK Implement route and exactly what each implementation-worker brief includes.",
+      "expected_output": "Routes the plan through implement-orchestrator and shows that each implementation-worker brief carries the constraining brain principle (money is integer cents) as frozen text in the brief, because workers start with zero context and do not read the brain themselves.",
+      "fixture": {
+        "files": {
+          "brain/index.md": "# Brain\n\n## Principles\n- [[principles]] — Project engineering and design principles.\n- [[principles/money-is-integer-cents]] — All monetary amounts are integer cents, never floats.\n",
+          "brain/principles.md": "# Principles\n\nProject engineering and design principles.\n\n- [[principles/money-is-integer-cents]]\n",
+          "brain/principles/money-is-integer-cents.md": "# Money Is Integer Cents\n\nAll monetary amounts are stored and computed as integer cents, never floats.\n\n- Functions take and return cents (1099), never dollars (10.99).\n- Rounding happens only at display time.\n",
+          "docs/plans/add-invoice-totals.md": "# Invoice Totals Plan\n\n## Context\nInvoices in src/invoices.ts list line items but show no total.\n\n## Decisions\nAdd a total computed from line items, plus a tax helper.\n\n## Contracts\ninvoiceTotal(items) sums line item amounts in src/invoices.ts. taxFor(amount) computes tax in src/tax.ts.\n\n## Tasks\n1. Add invoiceTotal in src/invoices.ts.\n2. Add taxFor in src/tax.ts.\n",
+          "src/invoices.ts": "export type LineItem = { label: string; amount: number };\n\nexport function lineItems(): LineItem[] {\n  return [];\n}\n"
+        }
+      },
+      "expectations": [
+        "Reads the brain principles before deciding contracts",
+        "Routes the work through implement-orchestrator with implementation-worker slices",
+        "Identifies money-is-integer-cents as a principle that constrains these slices",
+        "States the constraining principle is carried into each implementation-worker brief as frozen text",
+        "Explains that workers start with zero context, so they receive the principle in the brief rather than reading the brain themselves"
+      ],
+      "assertions": {
+        "required_substrings": ["implement-orchestrator", "implementation-worker", "cents", "brain"],
+        "forbidden_substrings": ["workers read the brain", "ignore the brain principles"],
+        "unchanged_files": ["docs/plans/add-invoice-totals.md", "src/invoices.ts", "brain/principles/money-is-integer-cents.md"]
+      }
     }
   ]
 }
