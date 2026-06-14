@@ -77,12 +77,16 @@ Each must include:
 - The unit's exact files, the change to make, and files to read first.
 - Code conventions to follow, with a concrete file to mimic.
 - The local loop to run, in order: implement the smallest correct change, then
-  run `afk:simplify` on its own diff, then the project test command and fix
-  failures, then the unit's e2e recipe.
+  run the project test command and fix failures, then the unit's e2e recipe.
 - Hard boundaries: edit only this unit's files, no neighboring refactors, no new
   dependencies, no renames outside the brief.
-- The finish: commit, push the branch, open a PR with `gh pr create`, and report
-  back the single line `PR: <url>` (or `BLOCKED: <reason>`).
+- The finish, in order: if the unit's diff is substantial — multi-line logic,
+  a new file, an extraction, or a non-trivial rewrite — run `afk:simplify` on it
+  and re-run the test command so the PR carries cleaned-up, still-passing code;
+  skip simplify when the change is a trivial one-liner (a version bump, a string
+  or constant edit, a rename) where there is nothing to clean up. Then commit,
+  push the branch, open a PR with `gh pr create`, and report back the single line
+  `PR: <url>` (or `BLOCKED: <reason>`).
 
 ### 5. Track progress to a status table
 
@@ -122,7 +126,7 @@ missing decision or for approval before the spawn in step 3.
 | "There's a shared component to build first, but workers can figure it out." | Then you've delegated architecture across N parallel agents. Freeze the contract in the lead first — that's `afk:implement`, not batch. |
 | "I'll spawn the workers now and confirm the plan after." | Spawning is expensive and creates branches/PRs. Get plan approval in step 3 before any worker starts. |
 | "A worker said it opened a PR, so it's done." | Record only the `PR:` line it actually reported. Don't invent links or assume green CI. |
-| "Each worker can skip simplify and tests to go faster." | The per-unit loop — simplify, test, e2e — is what makes each PR mergeable on its own. It is not optional. |
+| "Each worker can skip tests and e2e to go faster." | The per-unit loop — test, e2e, then simplify on substantial diffs — is what makes each PR mergeable on its own. Tests and e2e are never optional; simplify is skipped only for trivial one-line edits. |
 | "30 units is fine, I'll just make 60." | Past ~30 units the tracking and review cost outweighs the parallelism. Re-group into coarser units. |
 
 ## Output
@@ -153,5 +157,6 @@ If units turned out to be dependent, stop before spawning and hand off to
 
 - `afk:implement` — the sequential, single-working-tree alternative; owns the
   freeze-then-fan-out recipe when a shared contract must be built first.
-- `afk:simplify` — the cleanup pass each worker runs on its own diff.
+- `afk:simplify` — the cleanup pass each worker runs on its own diff when the
+  unit's change is substantial (skipped for trivial one-liners).
 - `afk:grill` — produces the `docs/plans/<slug>.md` that batch decomposes.

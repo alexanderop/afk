@@ -50,6 +50,22 @@
       "assertions": {
         "required_substrings": ["afk:simplify", "diff"]
       }
+    },
+    {
+      "id": "help-recommends-prototype-for-mockups",
+      "prompt": "Which AFK skill should I use to mock up three dashboard layouts?",
+      "expected_output": "Recommends afk:prototype as the next step for throwaway UI layout exploration.",
+      "expectations": [
+        "Recognizes mockups and layout exploration as prototype intent",
+        "Recommends exactly one next skill",
+        "Names afk:prototype",
+        "Explains that the output is a throwaway prototype or variants",
+        "Does not route to afk:ship"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:prototype"],
+        "forbidden_substrings": ["afk:ship", "Next step: [Q]"]
+      }
     }
   ]
 }

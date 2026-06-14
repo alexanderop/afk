@@ -17,6 +17,9 @@ matter:
                  Turns a vague objective into a concrete /goal condition with
                  verification evidence, constraints, and optional stop bounds.
 
+/afk:prototype   Builds a throwaway logic TUI or UI variant route to answer
+                 design uncertainty before committed planning or implementation.
+
 /afk:grill       AI interviews YOU about the plan, one question at a time,
                  challenging it against your domain glossary and ADRs.
                  Output: docs/plans/<slug>.md
@@ -112,9 +115,10 @@ available on your PATH when it routes to frontend browser QA.
 AFK works by letting Claude pick a skill from its description. If a skill
 doesn't fire on its own (some Claude Code versions don't auto-discover plugin
 skills, and crowded installs can drop less-used ones from the listing), invoke
-it directly: `/afk:help`, `/afk:grill`, `/afk:implement`, `/afk:batch`,
-`/afk:simplify`, `/afk:qa`, `/afk:ship`, `/afk:write-good-goal`, and the memory
-skills `/afk:brain`, `/afk:init-brain`, `/afk:reflect`, `/afk:ruminate`,
+it directly: `/afk:help`, `/afk:prototype`, `/afk:grill`, `/afk:implement`,
+`/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:ship`,
+`/afk:write-good-goal`, and the memory skills `/afk:brain`, `/afk:init-brain`,
+`/afk:reflect`, `/afk:ruminate`,
 `/afk:meditate`, `/afk:plan`, `/afk:review`. Run `/doctor` to check plugin
 loading, and raise `skillListingBudgetFraction` in settings to keep more skill
 descriptions listed.
@@ -125,6 +129,7 @@ descriptions listed.
 CONTEXT.md            # domain glossary, grown by /afk:grill
 docs/adr/NNNN-*.md    # decisions worth recording, offered sparingly by grill
 docs/plans/<slug>.md  # the agreed plan, input to /afk:implement
+docs/prototypes/      # prototype verdict notes for throwaway exploration
 qa/                   # QA reports + screenshots (gitignored)
 brain/                # persistent memory vault: principles, gotchas, plans
 ```

@@ -1,13 +1,13 @@
 {
   "name": "afk",
   "displayName": "AFK",
-  "description": "A help router plus an optional ship orchestrator for the AFK flow: grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel cleanup) → qa (frontend/backend evidence verification). Ships a persistent brain/ memory vault (reflect, ruminate, meditate, plan, review, brain) that the flow reads before acting and writes back to as it learns.",
-  "version": "1.3.0",
+  "description": "A help router plus an optional ship orchestrator for the AFK flow: prototype (throwaway logic/UI exploration) → grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel cleanup) → qa (frontend/backend evidence verification). Ships a persistent brain/ memory vault (reflect, ruminate, meditate, plan, review, brain) that the flow reads before acting and writes back to as it learns.",
+  "version": "1.4.0",
   "author": {
     "name": "Alexander Opalic"
   },
   "homepage": "https://alexop.dev",
   "repository": "https://github.com/alexanderop/afk",
   "license": "MIT",
-  "keywords": ["afk", "help", "grill", "delegation", "subagents", "deduplication", "browser-qa", "memory", "brain", "reflect", "obsidian"]
+  "keywords": ["afk", "help", "prototype", "grill", "delegation", "subagents", "deduplication", "browser-qa", "memory", "brain", "reflect", "obsidian"]
 }

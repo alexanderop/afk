@@ -1,0 +1,37 @@
+{
+  "skill_name": "prototype",
+  "evals": [
+    {
+      "id": "prototype-ui-variants",
+      "prompt": "Prototype three different layouts for the settings page. Eval mode: do not edit files; explain the AFK Prototype route and artifact shape.",
+      "expected_output": "Routes to the UI branch, prefers an existing route with ?variant=, includes a floating switcher, and captures a docs/prototypes verdict note.",
+      "expectations": [
+        "Classifies the request as a UI prototype",
+        "Defaults to three structurally different variants",
+        "Prefers mounting variants on an existing page with ?variant=",
+        "Includes a floating dev-only switcher",
+        "Says the result is throwaway and captures a docs/prototypes verdict"
+      ],
+      "assertions": {
+        "required_substrings": ["UI", "three", "?variant=", "docs/prototypes", "throwaway"],
+        "forbidden_substrings": ["afk:ship", "production evidence"]
+      }
+    },
+    {
+      "id": "prototype-logic-tui",
+      "prompt": "I want to sanity-check whether this onboarding state machine handles invite accepted then account deleted. Eval mode: do not edit files; explain the AFK Prototype route and artifact shape.",
+      "expected_output": "Routes to the logic branch, builds a small terminal prototype over a pure state module, renders full state after each action, and captures a docs/prototypes verdict note.",
+      "expectations": [
+        "Classifies the request as a logic or state prototype",
+        "Uses a tiny interactive terminal app",
+        "Keeps core logic in a portable pure module",
+        "Renders full state after every action",
+        "Captures the answer in docs/prototypes"
+      ],
+      "assertions": {
+        "required_substrings": ["logic", "terminal", "state", "pure", "docs/prototypes"],
+        "forbidden_substrings": ["real database", "production evidence"]
+      }
+    }
+  ]
+}

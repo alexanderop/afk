@@ -2,6 +2,7 @@ skill,display-name,menu-code,description,phase,preceded-by,followed-by,required,
 afk:help,AFK Help,H,Orient the user in the AFK flow and recommend the next skill.,anytime,,,false,,
 afk:ship,Ship,P,Run the AFK loop to evidence with planning when needed implementation cleanup QA and a final ship verdict.,0-4-flow,,afk:qa,false,conversation,phase route plus ship/no-ship verdict
 afk:write-good-goal,Write Good Goal,O,Turn a vague objective into a concrete /goal condition with verification and bounds.,0-goal,,afk:grill,false,conversation,recommended /goal text
+afk:prototype,Prototype,T,Build a throwaway logic TUI or UI variant route to answer design uncertainty before planning or implementation.,1-explore,afk:write-good-goal,afk:grill,false,working tree + docs/prototypes,throwaway prototype plus captured verdict
 afk:grill,Grill,G,Interview and stress-test a non-trivial idea using repo context plus fetched docs or blogs when relevant.,1-plan,,afk:implement,true,docs/plans,docs/plans/<slug>.md
 afk:implement,Implement,I,Read the code, fix architecture and contracts, then delegate independent TDD slices and review every diff.,2-build,afk:grill,afk:simplify,true,working tree,code changes and passing local verification
 afk:batch,Batch,B,Fan an independently-mergeable plan out into many parallel worktree workers that each implement simplify test and open a PR.,2-build,afk:grill,afk:simplify,false,branches/PRs,one PR per unit plus a status table

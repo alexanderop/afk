@@ -49,6 +49,9 @@ explanation of AFK itself.
 - The user asks to run the whole AFK flow, ship a feature, resume an AFK
   lifecycle, or get from idea/plan to a ship/no-ship verdict: recommend
   `afk:ship`.
+- The user asks to prototype, mock up, try a few designs, create UI variants,
+  make something playable, or sanity-check a state model/API/data shape by
+  interacting with it: recommend `afk:prototype`.
 - No concrete plan in `docs/plans/` or `brain/plans/`: recommend `afk:grill` to
   interview a vague idea into a plan, or `afk:plan` to decompose an
   already-clear task into phased plans. Both feed `afk:implement`.
@@ -87,8 +90,8 @@ intent. On some Claude Code versions plugin skills are not auto-discovered, or a
 crowded install drops less-used descriptions from the skill listing. When a
 skill does not trigger on its own, invoke it explicitly:
 
-`/afk:help`, `/afk:write-good-goal`, `/afk:grill`, `/afk:implement`,
-`/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:ship`.
+`/afk:help`, `/afk:write-good-goal`, `/afk:prototype`, `/afk:grill`,
+`/afk:implement`, `/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:ship`.
 
 If auto-trigger keeps failing, run `/doctor` to check plugin/skill loading, and
 raise `skillListingBudgetFraction` in settings so more descriptions stay listed.
