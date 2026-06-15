@@ -81,6 +81,13 @@ obvious cause, or execution of an already-written plan (`brain/plans/` or
    different things.
 10. Stress-test decisions with concrete scenarios, edge cases, failure modes,
     permission boundaries, lifecycle states, and cross-system contracts.
+    For experience-bearing work — UI, dashboards, reports, anything whose value
+    is what the user *understands or can do* — also grill the quality bar, not
+    just the data: which insight or outcome the user must get, what must be
+    visible at a glance, and how "good" will be judged (legibility,
+    scannability). Treat that bar as a contract, not taste — without it,
+    implementation ships something that runs but does not deliver, and QA has no
+    bar to fail it against.
 11. Cross-reference user claims against code and fetched sources. Surface
     contradictions explicitly and ask which source should win.
 12. Update `CONTEXT.md` immediately when a glossary term is resolved. Use it
@@ -100,7 +107,9 @@ obvious cause, or execution of an already-written plan (`brain/plans/` or
     write to `brain/plans/<slug>.md` and add a wikilink to it in
     `brain/plans/index.md`; otherwise write to `docs/plans/<slug>.md`. (Do not
     edit `brain/index.md` — the auto-index hook maintains it.) Include decisions
-    made, contracts between parts, relevant glossary or ADR updates, and the
+    made, contracts between parts, relevant glossary or ADR updates, an explicit
+    `## Acceptance` bar for experience-bearing work (the user-visible quality
+    criteria, so `afk:implement` has a target and `afk:qa` has a bar), and the
     implementation task list grouped into parallel waves (see Output). Decide the
     schedule here so `afk:implement` does not have to re-derive it: mark which
     slices are independent (disjoint files, no shared contract) so they run
@@ -130,6 +139,7 @@ fetched primary sources.
 |---------|---------|
 | "I can ask the user how the code works." | Read the code first and ask only when the code conflicts with intent or another source. |
 | "The plan is mostly obvious." | Non-trivial work needs explicit contracts, edge cases, and source-of-truth decisions before implementation. |
+| "The data contracts are nailed, so the plan is ready." | For experience-bearing work, contracts aren't the bar. Name the user-visible quality bar (the insight, what's legible at a glance) as `## Acceptance`, or implement ships something that runs but doesn't deliver. |
 | "I'll batch glossary updates at the end." | Update `CONTEXT.md` when the term is resolved so later questions use the canonical meaning. |
 | "This decision feels important, so it needs an ADR." | ADRs are only for decisions that are hard to reverse, surprising without context, and trade-off driven. |
 | "A subagent report is enough." | The lead must synthesize and verify important claims before asking or planning. |
@@ -154,6 +164,14 @@ otherwise `docs/plans/<slug>.md`) with this shape:
 
 ## Contracts
 - <Interface, data, lifecycle, permission, or ownership contract>
+
+## Acceptance
+<For experience-bearing work (UI, dashboards, reports). The user-visible quality
+bar — what "good" means, not just that it runs. Each criterion must be
+verifiable by QA.>
+- <The insight or outcome the user must get, and what makes it good — e.g. the
+  90-day trend is legible at a glance, axis scaled to the data range not fixed
+  to zero, the key comparison visible without interaction, same insight on mobile>
 
 ## Open Non-Blocking Notes
 - <Known follow-up that does not block implementation>

@@ -12,7 +12,9 @@ SHIP, DO NOT SHIP, or SHIP WITH CAVEATS verdict.
 
 **Core principle:** tests are supporting evidence; QA is the observed behavior
 of the real UI, API, CLI, worker, or service contract. A claim without evidence
-is not a finding.
+is not a finding. QA also judges whether that observed behavior **delivers the
+change's stated intent** — a feature that runs without errors but does not
+accomplish its purpose is not a SHIP.
 
 ## When to Use
 
@@ -26,6 +28,9 @@ actually works", or "can this ship?"
    - Identify the flow under test from the plan (`docs/plans/<slug>.md` from
      `afk:grill` or `brain/plans/<slug>/` from `afk:plan`), the recent diff, or
      the user's named target.
+   - Capture the change's **stated intent** — what the user should be able to
+     understand or do once it ships (the plan's `## Acceptance` bar if present).
+     QA judges delivery of that intent, not just that the code executes.
    - Read local run instructions from `README`, `CLAUDE.md`, package scripts,
      Procfile or compose files, Makefile, and framework config.
    - If the vault has principles, skim `brain/principles.md` for any that set an
@@ -62,7 +67,9 @@ actually works", or "can this ship?"
      back to unit tests for browser QA.
    - Derive cases from the plan and expected user behavior, not from the
      implementation: happy path, every acceptance criterion, invalid input,
-     empty submit, refresh mid-flow, back button, and double-click submit.
+     empty submit, refresh mid-flow, back button, double-click submit, and
+     whether the primary view actually delivers its stated insight (legible and
+     useful at a glance), not only that it renders.
    - For each step:
      1. Wait for a reliable signal with `wait --load networkidle` or
         `wait --text "..."`.
@@ -76,6 +83,13 @@ actually works", or "can this ship?"
         confirming the downstream view updated.
    - Treat a rendered success screen with a 500, uncaught exception, or
      relevant console error as a failure.
+   - Judge the primary view against its stated intent, not just that it
+     rendered. Does the change let the user understand or do what the plan
+     promised? For data visualizations specifically, confirm it is legible:
+     axes scaled to the data range — not fixed to zero so real movement reads
+     as a flat line — the key trend or comparison visible at a glance, and
+     units and labels present. A chart that draws a line but hides the trend
+     fails its purpose even with no console errors. Name that gap as a defect.
    - When a screen looks broken, triage before reporting: confirm the URL,
      whether `open` landed on `about:blank`, whether the error is a product bug
      or missing local key, and whether direct-loading a client-routed URL needs
@@ -143,6 +157,8 @@ invent QA coverage from tests or static inspection.
 |---------|---------|
 | "Tests passed, so QA passed." | Tests are supporting evidence; QA needs observed user or contract behavior. |
 | "The page showed success, so it worked." | Check console, network-visible failures, persisted state, and downstream views. |
+| "The chart renders a line, so the chart works." | Rendering is not communicating. Judge the primary view against the insight it must deliver — a trend squashed by an unscaled axis fails even with no errors. |
+| "It runs with no errors, so it's a SHIP." | Running is necessary, not sufficient. A clean SHIP also requires that the change delivers its stated intent. |
 | "The endpoint returned 200 once." | Verify validation, errors, persistence, permissions, and side effects where relevant. |
 | "The local setup is broken, but the code looks fine." | That is a blocker or caveat, not a ship verdict. |
 | "A finding seems obvious." | Reproduce it and cite evidence from the report. |
@@ -169,6 +185,11 @@ Evidence: qa/evidence/<slug>/...
 (environmental noise, local setup caveats, missing keys, and supporting test
 commands/results that should not be treated as product defects)
 ```
+
+A clean SHIP requires both: it works (no functional defects) **and** it delivers
+its stated intent (the user can understand or do what the plan promised). When it
+runs but does not deliver that intent, the verdict is DO NOT SHIP or SHIP WITH
+CAVEATS with the gap named as the caveat — never a clean SHIP.
 
 Failures must be reproducible from the report alone.
 

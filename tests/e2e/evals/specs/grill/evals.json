@@ -224,6 +224,41 @@
       "assertions": {
         "required_substrings": ["docs/auth-design.md"]
       }
+    },
+    {
+      "id": "grill-ui-feature-elicits-quality-bar",
+      "prompt": "Grill me on adding a dashboard so I can understand my training trends at a glance.",
+      "expected_output": "For experience-bearing UI work, the grill recognizes the goal is comprehension/insight and raises what 'good' looks like (the insight to surface, legibility bar), not just data contracts.",
+      "fixture": {
+        "files": {
+          "README.md": "# Trainlog\n\nA training tracker. Workouts and sets are already logged and stored; there is no dashboard yet.\n"
+        }
+      },
+      "expectations": [
+        "Recognizes the goal is helping the user understand their training trends (comprehension/insight), not merely displaying the stored data",
+        "Raises what 'good' or 'useful' looks like as a question or proposed bar — which insight must be visible at a glance and how legibility will be judged — rather than treating this as only a data or API contract problem",
+        "Asks one focused question at a time and includes a recommended answer with rationale"
+      ],
+      "assertions": {
+        "required_substrings": ["at a glance"]
+      }
+    },
+    {
+      "id": "grill-ui-plan-records-quality-bar",
+      "prompt": "We have resolved the decisions. Finish the grill session by writing docs/plans/training-dashboard.md. Decisions: add a dashboard at /dashboard; the primary insight is whether weekly training volume is trending up or down over the last 12 weeks; charts must be legible at a glance with the y-axis scaled to the data range rather than fixed to zero; the current-week-vs-previous comparison must be visible without any interaction; mobile must surface the same primary insight. Contracts: GET /api/stats/volume returns one point per week for 12 weeks; the dashboard renders them as a line chart with the comparison summary above it.",
+      "expected_output": "Writes a plan that records an explicit user-visible quality/acceptance bar (the insight to surface, legibility, axis scaled to data, comparison visible) so afk:implement has a target and afk:qa has a bar to verify against.",
+      "expectations": [
+        "Writes the plan with an explicit user-visible quality/acceptance bar describing what 'good' looks like (legible charts, y-axis scaled to the data, the comparison visible at a glance), not only data contracts",
+        "Captures the primary insight the view must deliver — whether 12-week training volume is trending up or down — as a verifiable acceptance criterion",
+        "States that the plan is ready for afk:implement"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:implement"],
+        "required_files": ["docs/plans/training-dashboard.md"],
+        "required_file_substrings": {
+          "docs/plans/training-dashboard.md": ["## Acceptance", "at a glance"]
+        }
+      }
     }
   ]
 }
