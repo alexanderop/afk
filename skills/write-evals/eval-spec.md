@@ -18,10 +18,16 @@ Each case:
 | `id` | yes | stable, kebab-case; used to filter a single run |
 | `prompt` | yes | what the user/system-under-test is asked to do |
 | `expected_output` | no | one-sentence human summary of the target behavior |
+| `kind` | no | `"judged"` (default) or `"routing"` — see below |
 | `max_budget_usd` | no | per-run budget override for an expensive case |
 | `fixture.files` | no | `{ "path": "contents" }` written into a fresh temp git repo before the run |
-| `expectations` | no | natural-language behaviors graded by an LLM judge (use only for what substrings can't capture) |
+| `expectations` | no | natural-language behaviors graded by an LLM judge (use only for what substrings can't capture); judged cases only |
+| `routing` | no | code-graded route check, required for `kind:"routing"` (below) |
 | `assertions` | no | deterministic, zero-judge checks (below) |
+
+> The AFK integration lint requires `expected_output` on every case. `kind:"routing"`
+> cases must omit `expectations` and carry a `routing` block; judged cases keep
+> `expectations` and must not carry `routing`.
 
 `assertions` keys:
 
@@ -31,6 +37,48 @@ Each case:
 - `required_file_substrings` — `{ "path": ["str", ...] }` content checks on
   produced files.
 - `unchanged_files` — fixture files that must be byte-identical afterward.
+
+## Case kinds
+
+`kind` defaults to `"judged"` — today's behavior: `assertions` plus optional
+LLM-judged `expectations`. Set `kind:"routing"` when the *whole* behavior under
+test is "which skill/route did it pick", which a code-graded substring check
+grades faithfully and cheaply.
+
+### Routing case (`kind:"routing"`)
+
+```json
+{
+  "id": "help-after-plan",
+  "prompt": "...",
+  "expected_output": "Recommends afk:implement when a plan exists and there's no diff.",
+  "kind": "routing",
+  "fixture": { "files": {} },
+  "routing": {
+    "expect": ["afk:implement"],
+    "forbid": ["run afk:qa now"],
+    "overblock_guard": false
+  }
+}
+```
+
+- A **trial is correct** iff every `expect` substring is present (case-insensitive,
+  over the agent's prose + final result) **and** no `forbid` substring is present.
+- A **routing case passes** iff a strict majority of trials are correct (≥2/3 at the
+  default `AFK_EVAL_TRIALS=3`). Per-case agreement is reported `N/trials`; a case with
+  mixed trials (some correct, some not) is flagged **flaky** in the summary.
+- `overblock_guard: true` marks a "should-proceed" gate twin: failing such a case is
+  tallied as an **over-block** (the suite blocked something safe). Default `false`.
+- Routing cases are code-graded — they carry no `expectations` and incur no judge cost.
+  The summary prints routing accuracy, the over-block count, and flaky cases.
+
+### Judge output shape (judged cases)
+
+The judge is instructed to first reason inside a single `<thinking>…</thinking>`
+block, then output STRICT JSON only after the closing tag:
+`{"results":[{"reason":"...","met":true}]}`, one entry per expectation in order.
+The harness discards the `<thinking>` block and reads `met` **by key**, so field
+order and the reasoning prose don't affect grading.
 
 ## Design rules
 

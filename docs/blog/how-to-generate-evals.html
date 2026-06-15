@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build your own eval harness from scratch — Bun + claude -p</title>
+<style>
+  :root {
+    --ink: #e7eaee;
+    --muted: #98a2ad;
+    --line: #2a3038;
+    --bg: #11141a;
+    --card: #1a1f27;
+    --accent: #5fc28b;
+    --accent-soft: #15281e;
+    --warn: #e6b25c;
+    --warn-soft: #2a2114;
+    --code-bg: #0d1117;
+    --code-ink: #e8eaed;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.65;
+    font-size: 18px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px 120px; }
+  header.hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 72px 24px 40px;
+  }
+  .kicker {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-size: 42px;
+    line-height: 1.12;
+    margin: 0 0 18px;
+    letter-spacing: -0.02em;
+  }
+  .standfirst {
+    font-size: 21px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .byline {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--muted);
+  }
+  h2 {
+    font-size: 27px;
+    margin: 56px 0 14px;
+    letter-spacing: -0.01em;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-soft);
+  }
+  h3 { font-size: 20px; margin: 36px 0 8px; }
+  p { margin: 0 0 18px; }
+  a { color: var(--accent); }
+  strong { font-weight: 700; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: #232a33;
+    padding: 0.12em 0.36em;
+    border-radius: 5px;
+    border: 1px solid var(--line);
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 20px 22px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 14.5px;
+    line-height: 1.55;
+    margin: 0 0 22px;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+  .tok-key { color: #9cdcfe; }
+  .tok-str { color: #ce9178; }
+  .tok-com { color: #7f8c97; font-style: italic; }
+  .tok-fn  { color: #dcdcaa; }
+  .tok-lit { color: #569cd6; }
+  blockquote {
+    margin: 0 0 22px;
+    padding: 2px 20px;
+    border-left: 4px solid var(--accent);
+    color: var(--muted);
+    font-style: italic;
+  }
+  .callout {
+    background: var(--accent-soft);
+    border: 1px solid #22563a;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 0 0 24px;
+  }
+  .callout.warn { background: var(--warn-soft); border-color: #5a4620; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .label {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .callout.warn .label { color: var(--warn); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 24px;
+    font-size: 15.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th { background: var(--card); font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .ladder { counter-reset: step; list-style: none; padding: 0; margin: 0 0 24px; }
+  .ladder li {
+    position: relative;
+    padding: 14px 16px 14px 58px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    margin-bottom: 10px;
+  }
+  .ladder li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 14px; top: 14px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    display: grid; place-items: center;
+    font-size: 15px;
+  }
+  .ladder li b { display: block; }
+  .ladder small { color: var(--muted); }
+  hr { border: none; border-top: 1px solid var(--line); margin: 48px 0; }
+  footer {
+    max-width: 760px; margin: 0 auto; padding: 24px;
+    color: var(--muted); font-size: 14px;
+  }
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 0 0 12px;
+    font-size: 16px;
+  }
+  .toc strong { display:block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .toc ol { margin: 0; padding-left: 20px; }
+  .toc li { margin: 4px 0; }
+  @media (max-width: 600px) {
+    body { font-size: 17px; }
+    h1 { font-size: 33px; }
+    header.hero { padding-top: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="kicker">Build it yourself · ~150 lines</p>
+  <h1>Build your own eval harness from scratch with Bun and <code>claude&nbsp;-p</code></h1>
+  <p class="standfirst">You don't need a framework, a SaaS dashboard, or a dependency to test an AI agent. You need a way to run it, a way to grade it, and a loop around both. Here we build a real, working eval harness in a single Bun file — start to finish, every line explained.</p>
+  <p class="byline">A hands-on tutorial. By the end you'll have one <code>evals.ts</code> file that spins up a sandbox, drives the agent through the <code>claude</code> CLI, and grades the result three different ways.</p>
+</header>
+
+<div class="wrap">
+
+  <nav class="toc">
+    <strong>What we'll build</strong>
+    <ol>
+      <li><a href="#what">What we're building</a></li>
+      <li><a href="#setup">Setup: Bun and the <code>claude</code> CLI</a></li>
+      <li><a href="#run-agent">Step 1 — drive the agent from code</a></li>
+      <li><a href="#sandbox">Step 2 — give it a sandbox to act in</a></li>
+      <li><a href="#assert">Step 3 — grade with cheap, deterministic checks</a></li>
+      <li><a href="#judge">Step 4 — grade fuzzy behavior with an LLM judge</a></li>
+      <li><a href="#trials">Step 5 — run it more than once and vote</a></li>
+      <li><a href="#wire">Putting it together</a></li>
+      <li><a href="#afk">Where this goes in production</a></li>
+      <li><a href="#next">Where to take it next</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="what">What we're building</h2>
+
+  <p>An <strong>eval</strong> is a test for software that isn't deterministic. A unit test asks "does <code>2 + 2</code> return <code>4</code>?" — but an AI agent gives you a different paragraph every time you ask, so there's no single value to assert against. An eval instead pins down <em>one observable behavior</em> ("when there's no plan yet, it recommends planning first") and checks whether the agent did it, while tolerating the fact that the exact words vary.</p>
+
+  <p>People reach for hosted platforms for this. You don't have to. Every eval harness, underneath the dashboard, is the same three moves:</p>
+
+  <ol class="ladder">
+    <li><b>Run the agent</b><small>Give it a prompt in a controlled environment and capture everything it says and does.</small></li>
+    <li><b>Grade the result</b><small>Check the output — cheaply with string and file assertions where you can, with a second LLM as a judge where you can't.</small></li>
+    <li><b>Loop and report</b><small>Do that for every case, tally pass/fail, exit non-zero if anything failed so CI can gate on it.</small></li>
+  </ol>
+
+  <p>Bun gives us a fast TypeScript runtime with <code>spawnSync</code> and the filesystem built in. The <code>claude</code> CLI gives us an agent we can drive from the command line and an LLM we can use as a judge. That's everything. By the end of this post you'll have a single <code>evals.ts</code> file — roughly 150 lines — that you run with <code>bun evals.ts</code>. We'll build it one piece at a time.</p>
+
+  <h2 id="setup">Setup: Bun and the <code>claude</code> CLI</h2>
+
+  <p>Two prerequisites, both one-liners:</p>
+
+<pre><code><span class="tok-com"># 1. Bun — the runtime that runs our harness</span>
+curl -fsSL https://bun.sh/install | bash
+
+<span class="tok-com"># 2. The Claude Code CLI — the agent we're testing, and our judge</span>
+npm install -g @anthropic-ai/claude-code
+
+<span class="tok-com"># sanity check: this should print a model's reply</span>
+claude -p <span class="tok-str">"say hi in three words"</span> --output-format json</code></pre>
+
+  <p>The key flag we'll lean on is <code>--output-format json</code>, which makes the CLI print one machine-readable envelope instead of a stream of human text. Make a folder, drop in an empty <code>evals.ts</code>, and let's fill it.</p>
+
+  <h2 id="run-agent">Step 1 — drive the agent from code</h2>
+
+  <p>First, a function that runs the agent on a prompt and hands back its reply. We shell out to <code>claude -p</code> (the "print" / non-interactive mode) and parse the JSON envelope it prints. That envelope carries the final text in <code>result</code>, the dollar cost in <code>total_cost_usd</code>, and an <code>is_error</code> flag.</p>
+
+<pre><code><span class="tok-com">// evals.ts</span>
+import { spawnSync } from <span class="tok-str">"bun"</span>;
+
+<span class="tok-com">// Run the agent on `prompt` inside `cwd`; return its final reply.</span>
+function runAgent(prompt: string, cwd: string) {
+  const res = spawnSync({
+    cmd: [
+      <span class="tok-str">"claude"</span>, <span class="tok-str">"-p"</span>, prompt,
+      <span class="tok-str">"--output-format"</span>, <span class="tok-str">"json"</span>,          <span class="tok-com">// one JSON envelope on stdout</span>
+      <span class="tok-str">"--permission-mode"</span>, <span class="tok-str">"bypassPermissions"</span>, <span class="tok-com">// don't prompt us mid-run</span>
+      <span class="tok-str">"--max-budget-usd"</span>, <span class="tok-str">"0.50"</span>,           <span class="tok-com">// hard safety cap per run</span>
+    ],
+    cwd,
+    stdout: <span class="tok-str">"pipe"</span>,
+    stderr: <span class="tok-str">"pipe"</span>,
+    timeout: 180_000,
+  });
+
+  const envelope = JSON.parse(res.stdout.toString());
+  return {
+    text: envelope.result ?? <span class="tok-str">""</span>,
+    ok: res.exitCode === 0 &amp;&amp; envelope.is_error !== true,
+    cost: Number(envelope.total_cost_usd ?? 0),
+  };
+}</code></pre>
+
+  <div class="callout">
+    <span class="label">Why <code>spawnSync</code></span>
+    <p>Evals are slow (each one is a real model call) but we want them simple and ordered, not a clever async pipeline. Synchronous spawning keeps the whole harness readable top-to-bottom. You can parallelize later; correctness first.</p>
+  </div>
+
+  <h2 id="sandbox">Step 2 — give it a sandbox to act in</h2>
+
+  <p>Letting an agent loose in your real repo is a bad idea, and it makes runs non-repeatable. Instead, every case gets a fresh throwaway git repo seeded with exactly the files that behavior needs — a <strong>fixture</strong>. When the run is done, you can inspect or delete it.</p>
+
+<pre><code>import { mkdtempSync, mkdirSync, writeFileSync } from <span class="tok-str">"node:fs"</span>;
+import { tmpdir } from <span class="tok-str">"node:os"</span>;
+import { join, dirname } from <span class="tok-str">"node:path"</span>;
+
+<span class="tok-com">// Make a throwaway git repo seeded with `files`; return its path.</span>
+function makeSandbox(files: Record&lt;string, string&gt;) {
+  const dir = mkdtempSync(join(tmpdir(), <span class="tok-str">"eval-"</span>));
+  spawnSync({ cmd: [<span class="tok-str">"git"</span>, <span class="tok-str">"init"</span>, <span class="tok-str">"-q"</span>], cwd: dir });
+  for (const [path, content] of Object.entries(files)) {
+    const target = join(dir, path);
+    mkdirSync(dirname(target), { recursive: true });
+    writeFileSync(target, content);
+  }
+  return dir;
+}</code></pre>
+
+  <p>Keep fixtures tiny. If you're testing "does it notice the plan already exists," you need one file — a fake <code>docs/plans/checkout.md</code> — not a clone of your codebase. Small fixtures isolate the behavior and run fast.</p>
+
+  <h2 id="assert">Step 3 — grade with cheap, deterministic checks</h2>
+
+  <p>Now the grading. Always start with the cheapest tool that faithfully captures the behavior: plain string and file checks. They're free, instant, and never flaky. Reach for the LLM judge only for what these <em>can't</em> express.</p>
+
+<pre><code>import { existsSync } from <span class="tok-str">"node:fs"</span>;
+
+const has = (haystack: string, needle: string) =&gt;
+  haystack.toLowerCase().includes(needle.toLowerCase());
+
+type Checks = {
+  required_substrings?: string[];   <span class="tok-com">// must appear in the reply</span>
+  forbidden_substrings?: string[];  <span class="tok-com">// must NOT appear</span>
+  required_files?: string[];        <span class="tok-com">// must exist in the sandbox after the run</span>
+};
+
+<span class="tok-com">// Returns [label, passed] for each check.</span>
+function checkAssertions(checks: Checks, reply: string, dir: string) {
+  const out: [string, boolean][] = [];
+  for (const s of checks.required_substrings ?? [])
+    out.push([<span class="tok-str">`contains "${s}"`</span>, has(reply, s)]);
+  for (const s of checks.forbidden_substrings ?? [])
+    out.push([<span class="tok-str">`excludes "${s}"`</span>, !has(reply, s)]);
+  for (const f of checks.required_files ?? [])
+    out.push([<span class="tok-str">`created ${f}`</span>, existsSync(join(dir, f))]);
+  return out;
+}</code></pre>
+
+  <div class="callout">
+    <span class="label">Split two-part requirements</span>
+    <p>If a behavior has two halves — say, "records the repo's path <em>and</em> its origin URL" — write two checks, not one. Otherwise a half-right answer passes. One requirement, one assertion.</p>
+  </div>
+
+  <h2 id="judge">Step 4 — grade fuzzy behavior with an LLM judge</h2>
+
+  <p>Some behaviors have no keyword. "Did it read the repo before asking its first question?" "Did it explain the trade-off?" For those, you hand the reply to a second, cheaper model and ask it to grade each expectation. This is the powerful-but-pricey rung — use it sparingly.</p>
+
+  <p>Two details earn their keep in the prompt. We ask the judge to <em>reason first, then answer</em> in strict JSON, and we put the <code>reason</code> field <em>before</em> <code>met</code> — so it justifies, then decides, instead of blurting a verdict. We strip the reasoning before parsing.</p>
+
+<pre><code><span class="tok-com">// Ask a cheap model whether `reply` meets each expectation.</span>
+function judge(reply: string, expectations: string[]): boolean[] {
+  if (expectations.length === 0) return [];
+  const numbered = expectations.map((e, i) =&gt; <span class="tok-str">`${i + 1}. ${e}`</span>).join(<span class="tok-str">"\n"</span>);
+
+  const prompt = <span class="tok-str">`You are grading an AI agent's reply against a list of expectations.
+
+First reason inside a single &lt;thinking&gt;…&lt;/thinking&gt; block. Then, after the
+closing tag, output STRICT JSON only:
+{"results":[{"reason":"...","met":true}]}
+one entry per expectation, in order.
+
+=== REPLY ===
+${reply}
+=== END ===
+
+Expectations:
+${numbered}`</span>;
+
+  const res = spawnSync({
+    cmd: [
+      <span class="tok-str">"claude"</span>, <span class="tok-str">"-p"</span>, prompt,
+      <span class="tok-str">"--model"</span>, <span class="tok-str">"claude-haiku-4-5"</span>,   <span class="tok-com">// small + cheap is plenty for grading</span>
+      <span class="tok-str">"--output-format"</span>, <span class="tok-str">"json"</span>,
+      <span class="tok-str">"--permission-mode"</span>, <span class="tok-str">"bypassPermissions"</span>,
+      <span class="tok-str">"--max-budget-usd"</span>, <span class="tok-str">"0.10"</span>,
+    ],
+    stdout: <span class="tok-str">"pipe"</span>, stderr: <span class="tok-str">"pipe"</span>, timeout: 180_000,
+  });
+
+  <span class="tok-com">// strip the &lt;thinking&gt; block, then grab the JSON object</span>
+  const text = (JSON.parse(res.stdout.toString()).result ?? <span class="tok-str">""</span>)
+    .replace(/&lt;thinking&gt;[\s\S]*?&lt;\/thinking&gt;/gi, <span class="tok-str">""</span>);
+  const json = JSON.parse(text.slice(text.indexOf(<span class="tok-str">"{"</span>), text.lastIndexOf(<span class="tok-str">"}"</span>) + 1));
+  return expectations.map((_, i) =&gt; json.results?.[i]?.met === true);
+}</code></pre>
+
+  <div class="callout warn">
+    <span class="label">Read the judge's homework</span>
+    <p>A judged eval is only as trustworthy as the judge. The first few times, log the raw judge output and actually read its reasoning. A judge that misreads the transcript silently inverts your gate — green when it should be red. Reading two samples is the cheapest insurance you'll ever buy.</p>
+  </div>
+
+  <h2 id="trials">Step 5 — run it more than once and vote</h2>
+
+  <p>Run an agent once and a pass might be luck, a fail might be a bad roll. The fix is to run each case a few times and decide by majority. As a bonus, you learn which cases are <em>flaky</em> — where the trials disagree — which is an early warning that the behavior is one coin-flip from regressing.</p>
+
+<pre><code><span class="tok-com">// Run `fn` N times, return how many returned true + whether the majority did.</span>
+function vote(trials: number, fn: () =&gt; boolean) {
+  let correct = 0;
+  for (let i = 0; i &lt; trials; i++) if (fn()) correct++;
+  return {
+    correct,
+    passed: correct * 2 &gt; trials,              <span class="tok-com">// strict majority</span>
+    flaky: correct &gt; 0 &amp;&amp; correct &lt; trials,     <span class="tok-com">// trials disagreed</span>
+  };
+}</code></pre>
+
+  <p>This is the one place evals cost real money — three runs is three times the spend — so it's a pre-release pass, not an every-keystroke check. Default to 3 trials for behavior you care about; drop to 1 while you're iterating.</p>
+
+  <h2 id="wire">Putting it together</h2>
+
+  <p>Now the spine. Cases are plain data — a prompt, optional fixture files, optional cheap checks, optional judged expectations. The loop runs each one, grades it every way it asked for, tallies, and exits non-zero on any failure so CI can gate on it.</p>
+
+<pre><code>type EvalCase = {
+  id: string;
+  prompt: string;
+  files?: Record&lt;string, string&gt;;
+  checks?: Checks;
+  expectations?: string[];
+};
+
+const cases: EvalCase[] = [
+  {
+    id: <span class="tok-str">"recommends-planning-first"</span>,
+    prompt: <span class="tok-str">"I want to add team billing. What should I do first?"</span>,
+    checks: {
+      required_substrings: [<span class="tok-str">"plan"</span>],
+      forbidden_substrings: [<span class="tok-str">"just start coding"</span>],
+    },
+    expectations: [
+      <span class="tok-str">"Recommends clarifying or writing a plan before implementation"</span>,
+      <span class="tok-str">"Does not start writing code immediately"</span>,
+    ],
+  },
+];
+
+let pass = 0, fail = 0, spent = 0;
+
+for (const c of cases) {
+  console.log(<span class="tok-str">`\n▶ ${c.id}`</span>);
+
+  <span class="tok-com">// each trial runs in its own fresh sandbox</span>
+  const result = vote(3, () =&gt; {
+    const dir = makeSandbox(c.files ?? {});
+    const run = runAgent(c.prompt, dir);
+    spent += run.cost;
+    if (!run.ok) return false;
+
+    const checks = checkAssertions(c.checks ?? {}, run.text, dir);
+    const judged = judge(run.text, c.expectations ?? [])
+      .map((met, i) =&gt; [<span class="tok-str">`expectation ${i + 1}`</span>, met] as [string, boolean]);
+
+    const all = [...checks, ...judged];
+    for (const [label, ok] of all) console.log(<span class="tok-str">`   ${ok ? "✓" : "✗"} ${label}`</span>);
+    return all.every(([, ok]) =&gt; ok);
+  });
+
+  console.log(<span class="tok-str">`  ${result.passed ? "PASS" : "FAIL"} ${result.correct}/3${result.flaky ? "  (flaky)" : ""}`</span>);
+  result.passed ? pass++ : fail++;
+}
+
+console.log(<span class="tok-str">`\n${pass} passed, ${fail} failed — $${spent.toFixed(4)}`</span>);
+process.exit(fail &gt; 0 ? 1 : 0);</code></pre>
+
+  <p>Wire it into <code>package.json</code> so it's one command:</p>
+
+<pre><code><span class="tok-key">"scripts"</span>: {
+  <span class="tok-key">"test:evals"</span>: <span class="tok-str">"bun evals.ts"</span>
+}</code></pre>
+
+  <p>Then:</p>
+
+<pre><code>bun run test:evals
+
+<span class="tok-com"># ▶ recommends-planning-first</span>
+<span class="tok-com">#    ✓ contains "plan"</span>
+<span class="tok-com">#    ✓ excludes "just start coding"</span>
+<span class="tok-com">#    ✓ expectation 1</span>
+<span class="tok-com">#    ✓ expectation 2</span>
+<span class="tok-com">#   PASS 3/3</span>
+<span class="tok-com">#</span>
+<span class="tok-com"># 1 passed, 0 failed — $0.4120</span></code></pre>
+
+  <p>That's a real eval harness. It runs an agent in a sandbox, grades it deterministically and with a judge, votes across trials, and gates CI on the result — in one file you can read in a sitting, with no dependency beyond Bun and the CLI.</p>
+
+  <div class="callout">
+    <span class="label">Prove it works — write it red first</span>
+    <p>Before you trust a case, watch it <em>fail</em>. Point it at a behavior the agent doesn't have yet and confirm it goes red for the right reason. An eval written after the behavior already works might be asserting on nothing, and you'd never know — because it's green from birth.</p>
+  </div>
+
+  <h2 id="afk">Where this goes in production</h2>
+
+  <p>The harness above is the honest core. A production version adds polish, but nothing exotic. For a real-world reference, <strong>AFK</strong> — an open-source Claude Code plugin whose skills route a coding task through plan → implement → clean up → verify — ships a harness built on exactly this skeleton, grown to fit a real suite:</p>
+
+  <ul>
+    <li><strong>Richer transcripts.</strong> It uses <code>--output-format stream-json</code> instead of plain <code>json</code>, so the judge sees not just the final reply but every tool the agent called — essential when "did it read the repo first?" is the behavior.</li>
+    <li><strong>A dedicated routing case type.</strong> Most agent behavior is "which path did it pick?", which the cheap <code>expect</code> / <code>forbid</code> substring check grades perfectly — no judge needed. Each safety gate is paired with a "should-proceed" twin so an over-cautious agent that blocks <em>everything</em> can't hide.</li>
+    <li><strong>Saved artifacts.</strong> Every run writes its transcript, the copied sandbox, and the judge's raw output to a timestamped folder, so a failure is something you read, not something you guess at.</li>
+  </ul>
+
+  <p>None of that changes the three moves. It's the same run-grade-loop you just built, with more cases and sharper reporting.</p>
+
+  <h2 id="next">Where to take it next</h2>
+
+  <p>Once the core works, the highest-value additions, roughly in order:</p>
+
+  <ol>
+    <li><strong>Capture tool calls</strong> by switching to <code>stream-json</code> and parsing the event lines — your judge gets far more to work with.</li>
+    <li><strong>Add a routing case type</strong> — pure <code>expect</code>/<code>forbid</code> substring lists, no judge — for the many behaviors that are really just a path decision.</li>
+    <li><strong>Pair every gate with its twin</strong> so you measure over-blocking, not just missed blocks.</li>
+    <li><strong>Mirror the real request distribution</strong> — ambiguous prompts, rambling ones, adversarial ones whose keywords point at the wrong path. Don't pad the suite with near-duplicate happy paths.</li>
+    <li><strong>Write artifacts to disk</strong> so every failure is reproducible and inspectable.</li>
+  </ol>
+
+  <p>But you don't need any of that to start. The 150 lines above are enough to catch the day your agent quietly starts doing the wrong thing — which is the entire point. Evals don't make a probabilistic system deterministic; they let you <em>notice</em> when its behavior drifts, before your users do.</p>
+
+  <p style="color:var(--muted); font-size:15px;">The production reference described here lives in the AFK repo under <code>tests/e2e/evals/</code> and <code>skills/write-evals/</code> — including a self-contained <code>run-evals.template.ts</code> you can drop into any repo, which is the grown-up version of the file we built above.</p>
+
+
+</div>
+
+<footer>
+  A build-it-yourself tutorial for engineers who want an eval harness they fully understand. The full file is yours to copy, paste, and grow. Reuse freely.
+</footer>
+
+</body>
+</html>

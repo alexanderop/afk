@@ -11,13 +11,21 @@ const outDir = process.env.AFK_EVAL_OUT_DIR ?? fromPluginRoot("qa", "evals", new
 const budgetOverrideUsd = process.env.AFK_EVAL_MAX_BUDGET_USD;
 const maxBudgetUsd = budgetOverrideUsd ?? "0.50";
 const timeoutMs = envNumber("AFK_EVAL_TIMEOUT_SECONDS", 180) * 1000;
-const trials = Math.max(1, Math.round(envNumber("AFK_EVAL_TRIALS", 1)));
+const trials = Math.max(1, Math.round(envNumber("AFK_EVAL_TRIALS", 3)));
 const scoreThreshold = envNumber("AFK_EVAL_SCORE_THRESHOLD", 70);
 const judgeModel = process.env.AFK_EVAL_JUDGE_MODEL ?? "claude-haiku-4-5";
 const judgeBudgetUsd = "0.10";
 const transcriptCharLimit = 20000;
 let totalCost = 0;
 const judgeScores: number[] = [];
+
+// Routing-case tallies (code-graded; see eval-spec.md "Routing case").
+let routingCorrectTrials = 0;
+let routingTotalTrials = 0;
+let routingCasesPassed = 0;
+let routingCasesTotal = 0;
+let overBlocked = 0;
+const flakyCases: string[] = [];
 
 type EvalAssertions = {
   required_substrings?: string[];
@@ -27,15 +35,23 @@ type EvalAssertions = {
   unchanged_files?: string[];
 };
 
+type RoutingBlock = {
+  expect?: string[];
+  forbid?: string[];
+  overblock_guard?: boolean;
+};
+
 type EvalEntry = {
   id: string;
   prompt: string;
+  kind?: "judged" | "routing";
   max_budget_usd?: number;
   expectations?: string[];
   fixture?: {
     files?: Record<string, string>;
   };
   assertions?: EvalAssertions;
+  routing?: RoutingBlock;
 };
 
 type EvalSpec = {
@@ -112,8 +128,11 @@ function buildTranscript(assistantText: string, toolCalls: string[], resultText:
 }
 
 function extractJson(text: string): unknown {
-  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const candidate = fenced ? fenced[1] : text;
+  // Discard any <thinking>…</thinking> reasoning the judge emits before its JSON
+  // so a brace inside the reasoning can't derail the first-{ / last-} scan below.
+  const stripped = text.replace(/<thinking>[\s\S]*?<\/thinking>/gi, "");
+  const fenced = stripped.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fenced ? fenced[1] : stripped;
   const start = candidate.indexOf("{");
   const end = candidate.lastIndexOf("}");
   if (start === -1 || end === -1 || end < start) return undefined;
@@ -134,9 +153,9 @@ Below is a transcript of the agent's response (its prose, the tools it used, and
 
 For each expectation, decide whether the transcript shows it was met. Judge only against what the transcript demonstrates; do not assume unseen behavior.
 
-Return STRICT JSON only, no prose, no code fences, in exactly this shape:
-{"results":[{"met":true,"reason":"..."}]}
-with one entry per expectation, in the same order. "met" is a boolean; "reason" is one short sentence.
+First, reason about each expectation inside a single <thinking>…</thinking> block. Then, AFTER the closing </thinking> tag, output STRICT JSON only — no prose, no code fences — in exactly this shape:
+{"results":[{"reason":"...","met":true}]}
+with one entry per expectation, in the same order. "reason" is one short sentence; "met" is a boolean.
 
 === TRANSCRIPT START ===
 ${transcript}
@@ -198,8 +217,10 @@ ${evalEntry.prompt}
 
 Eval mode: follow the AFK skill normally. Include enough detail in the final response for the eval assertions to verify what happened. Do not edit files outside this temporary eval project.`;
 
+  const isRouting = evalEntry.kind === "routing";
   const trialScores: number[] = [];
   let lastUnmet: string[] = [];
+  let routingCorrectCount = 0;
 
   for (let trial = 1; trial <= trials; trial++) {
     const trialSuffix = trials > 1 ? `.trial${trial}` : "";
@@ -263,7 +284,16 @@ Eval mode: follow the AFK skill normally. Include enough detail in the final res
     run.pass(`${baseLabel} completed`);
     checkAssertions(spec, evalEntry, evalDir, projectCopyDir, assertionText, labelSuffix);
 
-    if (expectations.length > 0) {
+    if (isRouting) {
+      const routing = evalEntry.routing ?? {};
+      const missing = (routing.expect ?? []).filter((needle) => !containsCaseInsensitive(assertionText, needle));
+      const present = (routing.forbid ?? []).filter((needle) => containsCaseInsensitive(assertionText, needle));
+      const correct = missing.length === 0 && present.length === 0;
+      if (correct) routingCorrectCount += 1;
+      console.log(`  route${labelSuffix}: ${correct ? "correct" : "wrong"}${correct ? "" : ` (missing: ${missing.join(", ") || "none"}; forbidden present: ${present.join(", ") || "none"})`}`);
+    }
+
+    if (!isRouting && expectations.length > 0) {
       const transcript = buildTranscript(assistantText, toolCalls, resultText);
       const judged = judgeExpectations(transcript, expectations, evalDir, trialSuffix);
       if (judged) {
@@ -274,6 +304,26 @@ Eval mode: follow the AFK skill normally. Include enough detail in the final res
         console.log(`  judge${labelSuffix}: unparseable (see ${join(evalDir, `judge${trialSuffix}.json`)})`);
       }
     }
+  }
+
+  if (isRouting) {
+    routingCasesTotal += 1;
+    routingTotalTrials += trials;
+    routingCorrectTrials += routingCorrectCount;
+    const passed = routingCorrectCount * 2 > trials; // strict majority of trials correct
+    const label = `${spec.skill_name}/${evalEntry.id} routing ${routingCorrectCount}/${trials}`;
+    if (passed) {
+      run.pass(label);
+      routingCasesPassed += 1;
+    } else {
+      run.fail(label, `majority of trials routed wrong; see ${evalDir}`);
+      if (evalEntry.routing?.overblock_guard) overBlocked += 1;
+    }
+    // Mixed trials (some correct, some not) signal a flaky route, distinct from a clean fail.
+    if (routingCorrectCount > 0 && routingCorrectCount < trials) {
+      flakyCases.push(`${spec.skill_name}/${evalEntry.id} (${routingCorrectCount}/${trials})`);
+    }
+    return;
   }
 
   if (expectations.length === 0) return;
@@ -376,5 +426,15 @@ for (const specFile of listFiles(fromPluginRoot("tests", "e2e", "evals", "specs"
 }
 
 const meanJudgeScore = judgeScores.length > 0 ? Math.round((judgeScores.reduce((sum, score) => sum + score, 0) / judgeScores.length) * 100) : null;
-run.summary([`Cost: $${totalCost.toFixed(6)}`, `Score threshold: ${scoreThreshold}%`, meanJudgeScore === null ? "Mean judge score: n/a (no judged evals)" : `Mean judge score: ${meanJudgeScore}% across ${judgeScores.length} eval(s)`]);
+const summaryLines = [
+  `Cost: $${totalCost.toFixed(6)}`,
+  `Score threshold: ${scoreThreshold}%`,
+  meanJudgeScore === null ? "Mean judge score: n/a (no judged evals)" : `Mean judge score: ${meanJudgeScore}% across ${judgeScores.length} eval(s)`,
+];
+if (routingCasesTotal > 0) {
+  summaryLines.push(`Routing accuracy: ${routingCorrectTrials}/${routingTotalTrials} trials (${routingCasesPassed}/${routingCasesTotal} cases passed)`);
+  summaryLines.push(`Over-blocked: ${overBlocked}`);
+  summaryLines.push(flakyCases.length > 0 ? `Flaky routing (mixed agreement): ${flakyCases.join(", ")}` : "Flaky routing (mixed agreement): none");
+}
+run.summary(summaryLines);
 process.exit(run.exitCode());

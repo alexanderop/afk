@@ -133,6 +133,19 @@ function checkBehavioralEvalSpec(path: string, json: unknown, evalSkill: string)
       return false;
     }
     const assertions = isObject(entry.assertions) ? entry.assertions : {};
+    const isRouting = entry.kind === "routing";
+    const kindOk = entry.kind === undefined || entry.kind === "judged" || entry.kind === "routing";
+    // Routing cases are code-graded via a routing block and carry no expectations;
+    // judged cases keep the LLM-judged expectations array.
+    const expectationsOk = isRouting ? entry.expectations === undefined : isStringArray(entry.expectations);
+    const routing = isObject(entry.routing) ? entry.routing : {};
+    const routingOk = isRouting
+      ? isObject(entry.routing) &&
+        isStringArray(routing.expect ?? []) &&
+        (routing.expect ?? []).length > 0 &&
+        isStringArray(routing.forbid ?? []) &&
+        (routing.overblock_guard === undefined || typeof routing.overblock_guard === "boolean")
+      : entry.routing === undefined;
     return (
       typeof entry.id === "string" &&
       entry.id.length > 0 &&
@@ -140,7 +153,9 @@ function checkBehavioralEvalSpec(path: string, json: unknown, evalSkill: string)
       entry.prompt.length > 0 &&
       typeof entry.expected_output === "string" &&
       entry.expected_output.length > 0 &&
-      isStringArray(entry.expectations) &&
+      kindOk &&
+      expectationsOk &&
+      routingOk &&
       isStringArray(assertions.required_substrings ?? []) &&
       isStringArray(assertions.forbidden_substrings ?? []) &&
       isStringArray(assertions.required_files ?? []) &&

@@ -44,15 +44,26 @@ feature; this skill writes the eval and hands off.
    `required_file_substrings`, `required/forbidden_substrings`,
    `unchanged_files`. Split a two-part requirement into two assertions so a
    half-answer fails. Add `expectations` (LLM-judged) only for behaviors
-   substrings can't capture, e.g. "reads the repo before asking". See
+   substrings can't capture, e.g. "reads the repo before asking". When the
+   *whole* behavior is "which skill/route did it pick", use `kind:"routing"`
+   with a `routing` block (`expect`/`forbid`) instead — code-graded, judge-free,
+   and scored by strict-majority over trials. See
    [eval-spec.md](./eval-spec.md) for the full schema and a worked example.
 5. **Confirm it's red.** Run only the new case (the AFK harness filters via
    `AFK_EVAL_ID=<id>`; the template via `EVAL_ID=<id>`) and verify it fails for
    the right reason — the behavior is absent, not the fixture or assertion
-   malformed.
+   malformed. **Carve-out:** coverage cases that lock in already-correct
+   behavior — negative gate twins, edge-case classes, routing-volume cases —
+   may be born green; you can't make passing behavior fail. State this in the
+   PR/report and rely on review to catch dead assertions, rather than faking a
+   red. Net-new behavior still goes red first.
 6. **Go green.** Implement the behavior (or hand to the owning skill/agent), then
    re-run until deterministic assertions pass and the judge clears the threshold.
-7. **Keep zero-token checks green.** Make sure the spec JSON parses and any
+7. **Read the judge samples.** Open a `judge*.json` artifact for at least one
+   judged case and confirm the `<thinking>`-then-JSON output parses and the
+   verdicts are sane — a judge that misreads the transcript silently inverts the
+   gate. Routing cases need no judge; check their per-trial `route` log instead.
+8. **Keep zero-token checks green.** Make sure the spec JSON parses and any
    harness you scaffolded runs (`bun <runner>` with no specs should fail loudly,
    not crash).
 
@@ -73,9 +84,10 @@ Do not ask about facts discoverable by reading the repo's existing evals.
 |---------|---------|
 | "I'll write the eval after the feature works." | Then it can't go red — you've stamped a regression, not tested. Write it red first. |
 | "One required substring is enough." | A two-part requirement needs two assertions, or a half-answer passes. |
-| "Judge everything." | Substring/file assertions are deterministic and free to re-run; reserve the LLM judge for what they can't express. |
+| "Judge everything." | Substring/file assertions are deterministic and free to re-run; reserve the LLM judge for what they can't express. A pure route check is a `kind:"routing"` case — no judge at all. |
 | "This repo needs its own eval format." | Reuse the existing harness; a second format splits the suite. |
 | "The fixture should mirror the real repo." | Minimal fixtures isolate the behavior and run fast. |
+| "More cases is always better — add variations." | Add volume that mirrors the real request distribution (gate twins, edge classes, adversarial routes), not broad variation-spam that just re-tests the happy path. |
 
 ## Output
 

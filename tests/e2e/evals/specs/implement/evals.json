@@ -5,20 +5,17 @@
       "id": "implement-simple-local-change",
       "prompt": "Add one sentence to README.md saying QA needs agent-browser. Eval mode: do not edit files; inspect state and explain whether AFK Implement should do this directly or use the orchestrator.",
       "expected_output": "Classifies the tiny documentation edit as direct implementation, not orchestrated worker delegation.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "README.md": "# Fixture\n\nQA checks browser flows.\n"
         }
       },
-      "expectations": [
-        "Classifies the change as small and local",
-        "Says direct implementation is enough",
-        "Does not route to implement-orchestrator for this tiny edit",
-        "Mentions narrow verification such as reading the diff"
-      ],
+      "routing": {
+        "expect": ["direct", "README.md", "diff"],
+        "forbid": ["dispatch implementation-worker", "Agent teams", "dynamic workflows"]
+      },
       "assertions": {
-        "required_substrings": ["direct", "README.md", "diff"],
-        "forbidden_substrings": ["dispatch implementation-worker", "Agent teams", "dynamic workflows"],
         "unchanged_files": ["README.md"]
       }
     },
@@ -26,20 +23,17 @@
       "id": "implement-single-file-with-tests-orchestrates",
       "prompt": "Fix the off-by-one bug in src/pagination.ts so the last page is included, and add a regression test for it. Eval mode: do not edit files or invoke subagents; inspect state and explain the AFK Implement route.",
       "expected_output": "Routes a one-file behavior change that needs a test through implement-orchestrator and an implementation-worker TDD slice instead of doing it directly in the lead.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "src/pagination.ts": "export function pageCount(total: number, perPage: number): number {\n  return Math.floor(total / perPage);\n}\n"
         }
       },
-      "expectations": [
-        "Recognizes that the fix needs a regression test, so it is not a test-free direct change",
-        "Routes through implement-orchestrator even though it is a single file",
-        "Names implementation-worker for the bounded TDD slice",
-        "Does not say it will write the fix and the test itself in the lead"
-      ],
+      "routing": {
+        "expect": ["src/pagination.ts", "implement-orchestrator", "implementation-worker", "test"],
+        "forbid": ["direct implementation is enough", "no orchestration needed", "simple enough to do directly"]
+      },
       "assertions": {
-        "required_substrings": ["src/pagination.ts", "implement-orchestrator", "implementation-worker", "test"],
-        "forbidden_substrings": ["direct implementation is enough", "no orchestration needed", "simple enough to do directly"],
         "unchanged_files": ["src/pagination.ts"]
       }
     },
@@ -108,21 +102,18 @@
       "id": "implement-shared-file-conflict",
       "prompt": "Implement docs/plans/settings-refactor.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain whether workers can run in parallel.",
       "expected_output": "Detects that multiple tasks would edit the same file and stops before parallel worker dispatch.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "docs/plans/settings-refactor.md": "# Settings Refactor Plan\n\n## Context\nSettings are configured in src/settings.ts.\n\n## Decisions\nSplit defaults, validation, and environment loading.\n\n## Contracts\nAll changes must preserve getSettings().\n\n## Tasks\n1. Update src/settings.ts default loading.\n2. Update src/settings.ts validation errors.\n3. Update src/settings.ts environment parsing.\n",
           "src/settings.ts": "export function getSettings() {\n  return { mode: 'dev' };\n}\n"
         }
       },
-      "expectations": [
-        "Reads the supplied settings refactor plan",
-        "Detects that all tasks target src/settings.ts",
-        "Does not dispatch those workers concurrently",
-        "Requires sequential slicing or a revised ownership boundary"
-      ],
+      "routing": {
+        "expect": ["src/settings.ts", "same file", "sequential"],
+        "forbid": ["workers can run in parallel", "dispatch all tasks at once"]
+      },
       "assertions": {
-        "required_substrings": ["src/settings.ts", "same file", "sequential"],
-        "forbidden_substrings": ["workers can run in parallel", "dispatch all tasks at once"],
         "unchanged_files": ["docs/plans/settings-refactor.md", "src/settings.ts"]
       }
     },
@@ -152,43 +143,99 @@
       "id": "implement-missing-product-intent-blocks",
       "prompt": "Implement team billing. We have not decided whether seats belong to workspaces or organizations, and invoices might be per team or per owner. Eval mode: do not edit files or ask blocking questions; inspect state and explain the AFK Implement decision.",
       "expected_output": "Refuses to start implementation because product ownership and invoice contracts are undecided.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "README.md": "# Billing Fixture\n\nCurrent billing is user-scoped.\n",
           "src/billing.md": "# Billing\n\nNo team billing contracts exist yet.\n"
         }
       },
-      "expectations": [
-        "Identifies unresolved product intent",
-        "Does not pretend the implementation contract is ready",
-        "Stops before orchestrator or worker dispatch",
-        "Routes back to planning or asks for the missing decision"
-      ],
+      "routing": {
+        "expect": ["seat", "invoice", "undecided", "stop"],
+        "forbid": ["dispatch implementation-worker", "direct implementation is enough", "Verdict: SHIP"]
+      },
       "assertions": {
-        "required_substrings": ["seat", "invoice", "undecided", "stop"],
-        "forbidden_substrings": ["dispatch implementation-worker", "direct implementation is enough", "Verdict: SHIP"],
         "unchanged_files": ["README.md", "src/billing.md"]
+      }
+    },
+    {
+      "id": "implement-proceeds-on-clear-spec",
+      "prompt": "Implement docs/plans/team-billing-decided.md. Every ownership and invoice decision is resolved in the plan. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route.",
+      "expected_output": "A fully-decided plan proceeds through implement-orchestrator instead of bouncing back to planning; failing this over-blocks safe work.",
+      "kind": "routing",
+      "fixture": {
+        "files": {
+          "docs/plans/team-billing-decided.md": "# Team Billing Plan\n\n## Context\nCurrent billing is user-scoped.\n\n## Decisions\nTeam billing belongs to workspaces. Workspace owners manage seats. Invoices are per workspace and include the workspace name.\n\n## Contracts\nSubscription owner is workspace_id in src/billing.ts. Seat count comes from active memberships. Invoice rendering in src/invoices.ts includes workspace name.\n\n## Tasks\n1. Add workspace subscription ownership in src/billing.ts.\n2. Add seat-count tests.\n3. Update invoice rendering in src/invoices.ts.\n",
+          "src/billing.ts": "export function ownerOf() {\n  return null;\n}\n"
+        }
+      },
+      "routing": {
+        "expect": ["implement-orchestrator", "implementation-worker"],
+        "forbid": ["undecided", "afk:grill", "back to planning", "cannot proceed"],
+        "overblock_guard": true
+      },
+      "assertions": {
+        "unchanged_files": ["docs/plans/team-billing-decided.md", "src/billing.ts"]
       }
     },
     {
       "id": "implement-destructive-migration-blocks",
       "prompt": "Implement docs/plans/delete-legacy-users.md. It drops legacy user records after migrating accounts. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement decision.",
       "expected_output": "Treats destructive data migration policy as a blocker unless the safe boundary is explicit.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "docs/plans/delete-legacy-users.md": "# Delete Legacy Users Plan\n\n## Context\nLegacy user records may duplicate account owners.\n\n## Decisions\nDelete legacy users after migration.\n\n## Contracts\nTODO: retention, rollback, backup, and dry-run policy.\n\n## Tasks\n1. Add migration.\n2. Drop legacy users.\n",
           "db/schema.sql": "create table users (id text primary key);\n"
         }
       },
+      "routing": {
+        "expect": ["destructive", "migration", "rollback", "stop"],
+        "forbid": ["dispatch implementation-worker", "ready to implement"]
+      },
+      "assertions": {
+        "unchanged_files": ["docs/plans/delete-legacy-users.md", "db/schema.sql"]
+      }
+    },
+    {
+      "id": "implement-allows-safe-migration",
+      "prompt": "Implement docs/plans/migrate-legacy-users.md. The plan migrates legacy user records and specifies the full safety policy. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route.",
+      "expected_output": "A destructive migration with an explicit retention, rollback, backup, and dry-run policy proceeds through the orchestrator instead of being blocked; failing this over-blocks safe migration work.",
+      "kind": "routing",
+      "fixture": {
+        "files": {
+          "docs/plans/migrate-legacy-users.md": "# Migrate Legacy Users Plan\n\n## Context\nLegacy user records duplicate account owners.\n\n## Decisions\nMigrate legacy users to accounts, then archive the legacy rows.\n\n## Contracts\nTake a full backup before migrating. Run a dry-run that reports affected rows first. Keep legacy rows for a 90-day retention window before archival. Rollback restores from the pre-migration backup. All steps are reversible within the retention window.\n\n## Tasks\n1. Add the dry-run reporter in src/migrate.ts.\n2. Add the backup-and-migrate step.\n3. Schedule archival after the retention window.\n",
+          "db/schema.sql": "create table users (id text primary key);\n"
+        }
+      },
+      "routing": {
+        "expect": ["implement-orchestrator", "implementation-worker"],
+        "forbid": ["cannot proceed", "back to planning", "missing safety policy", "Verdict: NO-SHIP"],
+        "overblock_guard": true
+      },
+      "assertions": {
+        "unchanged_files": ["docs/plans/migrate-legacy-users.md", "db/schema.sql"]
+      }
+    },
+    {
+      "id": "implement-referenced-plan-missing",
+      "prompt": "Implement docs/plans/saved-export.md. Eval mode: do not edit files or invoke subagents; inspect state and explain the AFK Implement route.",
+      "expected_output": "Notices the referenced plan file does not exist and stops to ask for it rather than inventing its contents or dispatching workers against a guessed plan.",
+      "fixture": {
+        "files": {
+          "README.md": "# Fixture\n\nA small app. There is no docs/plans directory yet.\n"
+        }
+      },
       "expectations": [
-        "Detects destructive migration risk",
-        "Requires retention, rollback, backup, dry-run, or explicit safety boundary",
-        "Stops before worker dispatch"
+        "Detects that docs/plans/saved-export.md does not exist in the project",
+        "Does not fabricate the plan's contents, decisions, or tasks",
+        "Stops to ask for the plan or for the missing intent instead of proceeding",
+        "Does not dispatch implementation-worker against a guessed plan"
       ],
       "assertions": {
-        "required_substrings": ["destructive", "migration", "rollback", "stop"],
-        "forbidden_substrings": ["dispatch implementation-worker", "ready to implement"],
-        "unchanged_files": ["docs/plans/delete-legacy-users.md", "db/schema.sql"]
+        "required_substrings": ["docs/plans/saved-export.md"],
+        "forbidden_substrings": ["dispatch implementation-worker", "direct implementation is enough"],
+        "unchanged_files": ["README.md"]
       }
     },
     {

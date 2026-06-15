@@ -22,7 +22,8 @@ Use this skill when:
   of truth.
 
 Do not use this skill for tiny mechanical edits, direct bug fixes with an
-obvious cause, or execution of an already-written `docs/plans/` plan.
+obvious cause, or execution of an already-written plan (`brain/plans/` or
+`docs/plans/`).
 
 ## Process
 
@@ -95,8 +96,11 @@ obvious cause, or execution of an already-written `docs/plans/` plan.
     locally ("do it like that repo", "see the pattern in Y"), read it and record
     it in the plan: its origin (GitHub URL or name) and its local path, so
     implementation reads the real source instead of a remembered pattern.
-16. Write the agreed plan to `docs/plans/<slug>.md`. Include decisions made,
-    contracts between parts, relevant glossary or ADR updates, and the
+16. Write the agreed plan. If the brain vault exists (a `brain/` directory),
+    write to `brain/plans/<slug>.md` and add a wikilink to it in
+    `brain/plans/index.md`; otherwise write to `docs/plans/<slug>.md`. (Do not
+    edit `brain/index.md` — the auto-index hook maintains it.) Include decisions
+    made, contracts between parts, relevant glossary or ADR updates, and the
     implementation task list grouped into parallel waves (see Output). Decide the
     schedule here so `afk:implement` does not have to re-derive it: mark which
     slices are independent (disjoint files, no shared contract) so they run
@@ -134,7 +138,8 @@ fetched primary sources.
 
 ## Output
 
-Create `docs/plans/<slug>.md` with this shape:
+Create the plan file (`brain/plans/<slug>.md` when the brain vault exists,
+otherwise `docs/plans/<slug>.md`) with this shape:
 
 ```markdown
 # <Plan Title>
@@ -172,7 +177,8 @@ every slice, give the files it **owns** and what it **depends on**.
 1. <Verification task or command>
 ```
 
-End the session by telling the user the plan is ready, naming the exact
-`docs/plans/<slug>.md` path, and stating that it is the input to `afk:implement`
+End the session by telling the user the plan is ready, naming the exact plan
+path (`brain/plans/<slug>.md` or `docs/plans/<slug>.md`), and stating that it is
+the input to `afk:implement`
 (or `afk:batch` when the plan splits into many independently-mergeable units the
 user wants implemented as parallel PRs).

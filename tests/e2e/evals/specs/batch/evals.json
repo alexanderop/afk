@@ -2,9 +2,31 @@
   "skill_name": "batch",
   "evals": [
     {
+      "id": "batch-fans-out-parallel-not-sequential",
+      "prompt": "Implement docs/plans/extract-validators.md by fanning it out. Eval mode: do not edit files, spawn workers, or open PRs; inspect the plan and explain how AFK Batch schedules the units and what each produces.",
+      "expected_output": "Decomposes the plan into independent units run as parallel workers, one PR each, rather than one sequential pass.",
+      "kind": "routing",
+      "fixture": {
+        "files": {
+          "docs/plans/extract-validators.md": "# Extract Validators Plan\n\n## Context\nEach module in src/ hand-rolls input validation inline, duplicated logic.\n\n## Decisions\nExtract a validator per module into its own file with shared shape checks, error formatting, and tests.\n\n## Contracts\nEach validate<Name>(input) returns {ok, errors}. No two modules share a file.\n\n## Tasks\n1. Extract and test validateOrder in src/order-validator.ts.\n2. Extract and test validateUser in src/user-validator.ts.\n3. Extract and test validateInvoice in src/invoice-validator.ts.\n",
+          "src/order.ts": "export function placeOrder() { return true; }\n",
+          "src/user.ts": "export function createUser() { return true; }\n",
+          "src/invoice.ts": "export function makeInvoice() { return true; }\n"
+        }
+      },
+      "routing": {
+        "expect": ["parallel", "PR"],
+        "forbid": ["one at a time", "single PR", "sequential pass"]
+      },
+      "assertions": {
+        "unchanged_files": ["docs/plans/extract-validators.md", "src/order.ts", "src/user.ts", "src/invoice.ts"]
+      }
+    },
+    {
       "id": "batch-runs-simplify-before-pr-when-substantial",
       "prompt": "Implement docs/plans/extract-validators.md by fanning it out. Eval mode: do not edit files, spawn workers, or open PRs; inspect the plan and explain the per-unit worker loop — specifically what each worker does between finishing the change and opening its PR, and why.",
       "expected_output": "Each worker runs afk:simplify on its own diff before opening the PR, because the per-unit changes are substantial enough to warrant a cleanup pass.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "docs/plans/extract-validators.md": "# Extract Validators Plan\n\n## Context\nEach module in src/ hand-rolls input validation inline, ~40 lines each, duplicated logic.\n\n## Decisions\nExtract a validator per module into its own file with shared shape checks, error formatting, and tests.\n\n## Contracts\nEach validate<Name>(input) returns {ok, errors}. No two modules share a file.\n\n## Tasks\n1. Extract and test validateOrder in src/order-validator.ts (rewrite ~50 lines from src/order.ts).\n2. Extract and test validateUser in src/user-validator.ts (rewrite ~45 lines from src/user.ts).\n3. Extract and test validateInvoice in src/invoice-validator.ts (rewrite ~55 lines from src/invoice.ts).\n",
@@ -13,15 +35,11 @@
           "src/invoice.ts": "export function makeInvoice() { return true; }\n"
         }
       },
-      "expectations": [
-        "Decomposes the plan into independent units, one worker per validator file",
-        "States each worker runs afk:simplify on its own diff before opening its PR",
-        "Explains simplify runs because these per-unit changes are large enough to warrant a cleanup pass",
-        "Places simplify before the commit/push/PR step, not after the PR is opened"
-      ],
+      "routing": {
+        "expect": ["afk:simplify", "before", "PR"],
+        "forbid": ["open the PR first", "simplify after the PR"]
+      },
       "assertions": {
-        "required_substrings": ["afk:simplify", "before", "PR"],
-        "forbidden_substrings": ["open the PR first", "simplify after the PR"],
         "unchanged_files": ["docs/plans/extract-validators.md", "src/order.ts", "src/user.ts", "src/invoice.ts"]
       }
     },
@@ -29,6 +47,7 @@
       "id": "batch-skips-simplify-for-trivial-units",
       "prompt": "Implement docs/plans/bump-copyright.md by fanning it out. Eval mode: do not edit files, spawn workers, or open PRs; inspect the plan and explain the per-unit worker loop — specifically whether each worker should run afk:simplify before opening its PR, and why or why not.",
       "expected_output": "Each unit is a one-line trivial edit, so workers skip afk:simplify and go straight to test, commit, and PR. Simplify is gated on the per-unit change being big enough to be worth cleaning up.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "docs/plans/bump-copyright.md": "# Bump Copyright Year Plan\n\n## Context\nThe copyright year is hardcoded as 2024 in the footer of each package's LICENSE header.\n\n## Decisions\nChange the single year line from 2024 to 2025 in each file. One line per file, no logic.\n\n## Contracts\nEach file changes exactly one line. No two files share a file.\n\n## Tasks\n1. Bump the year in pkg-a/LICENSE.\n2. Bump the year in pkg-b/LICENSE.\n3. Bump the year in pkg-c/LICENSE.\n",
@@ -37,15 +56,11 @@
           "pkg-c/LICENSE": "Copyright 2024 Acme\n"
         }
       },
-      "expectations": [
-        "Decomposes the plan into independent one-line units, one worker per LICENSE file",
-        "States each worker skips afk:simplify because the per-unit change is a trivial one-line edit",
-        "Explains the simplify pass is gated on the change being big enough to be worth cleaning up",
-        "Still has each worker run the test command and open its PR"
-      ],
+      "routing": {
+        "expect": ["afk:simplify", "skip", "one-line"],
+        "forbid": ["every worker must run afk:simplify", "simplify is not optional"]
+      },
       "assertions": {
-        "required_substrings": ["afk:simplify", "skip", "one-line"],
-        "forbidden_substrings": ["every worker must run afk:simplify", "simplify is not optional"],
         "unchanged_files": ["docs/plans/bump-copyright.md", "pkg-a/LICENSE", "pkg-b/LICENSE", "pkg-c/LICENSE"]
       }
     }

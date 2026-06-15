@@ -5,36 +5,35 @@
       "id": "help-no-plan",
       "prompt": "What should I do next?",
       "expected_output": "Recommends afk:grill when no docs/plans artifact exists.",
-      "expectations": [
-        "Inspects project state before answering",
-        "Treats missing docs/plans as workflow signal",
-        "Recommends exactly one next skill",
-        "Names afk:grill",
-        "Does not list every AFK skill"
-      ],
-      "assertions": {
-        "required_substrings": ["afk:grill"],
-        "forbidden_substrings": ["Next step: [Q]", "run afk:qa now"]
+      "kind": "routing",
+      "routing": {
+        "expect": ["afk:grill"],
+        "forbid": ["Next step: [Q]", "run afk:qa now"]
       }
     },
     {
       "id": "help-after-plan",
       "prompt": "What now? Assume docs/plans/checkout.md exists and there is no implementation diff.",
       "expected_output": "Recommends afk:implement as the next step.",
+      "kind": "routing",
       "fixture": {
         "files": {
           "docs/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n"
         }
       },
-      "expectations": [
-        "Recognizes the existing plan as input to implementation",
-        "Names afk:implement",
-        "Explains that implementation should execute the written plan",
-        "Does not recommend afk:qa before implementation"
-      ],
-      "assertions": {
-        "required_substrings": ["afk:implement"],
-        "forbidden_substrings": ["Next step: [Q]", "run afk:qa now"]
+      "routing": {
+        "expect": ["afk:implement"],
+        "forbid": ["Next step: [Q]", "run afk:qa now"]
+      }
+    },
+    {
+      "id": "help-recommends-prototype-for-mockups",
+      "prompt": "Which AFK skill should I use to mock up three dashboard layouts?",
+      "expected_output": "Recommends afk:prototype as the next step for throwaway UI layout exploration.",
+      "kind": "routing",
+      "routing": {
+        "expect": ["afk:prototype"],
+        "forbid": ["afk:ship", "Next step: [Q]"]
       }
     },
     {
@@ -49,22 +48,6 @@
       ],
       "assertions": {
         "required_substrings": ["afk:simplify", "diff"]
-      }
-    },
-    {
-      "id": "help-recommends-prototype-for-mockups",
-      "prompt": "Which AFK skill should I use to mock up three dashboard layouts?",
-      "expected_output": "Recommends afk:prototype as the next step for throwaway UI layout exploration.",
-      "expectations": [
-        "Recognizes mockups and layout exploration as prototype intent",
-        "Recommends exactly one next skill",
-        "Names afk:prototype",
-        "Explains that the output is a throwaway prototype or variants",
-        "Does not route to afk:ship"
-      ],
-      "assertions": {
-        "required_substrings": ["afk:prototype"],
-        "forbidden_substrings": ["afk:ship", "Next step: [Q]"]
       }
     }
   ]
