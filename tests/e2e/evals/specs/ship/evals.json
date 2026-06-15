@@ -4,7 +4,7 @@
     {
       "id": "ship-existing-plan",
       "prompt": "Run AFK Ship for docs/plans/checkout.md. Eval mode: do not invoke child AFK skills or edit files; inspect state and explain the route you would take.",
-      "expected_output": "Recognizes the supplied plan path and routes through implement, simplify, and QA without asking planning questions.",
+      "expected_output": "Recognizes the supplied plan path and routes through implement, simplify, review, and QA without asking planning questions.",
       "kind": "routing",
       "fixture": {
         "files": {
@@ -12,7 +12,7 @@
         }
       },
       "routing": {
-        "expect": ["docs/plans/checkout.md", "afk:implement", "afk:simplify", "afk:qa", "Route:"],
+        "expect": ["docs/plans/checkout.md", "afk:implement", "afk:simplify", "afk:review", "afk:qa", "Route:"],
         "forbid": ["Next AFK skill to run: afk:grill"]
       }
     },

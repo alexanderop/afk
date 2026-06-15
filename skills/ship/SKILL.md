@@ -6,8 +6,8 @@ description: Use when the user asks to run the whole AFK flow, ship a feature, t
 # Ship
 
 Drive AFK's existing skills to an evidence-backed verdict. This skill
-orchestrates `afk:grill`, `afk:implement`, `afk:simplify`, and `afk:qa`
-without replacing their detailed instructions.
+orchestrates `afk:grill`, `afk:implement`, `afk:simplify`, `afk:review`, and
+`afk:qa` without replacing their detailed instructions.
 
 Core principle: do not claim something can ship until the relevant AFK phase
 artifacts exist or are deliberately skipped with a reason.
@@ -70,7 +70,19 @@ Do not use this skill for:
    - Skip simplify only for tiny, mechanical, generated, formatting-only, or
      documentation-only changes, and say why.
 
-5. Run QA for behavior-bearing work.
+5. Review before QA.
+   - Invoke `afk:review` on the implementation diff to get a principle-grounded,
+     no-changes read before behavioral verification. Run it after simplify so
+     review judges the cleaned-up diff.
+   - Review only diagnoses; it never edits. If review returns **Revise**
+     (high-severity findings), loop back to `afk:implement` or `afk:simplify` to
+     resolve them before QA, or carry the unresolved findings as a caveat or
+     `DO NOT SHIP`. Do not advance to QA pretending high-severity findings are
+     absent.
+   - Skip review for the same tiny/mechanical/generated/formatting-only or
+     documentation-only changes that skip simplify, and say why.
+
+6. Run QA for behavior-bearing work.
    - Invoke `afk:qa` when the change affects user-visible behavior, an API,
      CLI, worker, persistence, integration, or service contract.
    - QA must produce a `qa/<slug>.md` report with `SHIP`, `DO NOT SHIP`, or
@@ -78,7 +90,7 @@ Do not use this skill for:
    - For pure prose, metadata, or non-behavioral cleanup, skip QA with the
      specific reason and cite the verification used instead.
 
-6. Persist learnings to the brain.
+7. Persist learnings to the brain.
    - Once the verdict is known, invoke `afk:reflect` to capture durable
      learnings from the run — corrections, gotchas, decisions, and rationale —
      into `brain/` (or route skill-process fixes into the relevant skill).
@@ -86,11 +98,11 @@ Do not use this skill for:
      with no new knowledge); say so. Reflection persists knowledge; it never
      changes the ship verdict.
 
-7. Finish with a ship report.
-   - Summarize the phase route taken, changed files, verification, QA report,
-     final verdict, and what was reflected into the brain.
-   - Always include the `Route`, `Plan`, `Verification`, `QA`, and `Memory`
-     fields even when phases were skipped.
+8. Finish with a ship report.
+   - Summarize the phase route taken, changed files, verification, review
+     verdict, QA report, final verdict, and what was reflected into the brain.
+   - Always include the `Route`, `Plan`, `Verification`, `Review`, `QA`, and
+     `Memory` fields even when phases were skipped.
    - If any phase could not run, report the blocker as a caveat or
      `DO NOT SHIP`; do not soften missing evidence into success.
 
@@ -123,10 +135,11 @@ Return this compact shape:
 
 ```markdown
 Verdict: SHIP | DO NOT SHIP | SHIP WITH CAVEATS
-Route: grill skipped/used -> implement -> simplify skipped/used -> qa skipped/used -> reflect skipped/used
+Route: grill skipped/used -> implement -> simplify skipped/used -> review skipped/used -> qa skipped/used -> reflect skipped/used
 Plan: docs/plans/<slug>.md or "none, reason"
 Changed: <files or summary>
 Verification: <commands/results>
+Review: accept | accept with notes | revise, or "skipped, reason"
 QA: qa/<slug>.md or "skipped, reason"
 Memory: <brain files written/updated, or "skipped, reason">
 Caveat: <one sentence, only if needed>
