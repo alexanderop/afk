@@ -59,8 +59,14 @@ brain/
 ├── principles.md         <- index for principles/
 ├── principles/           <- engineering and design principles
 ├── codebase/             <- project-specific knowledge and gotchas
+├── sources.md            <- index for sources/ (only if doc sites exist)
+├── sources/              <- pointers to external authoritative docs; never copies
 └── plans/                <- feature plans
 ```
+
+- `sources/` notes point at existing doc sites (VitePress, Docusaurus, …) and
+  are authoritative — read them in place, do not duplicate their content into
+  the brain. `init-brain` seeds them; keep them as thin pointers.
 
 - One topic per file. `brain/codebase/deploy-gotchas.md`, not a mega-file.
 - File names: lowercase, hyphenated. `worktree-gotchas.md`.

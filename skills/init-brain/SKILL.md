@@ -25,7 +25,7 @@ idempotent, but there is nothing to do.
    content:
 
    ```bash
-   sh "${CLAUDE_PLUGIN_ROOT}/skills/init-brain/scripts/init-brain.sh"
+   bash "${CLAUDE_PLUGIN_ROOT}/skills/init-brain/scripts/init-brain.sh"
    ```
 
    It creates, only if missing:
@@ -34,9 +34,23 @@ idempotent, but there is nothing to do.
    - `brain/principles.md` + `brain/principles/` — the principles the flow reads
      before acting (starts empty; grown by `afk:reflect` and `afk:meditate`)
    - `brain/plans/` + `brain/plans/index.md` — where the `plan` skill writes
+   - `brain/sources.md` + `brain/sources/<name>.md` — **only when the project
+     already has a doc site** (VitePress, VuePress, Docusaurus, Astro Starlight,
+     Nextra, MkDocs, Sphinx). The script seeds one stub note per detected site
+     so the brain *points at* the docs rather than absorbing them. The team
+     keeps their docs where they are — nothing in the repo moves.
 
-2. Report the vault path to the user. The PostToolUse hook keeps
-   `brain/index.md` in sync as files are added or removed from then on.
+2. **Refine the seeded source stubs.** If the script printed a "Detected doc
+   sites" report, open each detected docs root (its landing page / sidebar
+   config), and in that site's `brain/sources/<name>.md` replace the
+   `Scope: _TODO …_` line with a real one-line scope of what those docs cover
+   (e.g. "Public SDK API reference and guides", "Deployment runbooks"). Keep the
+   "authoritative — don't duplicate into the brain" line. Skip any stub whose
+   docs you can't read; leave its TODO for next time.
+
+3. Report the vault path to the user. The PostToolUse hook keeps
+   `brain/index.md` in sync — including the `## Sources` section — as files are
+   added or removed from then on.
 
 ## Stop and Ask
 
@@ -45,8 +59,9 @@ where the vault could belong to more than one package). Otherwise just run.
 
 ## Output
 
-A scaffolded `brain/` vault. Report the created paths (or "already present") and
-the vault root location.
+A scaffolded `brain/` vault. Report the created paths (or "already present"),
+the vault root location, and — if any doc sites were detected — which ones were
+registered under `brain/sources/` and which still need a Scope line.
 
 ## References
 

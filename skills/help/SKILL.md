@@ -20,6 +20,8 @@ explanation of AFK itself.
 ## Sources
 
 - Catalog: [afk-help.csv](./afk-help.csv)
+- AFK familiarity: does `brain/` exist? Present = the user has used AFK here
+  before (returning); absent = this is a fresh project (first contact).
 - Domain glossary: `CONTEXT.md` or `CONTEXT-MAP.md`
 - Decisions: `docs/adr/`
 - Plans: `docs/plans/` (from `afk:grill`) and `brain/plans/` (from `afk:plan`)
@@ -29,20 +31,29 @@ explanation of AFK itself.
 ## Process
 
 1. Read the catalog.
-2. Inspect the available artifacts listed above.
-3. Classify the user intent:
+2. Inspect the available artifacts listed above, including whether `brain/`
+   exists (fresh vs returning).
+3. If this is a fresh project (no `brain/`), lead with the onboarding path
+   before any other routing — see "Fresh project" below.
+4. Classify the user intent:
    - General orientation: explain where they are and the next step.
    - Specific skill question: explain that skill, when to use it, and what it
      produces.
    - End-to-end lifecycle request: recommend `afk:ship`.
    - "What now?": recommend exactly one next skill unless the state is truly
      ambiguous.
-4. Give the invocation, e.g. `afk:write-good-goal`, `afk:grill`,
+5. Give the invocation, e.g. `afk:write-good-goal`, `afk:grill`,
    `afk:ship`, `afk:implement`, `afk:batch`, `afk:simplify`, or `afk:qa`.
-5. If one next step is clearly right, offer to run it now.
+6. If one next step is clearly right, offer to run it now.
 
 ## Routing rules
 
+- **Fresh project (no `brain/` directory):** the user is new to AFK here.
+  Before routing on intent, orient them on the eval-first / TDD habit AFK
+  encourages: write a failing eval first, then implement against it. Recommend
+  `afk:write-evals` to capture the behavior as a failing eval, then
+  `afk:implement` to make it pass. Mention `afk:init-brain` so the memory vault
+  exists for future runs. Skip this lead-in once `brain/` is present.
 - The user asks for `/goal` help, objective shaping, success criteria, a
   completion condition, or a definition of done for long-running agent work:
   recommend `afk:write-good-goal`.
@@ -112,6 +123,7 @@ AFK step.
 | "The plan probably exists somewhere." | Inspect `docs/plans/`; missing artifacts are workflow signal. |
 | "There is a diff, so QA is next." | After a plan plus implementation diff, recommend `afk:simplify` before QA unless the user explicitly asks for verification. |
 | "The user said ship, so recommend QA only." | `afk:ship` owns the full route to a verdict; QA is just the final evidence phase. |
+| "Just route on intent; familiarity doesn't matter." | No `brain/` means a fresh project — lead with the eval-first onboarding (`afk:write-evals` then `afk:implement`) before intent routing. |
 
 ## Output
 

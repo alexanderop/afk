@@ -2,10 +2,25 @@
   "skill_name": "help",
   "evals": [
     {
+      "id": "help-fresh-project-eval-first",
+      "prompt": "What should I do next?",
+      "expected_output": "On a fresh project with no brain/, recommends the eval-first path: afk:write-evals before afk:implement.",
+      "kind": "routing",
+      "routing": {
+        "expect": ["afk:write-evals"],
+        "forbid": ["Next step: [Q]", "run afk:qa now"]
+      }
+    },
+    {
       "id": "help-no-plan",
       "prompt": "What should I do next?",
-      "expected_output": "Recommends afk:grill when no docs/plans artifact exists.",
+      "expected_output": "Recommends afk:grill when no docs/plans artifact exists for a returning user.",
       "kind": "routing",
+      "fixture": {
+        "files": {
+          "brain/index.md": "# Brain\n\nReturning AFK user.\n"
+        }
+      },
       "routing": {
         "expect": ["afk:grill"],
         "forbid": ["Next step: [Q]", "run afk:qa now"]
@@ -18,6 +33,7 @@
       "kind": "routing",
       "fixture": {
         "files": {
+          "brain/index.md": "# Brain\n\nReturning AFK user.\n",
           "docs/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n"
         }
       },
@@ -31,6 +47,11 @@
       "prompt": "Which AFK skill should I use to mock up three dashboard layouts?",
       "expected_output": "Recommends afk:prototype as the next step for throwaway UI layout exploration.",
       "kind": "routing",
+      "fixture": {
+        "files": {
+          "brain/index.md": "# Brain\n\nReturning AFK user.\n"
+        }
+      },
       "routing": {
         "expect": ["afk:prototype"],
         "forbid": ["afk:ship", "Next step: [Q]"]
