@@ -1,0 +1,54 @@
+/**
+ * afk brand theme — overrides VitePress default blue with a violet→indigo palette
+ * and a glowing gradient hero, closer in feel to Astro Starlight / Vite docs.
+ */
+
+:root {
+  /* Brand ramp (light) */
+  --vp-c-brand-1: #7c3aed; /* primary text/links — passes contrast on white */
+  --vp-c-brand-2: #6d28d9;
+  --vp-c-brand-3: #8b5cf6; /* hover / solid button bg */
+  --vp-c-brand-soft: rgba(124, 58, 237, 0.14);
+
+  /* Gradient hero title + glow */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #8b5cf6 30%, #6366f1);
+  --vp-home-hero-image-background-image: linear-gradient(
+    45deg,
+    rgba(139, 92, 246, 0.7) 30%,
+    rgba(99, 102, 241, 0.7)
+  );
+  --vp-home-hero-image-filter: blur(64px);
+}
+
+.dark {
+  /* Brighter ramp on dark backgrounds so links stay legible */
+  --vp-c-brand-1: #a78bfa;
+  --vp-c-brand-2: #8b5cf6;
+  --vp-c-brand-3: #7c3aed;
+  --vp-c-brand-soft: rgba(167, 139, 250, 0.16);
+}
+
+/* Slightly larger, softer hero on wide screens */
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(72px);
+  }
+}
+
+/* Custom :::principle and :::gotcha asides (registered in config markdown) */
+.vp-doc .custom-block.principle {
+  border-color: var(--vp-c-brand-1);
+  background-color: var(--vp-c-brand-soft);
+}
+.vp-doc .custom-block.principle .custom-block-title::before {
+  content: '◆ ';
+}
+.vp-doc .custom-block.gotcha {
+  border-color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--vp-c-text-1);
+}
+.vp-doc .custom-block.gotcha .custom-block-title::before {
+  content: '⚠ ';
+}

@@ -16,3 +16,4 @@ afk:meditate,Meditate,D,Audit and prune the brain vault and distill cross-cuttin
 afk:plan,Plan,L,Break a medium-to-large task into phased principle-grounded plans in brain/plans/.,memory,,,false,brain/plans,brain/plans/<slug> overview and phase files
 afk:review,Review,V,Principle-grounded review of code or plans with numbered findings and a verdict.,memory,,,false,conversation,numbered findings plus accept or revise verdict
 afk:write-evals,Write Evals,E,Generate failing behavioral evals for a skill agent or feature and scaffold a Bun eval harness when the repo has none.,anytime,,,false,evals,eval spec cases plus a scaffolded runner when missing
+afk:research,Research,W,Turn an open question into a structured external-grounding digest of prior art and landscape then pin durable sources into the brain.,1-plan,,afk:grill,false,brain/sources or conversation,external-grounding digest plus optional brain/sources pointer

@@ -70,6 +70,13 @@ it all yourself: hand the plan to the orchestrator, which freezes the contract
 and then fans the mechanical application out to workers (see the refactor recipe
 below).
 
+A finished plan does not downgrade the triage either. "The plan already froze
+every contract, so there is nothing left to orchestrate" is a reason to hand the
+plan straight to the orchestrator, not a reason to go direct — orchestration
+still buys bounded parallel slices and independent per-slice review even when the
+architecture is fully decided. Architecture-is-decided and orchestration-adds-no-
+value are different claims; do not conflate them.
+
 ### 2. Direct Implementation
 
 For genuinely test-free work (docs, config, copy, formatting, a literal
@@ -104,6 +111,11 @@ orchestrator's job. The lead's only inputs to `implement-orchestrator` are:
    locate it (check both plan locations) and pass it directly.
 2. Any constraints or acceptance criteria the user stated that are not already
    captured in the plan.
+3. Rulings for any decision in the plan the orchestrator will treat as a hard
+   blocker — destructive-migration policy, public-vs-private data, or contested
+   shared-interface ownership. Scan the plan for these before dispatch and fold
+   the rulings into the first brief. The orchestrator is not reliably resumable
+   mid-run; an unresolved blocker can cost a full re-dispatch.
 
 The orchestrator then reads the source, decides the contracts and slice
 boundaries, and briefs the workers. Hand it the plan and let it design; do not
@@ -195,6 +207,13 @@ boundary:
 5. Report evidence: failing test observed, passing test observed, and refactor
    verification.
 
+For behavior-preserving rewrites and migrations, a characterization or
+golden-master baseline captured before the change and kept green throughout is a
+valid substitute for per-slice red-green: the captured baseline is the
+failing-first signal — any drift turns it red. In that mode, brief workers to
+keep the baseline byte-identical rather than to author a new failing test per
+slice.
+
 ### 6. Review Every Result
 
 A worker's "done" report is a claim, not a fact.
@@ -209,7 +228,20 @@ After each worker returns:
    finish the fix in the lead context.
 
 When all slices land, run the full relevant test suite and read the complete
-diff end-to-end for integration issues that slice reviews could not see.
+diff end-to-end for integration issues that slice reviews could not see. The
+static gate — typecheck, unit tests, file existence — does not exercise runtime
+behavior or cross-slice interactions. Before accepting:
+
+- **Frontend slices:** boot the app and do a minimal live-render smoke check —
+  the affected page actually renders and key components are not blank. A green
+  unit suite does not prove the page renders.
+- **Forms and API contracts:** round-trip at least one real value against the
+  actual server, not just typecheck — e.g. a form field whose serialized shape
+  the server must accept.
+- **Migrations, schema, cross-cutting constraints:** run the end-to-end command
+  chain that exercises the new constraint against existing flows (e.g. a
+  re-import after a new foreign key), not only per-slice checks. Isolated slice
+  verification cannot see cross-slice runtime interactions.
 
 ## Stop and Ask
 
@@ -246,6 +278,8 @@ context and keep moving.
 | "The brief would be longer than the diff" | True for one-off local work, not a fan-out. Across N files you write one parameterized brief and reuse it — the per-file diff is the wrong unit. |
 | "The shared component keeps changing, so workers would collide" | That's a sequencing problem, not a reason to stay direct. The orchestrator freezes the shared file first, then dispatches the call-site edits in parallel. |
 | "I'll design the shared contract in the lead and just hand workers the call sites" | Contract design is the orchestrator's job. Designing it yourself is delegated architecture in reverse. Hand it the plan; let it freeze the contract and fan out the work. |
+| "The plan already fixed every contract, so I'll just execute it directly" | A decided plan is the orchestrator's input, not a reason to skip it. Frozen contracts still need bounded parallel slices and independent review. Hand the plan to `implement-orchestrator`. |
+| "Typecheck and unit tests are green, so it's done" | The static gate doesn't exercise runtime or cross-slice behavior. Boot the page, round-trip the form, run the migration chain. Green tests have shipped blank pages, 422s, and broken foreign keys. |
 
 ## Output
 

@@ -82,4 +82,9 @@ When workers report back:
 3. If the same slice fails twice, report that the lead should finish it in the
    main context or revise the architecture.
 4. Return a concise final orchestration report with slice status, changed
-   areas, verification evidence, and any required main-context follow-up.
+   areas, verification evidence, and any required main-context follow-up. In the
+   evidence, separate static checks (typecheck, unit tests, file existence) from
+   behavioral checks. Name the behavioral checks still owed in the main context —
+   live render, form/API round-trip, migration chain against existing data — so a
+   green report does not overstate readiness. The static gate cannot see runtime
+   or cross-slice defects.

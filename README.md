@@ -3,89 +3,9 @@
 One help router, one optional end-to-end orchestrator, focused workflow skills,
 a packaged implementation agent pair, and a persistent `brain/` memory vault the
 flow reads before acting and writes back to as it learns. Just the steps that
-matter:
+matter.
 
-```
-/afk:help        Inspects the current repo state and recommends the next AFK
-                 skill to run, with a short explanation.
-
-/afk:ship        Runs the AFK loop to evidence: plans when needed, implements,
-                 simplifies when useful, QA-checks behavior, and ends with a
-                 ship/no-ship verdict.
-
-/afk:write-good-goal
-                 Turns a vague objective into a concrete /goal condition with
-                 verification evidence, constraints, and optional stop bounds.
-
-/afk:prototype   Builds a throwaway logic TUI or UI variant route to answer
-                 design uncertainty before committed planning or implementation.
-
-/afk:grill       AI interviews YOU about the plan, one question at a time,
-                 challenging it against your domain glossary and ADRs.
-                 Output: docs/plans/<slug>.md
-
-/afk:implement   The lead classifies the work. Simple edits stay local;
-                 complex plans route through an Opus read-only orchestrator
-                 and Sonnet implementation workers, then every diff is
-                 reviewed.
-
-/afk:batch       The fan-out alternative to implement: splits an
-                 independently-mergeable plan into many units and runs one
-                 parallel worktree worker per unit, each opening its own PR.
-
-/afk:simplify    4 cleanup agents in parallel review the diff for reuse,
-                 simplification, efficiency, and altitude issues — then the
-                 fixes get applied. Quality only, no bug hunting.
-
-/afk:qa          Routes by project shape: dogfood-style browser QA for
-                 frontend apps, contract-level API/service QA for backend
-                 apps, and both for hybrids. Output: evidence-backed report.
-```
-
-Each skill works standalone. Run the focused skills in sequence for a feature,
-grab one on its own, or use `/afk:ship` when you want the loop driven to a
-verified verdict.
-
-## Memory: the brain vault
-
-AFK keeps a persistent `brain/` vault — an Obsidian-compatible markdown store of
-your project's engineering principles, codebase gotchas, and decisions. Two
-hooks run the plumbing: a SessionStart hook injects `brain/index.md` so every
-session knows what's there, and a PostToolUse hook rebuilds the index when
-`brain/` files change. The flow is wired to use it: `/afk:grill`, the implement
-orchestrator, and `/afk:qa` read the brain's principles before acting, and
-`/afk:ship` calls `/afk:reflect` to persist learnings afterward.
-
-```
-/afk:init-brain  Scaffold the brain/ vault in a project (optional — the vault
-                 is also created on demand the first time something writes to it).
-
-/afk:brain       Read or write the vault directly.
-
-/afk:reflect     Capture this session's learnings into the brain. Most brain
-                 content comes from here.
-
-/afk:ruminate    Mine past Claude Code conversations for patterns reflect missed.
-
-/afk:meditate    Audit and prune the vault; distill cross-cutting principles.
-
-/afk:plan        Break a medium-to-large task into phased, principle-grounded
-                 plans under brain/plans/. Planning only.
-
-/afk:review      Principle-grounded review of code or plans, ending in a verdict.
-                 Review only — no changes.
-```
-
-The brain skills and hooks are derived from
-[brainmaxxing](https://github.com/poteto/brainmaxxing) by Lauren Tan (MIT) and
-rewritten to AFK's skill conventions.
-
-AFK also ships two Claude Code subagents for implementation:
-
-- `afk:implement-orchestrator`: read-only Opus planner for complex contracts,
-  slice boundaries, and worker delegation.
-- `afk:implementation-worker`: Sonnet worker for one bounded TDD slice with
-  edit and verification tools.
+**Full documentation: https://alexanderop.github.io/afk/**
 
 ## Install
 
@@ -110,18 +30,29 @@ claude --plugin-dir ./afk
 [agent-browser](https://github.com/vercel-labs/agent-browser) CLI installed and
 available on your PATH when it routes to frontend browser QA.
 
+## Skills
+
+The four-step coding flow: **grill → implement → simplify → qa**. Use
+`/afk:ship` to drive the loop to a verified verdict, or grab any skill
+standalone. `/afk:batch` is the fan-out alternative to implement: one PR per
+independent unit, run in parallel worktrees. `/afk:prototype` builds a
+throwaway exploration before committed planning.
+
+The `brain/` vault skills (`init-brain`, `brain`, `reflect`, `ruminate`,
+`meditate`, `plan`, `review`) keep a persistent Obsidian-compatible store of
+your project's principles, gotchas, and decisions — wired into the flow
+automatically.
+
+For per-skill detail see the [Reference](https://alexanderop.github.io/afk/reference/help) section of the docs.
+
 ### If the skills don't auto-trigger
 
-AFK works by letting Claude pick a skill from its description. If a skill
-doesn't fire on its own (some Claude Code versions don't auto-discover plugin
-skills, and crowded installs can drop less-used ones from the listing), invoke
-it directly: `/afk:help`, `/afk:prototype`, `/afk:grill`, `/afk:implement`,
-`/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:ship`,
-`/afk:write-good-goal`, and the memory skills `/afk:brain`, `/afk:init-brain`,
-`/afk:reflect`, `/afk:ruminate`,
-`/afk:meditate`, `/afk:plan`, `/afk:review`. Run `/doctor` to check plugin
-loading, and raise `skillListingBudgetFraction` in settings to keep more skill
-descriptions listed.
+Invoke directly: `/afk:help`, `/afk:ship`, `/afk:grill`, `/afk:implement`,
+`/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:prototype`,
+`/afk:write-good-goal`, `/afk:research`, and the brain skills `/afk:brain`,
+`/afk:init-brain`, `/afk:reflect`, `/afk:ruminate`, `/afk:meditate`,
+`/afk:plan`, `/afk:review`.
+Run `/doctor` to check plugin loading.
 
 ## What lands in your repo
 
@@ -136,21 +67,13 @@ brain/                # persistent memory vault: principles, gotchas, plans
 
 ## Testing the plugin
 
+See [docs/testing-strategy.md](docs/testing-strategy.md) for the full approach.
+
 ```bash
-bun run test              # zero-token unit + integration checks
-bun run test:unit         # file-level markdown/manifest checks
-bun run test:integration  # cross-file plugin structure checks
+bun run test              # zero-token unit + integration checks (run on every edit)
 bun run test:e2e          # one cheap headless turn (~$0.01): plugin actually loads
 bun run test:evals        # model-backed behavioral evals via claude -p
 ```
-
-The testing approach is split into unit, integration, and end-to-end checks in
-[docs/testing-strategy.md](docs/testing-strategy.md). Static lint also validates
-behavioral eval specs under `tests/e2e/evals/specs/`.
-
-`bun run test:e2e` and `bun run test:evals` require Claude Code
-non-interactive auth, such as `ANTHROPIC_API_KEY` in CI or a local Claude Code
-login that works with `claude -p`.
 
 ## Credits
 
