@@ -43,7 +43,8 @@ explanation of AFK itself.
    - "What now?": recommend exactly one next skill unless the state is truly
      ambiguous.
 5. Give the invocation, e.g. `afk:write-good-goal`, `afk:grill`,
-   `afk:ship`, `afk:implement`, `afk:batch`, `afk:simplify`, or `afk:qa`.
+   `afk:ship`, `afk:implement`, `afk:batch`, `afk:simplify`, `afk:qa`, or
+   `afk:work`.
 6. If one next step is clearly right, offer to run it now.
 
 ## Routing rules
@@ -74,6 +75,10 @@ explanation of AFK itself.
 - The user asks for verification, browser QA, API/service QA, screenshots,
   request/response evidence, or a ship/no-ship call after implementation:
   recommend `afk:qa`.
+- A verified diff has a QA SHIP verdict and the user wants to commit, push, open
+  a PR, or add a post-deploy monitoring plan: recommend `afk:work`. It is the
+  ship-out closer for the `afk:implement` path; `afk:batch` already opens its own
+  PRs, and `afk:ship` stops before PR creation.
 - The user asks about persistent memory, project principles, capturing
   learnings, or the `brain/` vault: recommend the memory skills — `afk:reflect`
   to capture a session, `afk:ruminate` to mine past conversations, `afk:meditate`
@@ -102,7 +107,8 @@ crowded install drops less-used descriptions from the skill listing. When a
 skill does not trigger on its own, invoke it explicitly:
 
 `/afk:help`, `/afk:write-good-goal`, `/afk:prototype`, `/afk:grill`,
-`/afk:implement`, `/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:ship`.
+`/afk:implement`, `/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:work`,
+`/afk:ship`.
 
 If auto-trigger keeps failing, run `/doctor` to check plugin/skill loading, and
 raise `skillListingBudgetFraction` in settings so more descriptions stay listed.

@@ -1,6 +1,6 @@
 # Plan
 
-Invoke as `/afk:plan`. Use it to break a medium-to-large task into phased, principle-grounded plans written to `brain/plans/` — new features, multi-file refactors, or architectural changes. Plan never implements; the plan is the deliverable.
+Invoke as `/afk:plan`. Use it to break a medium-to-large task (new features, multi-file refactors, or architectural changes) into phased, principle-grounded plans written to `brain/plans/`. Plan never implements; the plan is the deliverable.
 
 ## What it does
 

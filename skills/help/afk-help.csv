@@ -7,7 +7,8 @@ afk:grill,Grill,G,Interview and stress-test a non-trivial idea using repo contex
 afk:implement,Implement,I,Read the code, fix architecture and contracts, then delegate independent TDD slices and review every diff.,2-build,afk:grill,afk:simplify,true,working tree,code changes and passing local verification
 afk:batch,Batch,B,Fan an independently-mergeable plan out into many parallel worktree workers that each implement simplify test and open a PR.,2-build,afk:grill,afk:simplify,false,branches/PRs,one PR per unit plus a status table
 afk:simplify,Simplify,S,Run a focused cleanup pass over the implementation diff for reuse simplification efficiency and altitude issues.,3-cleanup,afk:implement,afk:qa,false,working tree,simplification fixes or a no-change report
-afk:qa,QA,Q,Route by project shape: dogfood-style browser QA for frontends and contract-level service QA for backends.,4-verify,afk:simplify,,false,qa,QA report plus screenshots or request-response evidence
+afk:qa,QA,Q,Route by project shape: dogfood-style browser QA for frontends and contract-level service QA for backends.,4-verify,afk:simplify,afk:work,false,qa,QA report plus screenshots or request-response evidence
+afk:work,Work,K,Ship a verified afk:implement diff out: residual-findings gate then commit push and open a PR with a post-deploy monitoring plan.,5-shipout,afk:qa,,false,branches/PRs,a pull request plus a post-deploy monitoring plan
 afk:brain,Brain,M,Read or write the persistent brain/ memory vault of principles and codebase knowledge.,memory,,,false,brain/,brain notes and updated indexes
 afk:init-brain,Init Brain,N,Scaffold the brain/ vault and index in a project for first use.,memory,,,false,brain/,brain/ folder and index.md
 afk:reflect,Reflect,R,Persist learnings from the session into the brain after a run.,memory,,,false,brain/,brain notes plus a reflect summary

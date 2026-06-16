@@ -1,9 +1,8 @@
 import { defineConfig } from 'vitepress'
-import { withMermaid } from 'vitepress-plugin-mermaid'
 import container from 'markdown-it-container'
 import type { RenderRule } from 'markdown-it/lib/renderer'
 
-export default withMermaid(defineConfig({
+export default defineConfig({
   base: '/afk/',
   title: 'afk',
   description: 'A simple coding flow for Claude Code with a persistent brain memory vault.',
@@ -64,6 +63,7 @@ export default withMermaid(defineConfig({
               { text: 'batch', link: '/reference/batch' },
               { text: 'simplify', link: '/reference/simplify' },
               { text: 'qa', link: '/reference/qa' },
+              { text: 'work', link: '/reference/work' },
               { text: 'write-good-goal', link: '/reference/write-good-goal' },
               { text: 'write-evals', link: '/reference/write-evals' }
             ]
@@ -98,17 +98,5 @@ export default withMermaid(defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/alexanderop/afk' }
     ]
-  },
-
-  // Mermaid renders dark in dark mode automatically; this themes light mode.
-  mermaid: {
-    theme: 'base',
-    themeVariables: {
-      primaryColor: '#ede9fe',
-      primaryBorderColor: '#7c3aed',
-      primaryTextColor: '#1e1b4b',
-      lineColor: '#8b5cf6',
-      fontFamily: 'var(--vp-font-family-base)'
-    }
   }
-}))
+})

@@ -1,25 +1,14 @@
 # The AFK Flow
 
-afk's four-step flow takes you from unclear intent to a verified, shipped
-change. Each skill works standalone — run them in sequence for a feature, grab
-one on its own, or use `/afk:ship` to drive the whole loop automatically.
+afk's five-step flow takes you from unclear intent to a verified, shipped
+change. Each skill works standalone: run them in sequence for a feature, grab
+one on its own, or use `/afk:ship` to drive the planning-through-verdict loop
+automatically.
 
-```mermaid
-flowchart LR
-  idea([unclear intent]) --> grill
-  grill[grill<br/><span>plan interview</span>] --> implement[implement<br/><span>bounded TDD slices</span>]
-  implement --> simplify[simplify<br/><span>parallel cleanup</span>]
-  simplify --> review{{afk:review<br/>quality gate}}
-  review --> qa[qa<br/><span>evidence verification</span>]
-  qa --> verdict([SHIP / NO-SHIP])
-  implement -. fan-out .-> batch[batch<br/><span>parallel PRs</span>]
-
-  classDef accent fill:#ede9fe,stroke:#7c3aed,color:#1e1b4b;
-  class grill,implement,simplify,qa accent;
-```
+<FlowDiagram />
 
 ::: tip The whole loop, hands-free
-`/afk:ship` drives every box above to a verdict — planning when needed,
+`/afk:ship` drives every box above to a verdict: planning when needed,
 simplifying when useful, and calling [reflect](/reference/reflect) at the end to
 persist learnings back to the brain.
 :::
@@ -37,10 +26,10 @@ implement.
 ## implement
 
 [implement](/reference/implement) is the gate before any file editing. It
-triages complexity: genuinely test-free work (docs, config, a literal one-liner)
+triages complexity: test-free work (docs, config, a one-liner)
 stays in the main conversation; everything else routes through the
-[implement-orchestrator](/reference/implement) — a read-only Opus agent that
-decides architecture, contracts, and slice boundaries — which then fans the work
+[implement-orchestrator](/reference/implement), a read-only Opus agent that
+decides architecture, contracts, and slice boundaries, which then fans the work
 out to bounded Sonnet [implementation-worker](/reference/implement) agents
 running local TDD slices. Each worker writes the failing test first, makes the
 smallest passing change, and reports evidence.
@@ -50,7 +39,7 @@ smallest passing change, and reports evidence.
 [simplify](/reference/simplify) runs four independent cleanup agents in
 parallel, each reviewing the diff from one angle: reuse, simplification,
 efficiency, and altitude. It deduplicates their findings and applies only fixes
-that preserve intended behavior. This is not a correctness review — it improves
+that preserve intended behavior. This is not a correctness review; it improves
 quality without hunting for bugs.
 
 ## qa
@@ -59,7 +48,18 @@ quality without hunting for bugs.
 changed flow. It routes by project shape: browser QA with direct screenshots
 and console checks for frontend, contract-level API or CLI verification for
 backend, both for hybrids. It ends with a SHIP, DO NOT SHIP, or SHIP WITH
-CAVEATS verdict backed by direct evidence — not just "tests pass".
+CAVEATS verdict backed by direct evidence, not just "tests pass".
+
+## work
+
+[work](/reference/work) ships the verdict out. It is the closer for the
+single-diff implement path: after a QA SHIP verdict it runs a residual-findings
+gate over any unresolved review or QA findings (fix, file, accept-and-record, or
+stop), then commits in logical units, pushes, and opens a PR whose description
+links the QA evidence and includes a post-deploy monitoring plan. It confirms
+the earlier gates ran rather than re-running them. `ship` stops at local
+evidence, so `work` is the step you run after it; `batch` already opens its own
+PRs.
 
 ## batch
 

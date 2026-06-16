@@ -32,11 +32,14 @@ available on your PATH when it routes to frontend browser QA.
 
 ## Skills
 
-The four-step coding flow: **grill → implement → simplify → qa**. Use
-`/afk:ship` to drive the loop to a verified verdict, or grab any skill
-standalone. `/afk:batch` is the fan-out alternative to implement: one PR per
-independent unit, run in parallel worktrees. `/afk:prototype` builds a
-throwaway exploration before committed planning.
+The five-step coding flow: **grill → implement → simplify → qa → work**. Use
+`/afk:ship` to drive the planning-through-verdict loop, or grab any skill
+standalone. `/afk:work` is the ship-out closer for the implement path: after a
+QA verdict it runs the residual-findings gate, then commits, pushes, and opens a
+PR with a post-deploy monitoring plan (`/afk:ship` stops at local evidence).
+`/afk:batch` is the fan-out alternative to implement: one PR per independent
+unit, run in parallel worktrees. `/afk:prototype` builds a throwaway exploration
+before committed planning.
 
 The `brain/` vault skills (`init-brain`, `brain`, `reflect`, `ruminate`,
 `meditate`, `plan`, `review`) keep a persistent Obsidian-compatible store of
@@ -48,7 +51,7 @@ For per-skill detail see the [Reference](https://alexanderop.github.io/afk/refer
 ### If the skills don't auto-trigger
 
 Invoke directly: `/afk:help`, `/afk:ship`, `/afk:grill`, `/afk:implement`,
-`/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:prototype`,
+`/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:work`, `/afk:prototype`,
 `/afk:write-good-goal`, `/afk:research`, and the brain skills `/afk:brain`,
 `/afk:init-brain`, `/afk:reflect`, `/afk:ruminate`, `/afk:meditate`,
 `/afk:plan`, `/afk:review`.

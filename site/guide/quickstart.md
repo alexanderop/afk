@@ -9,7 +9,7 @@ Open any Claude Code session and run:
 /plugin install afk@afk
 ```
 
-Verify the install with `/help` — the skills appear under the `afk:` namespace
+Verify the install with `/help`. The skills appear under the `afk:` namespace
 (e.g. `/afk:grill`, `/afk:implement`, `/afk:ship`).
 
 To update later:
@@ -25,7 +25,7 @@ git clone https://github.com/alexanderop/afk
 claude --plugin-dir ./afk
 ```
 
-This runs the plugin directly from the working tree — nothing is installed
+This runs the plugin directly from the working tree, with nothing installed
 globally.
 
 ## Prerequisites
