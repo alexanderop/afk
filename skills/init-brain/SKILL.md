@@ -33,7 +33,11 @@ idempotent, but there is nothing to do.
    - `brain/index.md` — the index the SessionStart hook injects
    - `brain/principles.md` + `brain/principles/` — the principles the flow reads
      before acting (starts empty; grown by `afk:reflect` and `afk:meditate`)
-   - `brain/plans/` + `brain/plans/index.md` — where the `plan` skill writes
+   - `brain/context.md` — the domain glossary `afk:grill` grows as terms resolve
+   - `brain/decisions/` + `brain/decisions/index.md` — ADRs `afk:grill` records
+     for hard-to-reverse, trade-off-driven decisions
+   - `brain/plans/` + `brain/plans/index.md` — where `afk:grill` and the `plan`
+     skill write plans
    - `brain/sources.md` + `brain/sources/<name>.md` — **only when the project
      already has a doc site** (VitePress, VuePress, Docusaurus, Astro Starlight,
      Nextra, MkDocs, Sphinx). The script seeds one stub note per detected site

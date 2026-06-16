@@ -8,7 +8,7 @@ deleting it silently.
 ## Summary
 
 <2-4 sentences: what this change does and why. Pull the intent and key
-decisions from the plan (docs/plans/<slug>.md or brain/plans/<slug>/).>
+decisions from the plan (brain/plans/<slug>.md or brain/plans/<slug>/).>
 
 ## Key decisions
 

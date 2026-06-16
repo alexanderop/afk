@@ -28,13 +28,13 @@
     },
     {
       "id": "help-after-plan",
-      "prompt": "What now? Assume docs/plans/checkout.md exists and there is no implementation diff.",
+      "prompt": "What now? Assume brain/plans/checkout.md exists and there is no implementation diff.",
       "expected_output": "Recommends afk:implement as the next step.",
       "kind": "routing",
       "fixture": {
         "files": {
           "brain/index.md": "# Brain\n\nReturning AFK user.\n",
-          "docs/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n"
+          "brain/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n"
         }
       },
       "routing": {

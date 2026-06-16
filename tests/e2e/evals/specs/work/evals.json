@@ -8,7 +8,7 @@
       "kind": "routing",
       "fixture": {
         "files": {
-          "docs/plans/add-discount.md": "# Add Discount Plan\n\n## Context\nCheckout needs a percentage discount applied before tax.\n\n## Acceptance\nA cart with a discount code shows the reduced total in the browser.\n",
+          "brain/plans/add-discount.md": "# Add Discount Plan\n\n## Context\nCheckout needs a percentage discount applied before tax.\n\n## Acceptance\nA cart with a discount code shows the reduced total in the browser.\n",
           "src/checkout.ts": "export function total(items, discount) { return items.reduce((a, i) => a + i.price, 0) * (1 - discount); }\n"
         }
       },
@@ -17,7 +17,7 @@
         "forbid": ["open the PR now", "tests pass so ship", "gh pr create"]
       },
       "assertions": {
-        "unchanged_files": ["docs/plans/add-discount.md", "src/checkout.ts"]
+        "unchanged_files": ["brain/plans/add-discount.md", "src/checkout.ts"]
       }
     },
     {

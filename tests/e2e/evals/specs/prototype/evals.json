@@ -4,20 +4,20 @@
     {
       "id": "prototype-ui-variants",
       "prompt": "Prototype three different layouts for the settings page. Eval mode: do not edit files; explain the AFK Prototype route and artifact shape.",
-      "expected_output": "Routes to the UI branch, prefers an existing route with ?variant=, includes a floating switcher, and captures a docs/prototypes verdict note.",
+      "expected_output": "Routes to the UI branch, prefers an existing route with ?variant=, includes a floating switcher, and captures a brain/prototypes verdict note.",
       "kind": "routing",
       "routing": {
-        "expect": ["UI", "three", "?variant=", "docs/prototypes", "throwaway"],
+        "expect": ["UI", "three", "?variant=", "brain/prototypes", "throwaway"],
         "forbid": ["afk:ship", "production evidence"]
       }
     },
     {
       "id": "prototype-logic-tui",
       "prompt": "I want to sanity-check whether this onboarding state machine handles invite accepted then account deleted. Eval mode: do not edit files; explain the AFK Prototype route and artifact shape.",
-      "expected_output": "Routes to the logic branch, builds a small terminal prototype over a pure state module, renders full state after each action, and captures a docs/prototypes verdict note.",
+      "expected_output": "Routes to the logic branch, builds a small terminal prototype over a pure state module, renders full state after each action, and captures a brain/prototypes verdict note.",
       "kind": "routing",
       "routing": {
-        "expect": ["logic", "terminal", "state", "pure", "docs/prototypes"],
+        "expect": ["logic", "terminal", "state", "pure", "brain/prototypes"],
         "forbid": ["real database", "production evidence"]
       }
     },
@@ -27,7 +27,7 @@
       "expected_output": "Despite the 'let me play with' framing, this is a business-logic question, so it routes to the logic/terminal branch over a pure module rather than building UI variants.",
       "kind": "routing",
       "routing": {
-        "expect": ["logic", "terminal", "docs/prototypes"],
+        "expect": ["logic", "terminal", "brain/prototypes"],
         "forbid": ["?variant=", "floating switcher", "production evidence"]
       }
     }

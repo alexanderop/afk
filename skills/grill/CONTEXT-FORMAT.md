@@ -1,4 +1,8 @@
-# CONTEXT.md Format
+# brain/context.md Format
+
+The domain glossary lives at `brain/context.md`. The auto-index hook lists it in
+`brain/index.md` and the SessionStart hook injects that index, so the glossary
+becomes injected memory the whole flow reads.
 
 ## Structure
 
@@ -46,20 +50,23 @@ _Avoid_: Client, buyer, account
 - **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
 - **Write an example dialogue.** A conversation between a dev and a domain expert that demonstrates how the terms interact naturally and clarifies boundaries between related concepts.
 
-## Single vs multi-context repos
+## Single vs multi-context domains
 
-**Single context (most repos):** One `CONTEXT.md` at the repo root.
+**Single context (most projects):** One `brain/context.md` holds the whole
+glossary. Create it lazily when the first term is resolved.
 
-**Multiple contexts:** A `CONTEXT-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
+**Multiple contexts (large domains):** Split each bounded context into its own
+note under `brain/context/<area>.md`, and turn `brain/context.md` into a map that
+links them and records how they relate:
 
 ```md
-# Context Map
+# Context
 
 ## Contexts
 
-- [Ordering](./src/ordering/CONTEXT.md) — receives and tracks customer orders
-- [Billing](./src/billing/CONTEXT.md) — generates invoices and processes payments
-- [Fulfillment](./src/fulfillment/CONTEXT.md) — manages warehouse picking and shipping
+- [[context/ordering]] — receives and tracks customer orders
+- [[context/billing]] — generates invoices and processes payments
+- [[context/fulfillment]] — manages warehouse picking and shipping
 
 ## Relationships
 
@@ -70,8 +77,8 @@ _Avoid_: Client, buyer, account
 
 The skill infers which structure applies:
 
-- If `CONTEXT-MAP.md` exists, read it to find contexts
-- If only a root `CONTEXT.md` exists, single context
-- If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved
+- If `brain/context/` notes exist, `brain/context.md` is the map — read it to find the contexts
+- Otherwise `brain/context.md` is the single glossary
+- If neither exists, create `brain/context.md` lazily when the first term is resolved
 
 When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.

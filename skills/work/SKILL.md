@@ -43,7 +43,7 @@ Do not use this skill for:
    - Read `git status --short`, `git diff --stat`, and the current branch.
      Confirm there is real work to ship (an uncommitted diff, or a feature
      branch already ahead of base).
-   - Locate the supporting artifacts: the plan (`docs/plans/<slug>.md` from
+   - Locate the supporting artifacts: the plan (`brain/plans/<slug>.md` from
      `afk:grill` or `brain/plans/<slug>/` from `afk:plan`), the QA report
      (`qa/<slug>.md`) and its verdict, and any `afk:review` verdict from the
      session.

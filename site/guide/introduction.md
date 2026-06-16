@@ -12,7 +12,7 @@ grill → implement → simplify → qa → work
 
 **grill** interviews you about the plan one decision at a time, challenges it
 against your domain glossary and ADRs, and writes an agreed plan to
-`docs/plans/` (or `brain/plans/` when the vault exists).
+`brain/plans/`.
 
 **implement** triages complexity and routes accordingly: simple local edits stay
 in the main conversation; everything else goes through a read-only Opus

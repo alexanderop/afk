@@ -60,12 +60,13 @@ Run `/doctor` to check plugin loading.
 ## What lands in your repo
 
 ```
-CONTEXT.md            # domain glossary, grown by /afk:grill
-docs/adr/NNNN-*.md    # decisions worth recording, offered sparingly by grill
-docs/plans/<slug>.md  # the agreed plan, input to /afk:implement
-docs/prototypes/      # prototype verdict notes for throwaway exploration
-qa/                   # QA reports + screenshots (gitignored)
-brain/                # persistent memory vault: principles, gotchas, plans
+qa/                          # QA reports + screenshots (gitignored)
+brain/                       # persistent memory vault — everything AFK writes lives here:
+brain/context.md             #   domain glossary, grown by /afk:grill
+brain/decisions/NNNN-*.md    #   ADRs worth recording, offered sparingly by grill
+brain/plans/<slug>.md        #   the agreed plan, input to /afk:implement
+brain/prototypes/            #   prototype verdict notes for throwaway exploration
+brain/principles/            #   principles + gotchas the flow reads before acting
 ```
 
 ## Testing the plugin

@@ -27,7 +27,7 @@ If the question is "what should this look like", use [UI.md](UI.md).
    - Re-render after every action.
 6. Add one run command through the existing task runner. If no runner exists,
    put the command at the top of the prototype README.
-7. Capture the answer in `docs/prototypes/<slug>.md`.
+7. Capture the answer in `brain/prototypes/<slug>.md`.
 
 ## TUI Behavior
 

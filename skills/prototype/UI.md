@@ -49,7 +49,7 @@ return (
      element is focused.
    - Hide in production builds.
 6. Add one run command through the existing task runner.
-7. Capture the answer in `docs/prototypes/<slug>.md`.
+7. Capture the answer in `brain/prototypes/<slug>.md`.
 
 ## Anti-Patterns
 

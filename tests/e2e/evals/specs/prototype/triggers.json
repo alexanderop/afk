@@ -12,7 +12,7 @@
     "should_trigger": true
   },
   {
-    "query": "Implement docs/plans/search.md",
+    "query": "Implement brain/plans/search.md",
     "should_trigger": false
   },
   {

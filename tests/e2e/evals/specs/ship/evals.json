@@ -3,16 +3,16 @@
   "evals": [
     {
       "id": "ship-existing-plan",
-      "prompt": "Run AFK Ship for docs/plans/checkout.md. Eval mode: do not invoke child AFK skills or edit files; inspect state and explain the route you would take.",
+      "prompt": "Run AFK Ship for brain/plans/checkout.md. Eval mode: do not invoke child AFK skills or edit files; inspect state and explain the route you would take.",
       "expected_output": "Recognizes the supplied plan path and routes through implement, simplify, review, and QA without asking planning questions.",
       "kind": "routing",
       "fixture": {
         "files": {
-          "docs/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n2. Verify checkout.\n"
+          "brain/plans/checkout.md": "# Checkout Plan\n\n## Context\nBuild checkout.\n\n## Tasks\n1. Implement checkout.\n2. Verify checkout.\n"
         }
       },
       "routing": {
-        "expect": ["docs/plans/checkout.md", "afk:implement", "afk:simplify", "afk:review", "afk:qa", "Route:"],
+        "expect": ["brain/plans/checkout.md", "afk:implement", "afk:simplify", "afk:review", "afk:qa", "Route:"],
         "forbid": ["Next AFK skill to run: afk:grill"]
       }
     },
@@ -48,16 +48,16 @@
     },
     {
       "id": "ship-clear-feature-proceeds",
-      "prompt": "Run AFK Ship for docs/plans/saved-search.md. The plan resolves every decision and contract. Eval mode: do not invoke child AFK skills or edit files; inspect state and explain the route only.",
+      "prompt": "Run AFK Ship for brain/plans/saved-search.md. The plan resolves every decision and contract. Eval mode: do not invoke child AFK skills or edit files; inspect state and explain the route only.",
       "expected_output": "A fully-decided plan proceeds straight to afk:implement without bouncing back to grill; failing this over-blocks safe work.",
       "kind": "routing",
       "fixture": {
         "files": {
-          "docs/plans/saved-search.md": "# Saved Search Plan\n\n## Context\nUsers want to save a search query and rerun it.\n\n## Decisions\nSaved searches belong to the user. Max 50 per user. Stored in src/saved-search.ts.\n\n## Contracts\nsaveSearch(userId, query) returns the saved record. listSearches(userId) returns newest-first. Deleting a search is idempotent.\n\n## Tasks\n1. Add the saved-search store in src/saved-search.ts.\n2. Wire save/list/delete into the search view.\n"
+          "brain/plans/saved-search.md": "# Saved Search Plan\n\n## Context\nUsers want to save a search query and rerun it.\n\n## Decisions\nSaved searches belong to the user. Max 50 per user. Stored in src/saved-search.ts.\n\n## Contracts\nsaveSearch(userId, query) returns the saved record. listSearches(userId) returns newest-first. Deleting a search is idempotent.\n\n## Tasks\n1. Add the saved-search store in src/saved-search.ts.\n2. Wire save/list/delete into the search view.\n"
         }
       },
       "routing": {
-        "expect": ["docs/plans/saved-search.md", "afk:implement", "Route:"],
+        "expect": ["brain/plans/saved-search.md", "afk:implement", "Route:"],
         "forbid": ["Next AFK skill to run: afk:grill", "afk:grill ->"],
         "overblock_guard": true
       }

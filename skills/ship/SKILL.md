@@ -35,8 +35,8 @@ Do not use this skill for:
 
 1. Inspect current state before routing.
    - Read the user's request, `git status --short`, `git diff --stat`,
-     available plans (`docs/plans/` from `afk:grill` and `brain/plans/` from
-     `afk:plan`), and available `qa/` reports.
+     available plans (`brain/plans/` from `afk:grill` and `afk:plan`), and
+     available `qa/` reports.
    - If the user supplied a plan path, use that plan as the source of truth.
      Do not route back to `afk:grill` merely because the plan is terse; ask
      only when a specific missing decision blocks implementation.
@@ -54,7 +54,7 @@ Do not use this skill for:
      clear.
    - If product intent, contracts, edge cases, glossary terms, or source of
      truth are unresolved, invoke `afk:grill` and use its
-     `docs/plans/<slug>.md` output before implementation.
+     `brain/plans/<slug>.md` output before implementation.
 
 3. Run or resume implementation.
    - Invoke `afk:implement` for repo-changing work, passing the selected plan
@@ -136,7 +136,7 @@ Return this compact shape:
 ```markdown
 Verdict: SHIP | DO NOT SHIP | SHIP WITH CAVEATS
 Route: grill skipped/used -> implement -> simplify skipped/used -> review skipped/used -> qa skipped/used -> reflect skipped/used
-Plan: docs/plans/<slug>.md or "none, reason"
+Plan: brain/plans/<slug>.md or "none, reason"
 Changed: <files or summary>
 Verification: <commands/results>
 Review: accept | accept with notes | revise, or "skipped, reason"

@@ -30,7 +30,7 @@ if [ ! -f "$BRAIN_DIR/principles.md" ]; then
   created=1
 fi
 
-# brain/plans/ is where the `plan` skill writes — scaffold it too.
+# brain/plans/ is where grill and the `plan` skill write — scaffold it too.
 if [ ! -d "$BRAIN_DIR/plans" ]; then
   mkdir -p "$BRAIN_DIR/plans"
   created=1
@@ -41,12 +41,35 @@ if [ ! -f "$BRAIN_DIR/plans/index.md" ]; then
   created=1
 fi
 
+# brain/context.md is the domain glossary grill grows; brain/decisions/ holds
+# ADRs. Both are read by the flow before acting, so scaffold their entrypoints.
+if [ ! -f "$BRAIN_DIR/context.md" ]; then
+  printf '# Context\n\nProject domain glossary. Grown by `afk:grill` as terms are resolved. One term per definition; split large domains into `context/<area>.md` notes linked from here.\n' > "$BRAIN_DIR/context.md"
+  created=1
+fi
+
+if [ ! -d "$BRAIN_DIR/decisions" ]; then
+  mkdir -p "$BRAIN_DIR/decisions"
+  created=1
+fi
+
+if [ ! -f "$BRAIN_DIR/decisions/index.md" ]; then
+  printf '# Decisions\n\nArchitecture decision records (ADRs), numbered `NNNN-slug.md`. Offered by `afk:grill` for hard-to-reverse, trade-off-driven decisions.\n' > "$BRAIN_DIR/decisions/index.md"
+  created=1
+fi
+
 if [ ! -f "$INDEX" ]; then
   {
     echo "# Brain"
     echo ""
     echo "## Principles"
     echo "- [[principles]]"
+    echo ""
+    echo "## Context"
+    echo "- [[context]]"
+    echo ""
+    echo "## Decisions"
+    echo "- [[decisions/index]]"
     echo ""
     echo "## Plans"
     echo "- [[plans/index]]"

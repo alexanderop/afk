@@ -22,9 +22,9 @@ explanation of AFK itself.
 - Catalog: [afk-help.csv](./afk-help.csv)
 - AFK familiarity: does `brain/` exist? Present = the user has used AFK here
   before (returning); absent = this is a fresh project (first contact).
-- Domain glossary: `CONTEXT.md` or `CONTEXT-MAP.md`
-- Decisions: `docs/adr/`
-- Plans: `docs/plans/` (from `afk:grill`) and `brain/plans/` (from `afk:plan`)
+- Domain glossary: `brain/context.md`
+- Decisions: `brain/decisions/`
+- Plans: `brain/plans/` (from `afk:grill` and `afk:plan`)
 - QA evidence: `qa/`
 - Current implementation state: `git status --short` and `git diff --stat`
 
@@ -64,7 +64,7 @@ explanation of AFK itself.
 - The user asks to prototype, mock up, try a few designs, create UI variants,
   make something playable, or sanity-check a state model/API/data shape by
   interacting with it: recommend `afk:prototype`.
-- No concrete plan in `docs/plans/` or `brain/plans/`: recommend `afk:grill` to
+- No concrete plan in `brain/plans/`: recommend `afk:grill` to
   interview a vague idea into a plan, or `afk:plan` to decompose an
   already-clear task into phased plans. Both feed `afk:implement`.
 - A plan exists and there is little or no implementation diff: recommend
@@ -126,7 +126,7 @@ AFK step.
 | Thought | Reality |
 |---------|---------|
 | "The user asked for help, so list every skill." | List only relevant skills unless they ask to show everything. |
-| "The plan probably exists somewhere." | Inspect `docs/plans/`; missing artifacts are workflow signal. |
+| "The plan probably exists somewhere." | Inspect `brain/plans/`; missing artifacts are workflow signal. |
 | "There is a diff, so QA is next." | After a plan plus implementation diff, recommend `afk:simplify` before QA unless the user explicitly asks for verification. |
 | "The user said ship, so recommend QA only." | `afk:ship` owns the full route to a verdict; QA is just the final evidence phase. |
 | "Just route on intent; familiarity doesn't matter." | No `brain/` means a fresh project — lead with the eval-first onboarding (`afk:write-evals` then `afk:implement`) before intent routing. |

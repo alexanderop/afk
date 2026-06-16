@@ -1,6 +1,40 @@
+<script setup lang="ts">
+import type { Scene } from '../.vitepress/theme/rough/render'
+
+// simplify fans the diff out to four independent cleanup angles in parallel,
+// then the lead dedupes and applies only behavior-preserving fixes.
+const scene: Scene = {
+  width: 820,
+  height: 360,
+  groups: [
+    { x: 200, y: 20, w: 300, h: 320, label: '4 parallel angles' },
+  ],
+  nodes: [
+    { id: 'diff', x: 20, y: 150, w: 150, h: 46, shape: 'pill', label: 'the diff' },
+    { id: 'reuse', x: 220, y: 52, w: 260, h: 52, shape: 'round', fontSize: 14, label: 'reuse' },
+    { id: 'simpl', x: 220, y: 124, w: 260, h: 52, shape: 'round', fontSize: 14, label: 'simplification' },
+    { id: 'eff', x: 220, y: 196, w: 260, h: 52, shape: 'round', fontSize: 14, label: 'efficiency' },
+    { id: 'alt', x: 220, y: 268, w: 260, h: 52, shape: 'round', fontSize: 14, label: 'altitude' },
+    { id: 'lead', x: 560, y: 148, w: 200, h: 64, shape: 'round', accent: true, fontSize: 12, label: 'lead', sub: 'dedupe → apply safe fixes' },
+  ],
+  edges: [
+    { from: 'diff', to: 'reuse', fromSide: 'right', toSide: 'left' },
+    { from: 'diff', to: 'simpl', fromSide: 'right', toSide: 'left' },
+    { from: 'diff', to: 'eff', fromSide: 'right', toSide: 'left' },
+    { from: 'diff', to: 'alt', fromSide: 'right', toSide: 'left' },
+    { from: 'reuse', to: 'lead', fromSide: 'right', toSide: 'left' },
+    { from: 'simpl', to: 'lead', fromSide: 'right', toSide: 'left' },
+    { from: 'eff', to: 'lead', fromSide: 'right', toSide: 'left' },
+    { from: 'alt', to: 'lead', fromSide: 'right', toSide: 'left' },
+  ],
+}
+</script>
+
 # Simplify
 
 Invoke as `/afk:simplify`. Use it after `afk:implement` lands, or when you want changed code cleaned up, deduplicated, or made DRY without hunting for bugs.
+
+<RoughDiagram :scene="scene" caption="Four cleanup angles run in parallel over the diff; the lead dedupes their findings and applies only the fixes that preserve behavior." />
 
 ## What it does
 

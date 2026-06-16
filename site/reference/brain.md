@@ -1,6 +1,32 @@
+<script setup lang="ts">
+import type { Scene } from '../.vitepress/theme/rough/render'
+
+// brain applies a durability test before writing: only prompt-worthy knowledge
+// becomes a one-topic note; the hook keeps index.md in sync.
+const scene: Scene = {
+  width: 820,
+  height: 300,
+  nodes: [
+    { id: 'knowledge', x: 20, y: 120, w: 160, h: 46, shape: 'pill', fontSize: 13, label: 'candidate note' },
+    { id: 'test', x: 230, y: 96, w: 180, h: 96, shape: 'diamond', fontSize: 13, label: 'prompt-worthy?' },
+    { id: 'write', x: 500, y: 40, w: 200, h: 56, shape: 'cylinder', accent: true, fontSize: 13, label: 'brain/ note', sub: 'one topic / file' },
+    { id: 'index', x: 500, y: 122, w: 200, h: 48, shape: 'round', fontSize: 12, label: 'index.md (auto)' },
+    { id: 'discard', x: 500, y: 200, w: 200, h: 46, shape: 'pill', fontSize: 12, label: 'stays in plan / skill' },
+  ],
+  edges: [
+    { from: 'knowledge', to: 'test' },
+    { from: 'test', to: 'write', fromSide: 'right', toSide: 'left', label: 'yes' },
+    { from: 'test', to: 'discard', fromSide: 'bottom', toSide: 'left', label: 'no' },
+    { from: 'write', to: 'index', fromSide: 'bottom', toSide: 'top', dashed: true, label: 'hook rebuilds' },
+  ],
+}
+</script>
+
 # Brain
 
 Invoke as `/afk:brain`. Use it when a task needs to read or write the persistent `brain/` vault directly: adding a principle, recording a codebase gotcha, or grounding work in existing memory.
+
+<RoughDiagram :scene="scene" caption="brain applies a durability test before writing — durable notes become one-topic files, and the PostToolUse hook keeps index.md in sync." />
 
 ## What it does
 

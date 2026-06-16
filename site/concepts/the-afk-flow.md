@@ -16,12 +16,11 @@ persist learnings back to the brain.
 ## grill
 
 [grill](/reference/grill) interviews you about the plan one decision at a time.
-It reads the codebase, your domain glossary (`CONTEXT.md`), ADRs, and the
-brain's principles before asking anything, so it only asks questions the repo
-cannot answer. It stress-tests decisions with concrete scenarios, edge cases,
-and failure modes, then writes the agreed plan to `brain/plans/<slug>.md` (or
-`docs/plans/<slug>.md` when no vault exists). That plan is the input to
-implement.
+It reads the codebase, your domain glossary (`brain/context.md`), ADRs
+(`brain/decisions/`), and the brain's principles before asking anything, so it
+only asks questions the repo cannot answer. It stress-tests decisions with
+concrete scenarios, edge cases, and failure modes, then writes the agreed plan
+to `brain/plans/<slug>.md`. That plan is the input to implement.
 
 ## implement
 

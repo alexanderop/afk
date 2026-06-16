@@ -1,6 +1,6 @@
 [
   {
-    "query": "Implement the plan in docs/plans/search.md",
+    "query": "Implement the plan in brain/plans/search.md",
     "should_trigger": true
   },
   {

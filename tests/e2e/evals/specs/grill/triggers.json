@@ -20,7 +20,7 @@
     "should_trigger": false
   },
   {
-    "query": "The plan is written; implement docs/plans/auth.md",
+    "query": "The plan is written; implement brain/plans/auth.md",
     "should_trigger": false
   },
   {

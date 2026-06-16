@@ -1,8 +1,8 @@
 # ADR Format
 
-ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
+ADRs live in `brain/decisions/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc. The auto-index hook lists them under `## Decisions` in `brain/index.md`, and the SessionStart hook surfaces that index — so a recorded decision becomes injected memory.
 
-Create the `docs/adr/` directory lazily — only when the first ADR is needed.
+Create the `brain/decisions/` directory lazily — only when the first ADR is needed.
 
 ## Template
 
@@ -24,7 +24,7 @@ Only include these when they add genuine value. Most ADRs won't need them.
 
 ## Numbering
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+Scan `brain/decisions/` for the highest existing number and increment by one.
 
 ## When to offer an ADR
 

@@ -20,7 +20,7 @@ freeze-then-fan-out recipe instead.
 
 Use this skill when:
 
-- A `docs/plans/<slug>.md` plan from `afk:grill`, or a clear spec, breaks into
+- A `brain/plans/<slug>.md` plan from `afk:grill`, or a clear spec, breaks into
   5–30 units that can each land as a standalone PR.
 - The work is a codebase-wide migration, rename, dependency bump, lint-rule
   rollout, or the same pattern change applied across many files or packages.
@@ -144,7 +144,7 @@ Finish with this shape:
 
 ```markdown
 Batch: <n landed>/<total> units as PRs
-Plan: docs/plans/<slug>.md or "spec, reason"
+Plan: brain/plans/<slug>.md or "spec, reason"
 PRs: <list of urls>
 Failed/blocked: <unit # + reason, or "none">
 Next: <re-dispatch, finish-in-lead, or review-and-merge>
@@ -159,4 +159,4 @@ If units turned out to be dependent, stop before spawning and hand off to
   freeze-then-fan-out recipe when a shared contract must be built first.
 - `afk:simplify` — the cleanup pass each worker runs on its own diff when the
   unit's change is substantial (skipped for trivial one-liners).
-- `afk:grill` — produces the `docs/plans/<slug>.md` that batch decomposes.
+- `afk:grill` — produces the `brain/plans/<slug>.md` that batch decomposes.

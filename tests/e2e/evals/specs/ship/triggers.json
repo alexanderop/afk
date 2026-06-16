@@ -12,7 +12,7 @@
     "should_trigger": true
   },
   {
-    "query": "Use afk:ship on docs/plans/auth.md",
+    "query": "Use afk:ship on brain/plans/auth.md",
     "should_trigger": true
   },
   {

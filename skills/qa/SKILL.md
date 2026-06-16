@@ -25,7 +25,7 @@ actually works", or "can this ship?"
 ## Process
 
 1. Orient on the target.
-   - Identify the flow under test from the plan (`docs/plans/<slug>.md` from
+   - Identify the flow under test from the plan (`brain/plans/<slug>.md` from
      `afk:grill` or `brain/plans/<slug>/` from `afk:plan`), the recent diff, or
      the user's named target.
    - Capture the change's **stated intent** — what the user should be able to

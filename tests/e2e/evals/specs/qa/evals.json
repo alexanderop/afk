@@ -3,11 +3,11 @@
   "evals": [
     {
       "id": "qa-judges-intent-not-just-render",
-      "prompt": "Eval harness note: a real browser QA run already happened and produced the evidence below — treat it as the observations you have gathered. Do NOT start a dev server or agent-browser; interpret this evidence and produce the QA report and final verdict from it alone. Write the report to qa/dashboard.md.\n\nChange under test: the home dashboard weight card. The plan (docs/plans/dashboard.md) states its intent: \"I open the dashboard and immediately see whether my weight is trending up or down over the last 90 days.\"\n\nPre-captured evidence:\n- GET / returns HTTP 200. Console has no warnings, no [error] lines, no uncaught exceptions.\n- qa/evidence/dashboard/home.png shows the weight chart rendering one continuous line (a single <path> with a non-empty `d`). The y-axis ticks read 0, 50, 100, 150, 200 (kg). The plotted weight values for the window are 78.0, 80.9, 81.2, 79.4, 80.1, 80.4 kg.\n- The summary cards display: current weight 80.1 kg, 90-day average 80.4 kg. These match /api/stats output exactly.\n- LineChart.vue sets the y-scale with `scaleLinear().domain([0, max])`.",
+      "prompt": "Eval harness note: a real browser QA run already happened and produced the evidence below — treat it as the observations you have gathered. Do NOT start a dev server or agent-browser; interpret this evidence and produce the QA report and final verdict from it alone. Write the report to qa/dashboard.md.\n\nChange under test: the home dashboard weight card. The plan (brain/plans/dashboard.md) states its intent: \"I open the dashboard and immediately see whether my weight is trending up or down over the last 90 days.\"\n\nPre-captured evidence:\n- GET / returns HTTP 200. Console has no warnings, no [error] lines, no uncaught exceptions.\n- qa/evidence/dashboard/home.png shows the weight chart rendering one continuous line (a single <path> with a non-empty `d`). The y-axis ticks read 0, 50, 100, 150, 200 (kg). The plotted weight values for the window are 78.0, 80.9, 81.2, 79.4, 80.1, 80.4 kg.\n- The summary cards display: current weight 80.1 kg, 90-day average 80.4 kg. These match /api/stats output exactly.\n- LineChart.vue sets the y-scale with `scaleLinear().domain([0, max])`.",
       "expected_output": "Judges the chart against its stated purpose (seeing the 90-day trend at a glance) rather than only that it rendered without errors, and refuses a clean SHIP because the trend is illegible.",
       "fixture": {
         "files": {
-          "docs/plans/dashboard.md": "# Dashboard Plan\n\n## Context\nA home dashboard for a personal fitness app.\n\n## Acceptance\n- Opening the dashboard, the user can immediately see whether their weight is trending up or down over the last 90 days.\n"
+          "brain/plans/dashboard.md": "# Dashboard Plan\n\n## Context\nA home dashboard for a personal fitness app.\n\n## Acceptance\n- Opening the dashboard, the user can immediately see whether their weight is trending up or down over the last 90 days.\n"
         }
       },
       "expectations": [
@@ -27,7 +27,7 @@
       "expected_output": "When deriving frontend QA cases for an insight/dashboard feature, includes an explicit case that judges whether the page delivers its stated insight and is legible, not only functional render/data checks.",
       "fixture": {
         "files": {
-          "docs/plans/insights.md": "# Insights Plan\n\n## Acceptance\n- The user can see at a glance whether their nutrition is on track for the week versus their targets.\n"
+          "brain/plans/insights.md": "# Insights Plan\n\n## Acceptance\n- The user can see at a glance whether their nutrition is on track for the week versus their targets.\n"
         }
       },
       "expectations": [

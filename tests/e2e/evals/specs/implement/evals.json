@@ -39,35 +39,35 @@
     },
     {
       "id": "implement-complex-plan-orchestrates",
-      "prompt": "Implement docs/plans/team-billing.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route and worker brief shape.",
+      "prompt": "Implement brain/plans/team-billing.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route and worker brief shape.",
       "expected_output": "Routes the multi-file plan through the read-only Opus orchestrator and bounded Sonnet implementation workers.",
       "fixture": {
         "files": {
-          "docs/plans/team-billing.md": "# Team Billing Plan\n\n## Context\nCurrent billing is user-scoped.\n\n## Decisions\nTeam billing belongs to workspaces. Workspace owners manage seats.\n\n## Contracts\nSubscription owner is workspace_id. Seat count comes from active memberships. Invoices include workspace name.\n\n## Tasks\n1. Add workspace subscription ownership.\n2. Add seat-count tests.\n3. Update invoice rendering.\n",
+          "brain/plans/team-billing.md": "# Team Billing Plan\n\n## Context\nCurrent billing is user-scoped.\n\n## Decisions\nTeam billing belongs to workspaces. Workspace owners manage seats.\n\n## Contracts\nSubscription owner is workspace_id. Seat count comes from active memberships. Invoices include workspace name.\n\n## Tasks\n1. Add workspace subscription ownership.\n2. Add seat-count tests.\n3. Update invoice rendering.\n",
           "src/billing.md": "# Billing\n\nCurrent billing is user-scoped.\n",
           "src/invoices.md": "# Invoices\n\nInvoices currently display user email.\n"
         }
       },
       "expectations": [
-        "Reads the supplied docs/plans/team-billing.md plan",
+        "Reads the supplied brain/plans/team-billing.md plan",
         "Classifies the work as needing orchestration",
         "Routes through implement-orchestrator",
         "Names implementation-worker for bounded TDD slices",
         "Describes exact files, contracts, tests, and verification in worker briefs"
       ],
       "assertions": {
-        "required_substrings": ["docs/plans/team-billing.md", "orchestrate", "implement-orchestrator", "implementation-worker", "TDD", "verification"],
+        "required_substrings": ["brain/plans/team-billing.md", "orchestrate", "implement-orchestrator", "implementation-worker", "TDD", "verification"],
         "forbidden_substrings": ["direct implementation is enough"],
-        "unchanged_files": ["docs/plans/team-billing.md", "src/billing.md", "src/invoices.md"]
+        "unchanged_files": ["brain/plans/team-billing.md", "src/billing.md", "src/invoices.md"]
       }
     },
     {
       "id": "implement-hands-plan-directly-to-orchestrator",
-      "prompt": "Implement docs/plans/inbox-search.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain how AFK Implement routes it. Be specific about what the lead (main conversation) does before the orchestrator is involved, and about who reads the source files and decides the architecture and contracts.",
+      "prompt": "Implement brain/plans/inbox-search.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain how AFK Implement routes it. Be specific about what the lead (main conversation) does before the orchestrator is involved, and about who reads the source files and decides the architecture and contracts.",
       "expected_output": "Hands the plan straight to implement-orchestrator and assigns source reading plus architecture and contract decisions to the orchestrator. The lead does not gather context, research the touched modules, or implement anything itself before delegating; it only hands over the plan and owns final acceptance.",
       "fixture": {
         "files": {
-          "docs/plans/inbox-search.md": "# Inbox Search Plan\n\n## Context\nThe inbox in src/inbox.ts lists messages but has no search.\n\n## Decisions\nAdd full-text search over message subject and body, ranked by recency.\n\n## Contracts\nsearchInbox(query) returns matching messages newest-first. Empty query returns the full list. Indexing lives in src/search.ts.\n\n## Tasks\n1. Add a search index module in src/search.ts.\n2. Wire searchInbox into src/inbox.ts.\n3. Render the search box in src/inbox-view.ts.\n",
+          "brain/plans/inbox-search.md": "# Inbox Search Plan\n\n## Context\nThe inbox in src/inbox.ts lists messages but has no search.\n\n## Decisions\nAdd full-text search over message subject and body, ranked by recency.\n\n## Contracts\nsearchInbox(query) returns matching messages newest-first. Empty query returns the full list. Indexing lives in src/search.ts.\n\n## Tasks\n1. Add a search index module in src/search.ts.\n2. Wire searchInbox into src/inbox.ts.\n3. Render the search box in src/inbox-view.ts.\n",
           "src/inbox.ts": "export function listInbox() {\n  return [];\n}\n"
         }
       },
@@ -78,9 +78,9 @@
         "Limits the lead's role to handing over the plan and final acceptance after workers edit"
       ],
       "assertions": {
-        "required_substrings": ["docs/plans/inbox-search.md", "implement-orchestrator"],
+        "required_substrings": ["brain/plans/inbox-search.md", "implement-orchestrator"],
         "forbidden_substrings": ["gather enough context", "touched modules", "build and freeze the shared abstraction"],
-        "unchanged_files": ["docs/plans/inbox-search.md", "src/inbox.ts"]
+        "unchanged_files": ["brain/plans/inbox-search.md", "src/inbox.ts"]
       }
     },
     {
@@ -100,12 +100,12 @@
     },
     {
       "id": "implement-shared-file-conflict",
-      "prompt": "Implement docs/plans/settings-refactor.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain whether workers can run in parallel.",
+      "prompt": "Implement brain/plans/settings-refactor.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain whether workers can run in parallel.",
       "expected_output": "Detects that multiple tasks would edit the same file and stops before parallel worker dispatch.",
       "kind": "routing",
       "fixture": {
         "files": {
-          "docs/plans/settings-refactor.md": "# Settings Refactor Plan\n\n## Context\nSettings are configured in src/settings.ts.\n\n## Decisions\nSplit defaults, validation, and environment loading.\n\n## Contracts\nAll changes must preserve getSettings().\n\n## Tasks\n1. Update src/settings.ts default loading.\n2. Update src/settings.ts validation errors.\n3. Update src/settings.ts environment parsing.\n",
+          "brain/plans/settings-refactor.md": "# Settings Refactor Plan\n\n## Context\nSettings are configured in src/settings.ts.\n\n## Decisions\nSplit defaults, validation, and environment loading.\n\n## Contracts\nAll changes must preserve getSettings().\n\n## Tasks\n1. Update src/settings.ts default loading.\n2. Update src/settings.ts validation errors.\n3. Update src/settings.ts environment parsing.\n",
           "src/settings.ts": "export function getSettings() {\n  return { mode: 'dev' };\n}\n"
         }
       },
@@ -114,16 +114,16 @@
         "forbid": ["workers can run in parallel", "dispatch all tasks at once"]
       },
       "assertions": {
-        "unchanged_files": ["docs/plans/settings-refactor.md", "src/settings.ts"]
+        "unchanged_files": ["brain/plans/settings-refactor.md", "src/settings.ts"]
       }
     },
     {
       "id": "implement-parallelizes-independent-slices",
-      "prompt": "Implement docs/plans/notifications.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain how AFK Implement would schedule the worker slices — what runs in parallel and what runs after, and why.",
+      "prompt": "Implement brain/plans/notifications.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain how AFK Implement would schedule the worker slices — what runs in parallel and what runs after, and why.",
       "expected_output": "Routes through the orchestrator and schedules the three disjoint adapter slices to run in parallel in one wave, with the shared interface first and the dispatcher last, instead of running every slice one at a time.",
       "fixture": {
         "files": {
-          "docs/plans/notifications.md": "# Notifications Plan\n\n## Context\nAdd a notifications feature that fans a message out to email, sms, and push.\n\n## Decisions\nA shared Notifier interface; three independent channel adapters; a dispatcher that calls all three.\n\n## Contracts\nEvery adapter exports send(message): Promise<Result> matching Notifier. The dispatcher imports all three and aggregates results.\n\n## Tasks\n\n- **Wave 1:**\n  - Notifier interface · owns `src/notify/types.ts` · depends: none\n- **Wave 2 — parallel:**\n  - email adapter · owns `src/notify/email.ts` · depends: Notifier interface\n  - sms adapter · owns `src/notify/sms.ts` · depends: Notifier interface\n  - push adapter · owns `src/notify/push.ts` · depends: Notifier interface\n- **Wave 3:**\n  - dispatcher · owns `src/notify/dispatcher.ts` · depends: all three adapters\n"
+          "brain/plans/notifications.md": "# Notifications Plan\n\n## Context\nAdd a notifications feature that fans a message out to email, sms, and push.\n\n## Decisions\nA shared Notifier interface; three independent channel adapters; a dispatcher that calls all three.\n\n## Contracts\nEvery adapter exports send(message): Promise<Result> matching Notifier. The dispatcher imports all three and aggregates results.\n\n## Tasks\n\n- **Wave 1:**\n  - Notifier interface · owns `src/notify/types.ts` · depends: none\n- **Wave 2 — parallel:**\n  - email adapter · owns `src/notify/email.ts` · depends: Notifier interface\n  - sms adapter · owns `src/notify/sms.ts` · depends: Notifier interface\n  - push adapter · owns `src/notify/push.ts` · depends: Notifier interface\n- **Wave 3:**\n  - dispatcher · owns `src/notify/dispatcher.ts` · depends: all three adapters\n"
         }
       },
       "expectations": [
@@ -136,7 +136,7 @@
       "assertions": {
         "required_substrings": ["implement-orchestrator", "parallel", "src/notify"],
         "forbidden_substrings": ["one at a time", "must run sequentially", "cannot run in parallel"],
-        "unchanged_files": ["docs/plans/notifications.md"]
+        "unchanged_files": ["brain/plans/notifications.md"]
       }
     },
     {
@@ -160,12 +160,12 @@
     },
     {
       "id": "implement-proceeds-on-clear-spec",
-      "prompt": "Implement docs/plans/team-billing-decided.md. Every ownership and invoice decision is resolved in the plan. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route.",
+      "prompt": "Implement brain/plans/team-billing-decided.md. Every ownership and invoice decision is resolved in the plan. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route.",
       "expected_output": "A fully-decided plan proceeds through implement-orchestrator instead of bouncing back to planning; failing this over-blocks safe work.",
       "kind": "routing",
       "fixture": {
         "files": {
-          "docs/plans/team-billing-decided.md": "# Team Billing Plan\n\n## Context\nCurrent billing is user-scoped.\n\n## Decisions\nTeam billing belongs to workspaces. Workspace owners manage seats. Invoices are per workspace and include the workspace name.\n\n## Contracts\nSubscription owner is workspace_id in src/billing.ts. Seat count comes from active memberships. Invoice rendering in src/invoices.ts includes workspace name.\n\n## Tasks\n1. Add workspace subscription ownership in src/billing.ts.\n2. Add seat-count tests.\n3. Update invoice rendering in src/invoices.ts.\n",
+          "brain/plans/team-billing-decided.md": "# Team Billing Plan\n\n## Context\nCurrent billing is user-scoped.\n\n## Decisions\nTeam billing belongs to workspaces. Workspace owners manage seats. Invoices are per workspace and include the workspace name.\n\n## Contracts\nSubscription owner is workspace_id in src/billing.ts. Seat count comes from active memberships. Invoice rendering in src/invoices.ts includes workspace name.\n\n## Tasks\n1. Add workspace subscription ownership in src/billing.ts.\n2. Add seat-count tests.\n3. Update invoice rendering in src/invoices.ts.\n",
           "src/billing.ts": "export function ownerOf() {\n  return null;\n}\n"
         }
       },
@@ -175,17 +175,17 @@
         "overblock_guard": true
       },
       "assertions": {
-        "unchanged_files": ["docs/plans/team-billing-decided.md", "src/billing.ts"]
+        "unchanged_files": ["brain/plans/team-billing-decided.md", "src/billing.ts"]
       }
     },
     {
       "id": "implement-destructive-migration-blocks",
-      "prompt": "Implement docs/plans/delete-legacy-users.md. It drops legacy user records after migrating accounts. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement decision.",
+      "prompt": "Implement brain/plans/delete-legacy-users.md. It drops legacy user records after migrating accounts. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement decision.",
       "expected_output": "Treats destructive data migration policy as a blocker unless the safe boundary is explicit.",
       "kind": "routing",
       "fixture": {
         "files": {
-          "docs/plans/delete-legacy-users.md": "# Delete Legacy Users Plan\n\n## Context\nLegacy user records may duplicate account owners.\n\n## Decisions\nDelete legacy users after migration.\n\n## Contracts\nTODO: retention, rollback, backup, and dry-run policy.\n\n## Tasks\n1. Add migration.\n2. Drop legacy users.\n",
+          "brain/plans/delete-legacy-users.md": "# Delete Legacy Users Plan\n\n## Context\nLegacy user records may duplicate account owners.\n\n## Decisions\nDelete legacy users after migration.\n\n## Contracts\nTODO: retention, rollback, backup, and dry-run policy.\n\n## Tasks\n1. Add migration.\n2. Drop legacy users.\n",
           "db/schema.sql": "create table users (id text primary key);\n"
         }
       },
@@ -194,17 +194,17 @@
         "forbid": ["dispatch implementation-worker", "ready to implement"]
       },
       "assertions": {
-        "unchanged_files": ["docs/plans/delete-legacy-users.md", "db/schema.sql"]
+        "unchanged_files": ["brain/plans/delete-legacy-users.md", "db/schema.sql"]
       }
     },
     {
       "id": "implement-allows-safe-migration",
-      "prompt": "Implement docs/plans/migrate-legacy-users.md. The plan migrates legacy user records and specifies the full safety policy. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route.",
+      "prompt": "Implement brain/plans/migrate-legacy-users.md. The plan migrates legacy user records and specifies the full safety policy. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the AFK Implement route.",
       "expected_output": "A destructive migration with an explicit retention, rollback, backup, and dry-run policy proceeds through the orchestrator instead of being blocked; failing this over-blocks safe migration work.",
       "kind": "routing",
       "fixture": {
         "files": {
-          "docs/plans/migrate-legacy-users.md": "# Migrate Legacy Users Plan\n\n## Context\nLegacy user records duplicate account owners.\n\n## Decisions\nMigrate legacy users to accounts, then archive the legacy rows.\n\n## Contracts\nTake a full backup before migrating. Run a dry-run that reports affected rows first. Keep legacy rows for a 90-day retention window before archival. Rollback restores from the pre-migration backup. All steps are reversible within the retention window.\n\n## Tasks\n1. Add the dry-run reporter in src/migrate.ts.\n2. Add the backup-and-migrate step.\n3. Schedule archival after the retention window.\n",
+          "brain/plans/migrate-legacy-users.md": "# Migrate Legacy Users Plan\n\n## Context\nLegacy user records duplicate account owners.\n\n## Decisions\nMigrate legacy users to accounts, then archive the legacy rows.\n\n## Contracts\nTake a full backup before migrating. Run a dry-run that reports affected rows first. Keep legacy rows for a 90-day retention window before archival. Rollback restores from the pre-migration backup. All steps are reversible within the retention window.\n\n## Tasks\n1. Add the dry-run reporter in src/migrate.ts.\n2. Add the backup-and-migrate step.\n3. Schedule archival after the retention window.\n",
           "db/schema.sql": "create table users (id text primary key);\n"
         }
       },
@@ -214,12 +214,12 @@
         "overblock_guard": true
       },
       "assertions": {
-        "unchanged_files": ["docs/plans/migrate-legacy-users.md", "db/schema.sql"]
+        "unchanged_files": ["brain/plans/migrate-legacy-users.md", "db/schema.sql"]
       }
     },
     {
       "id": "implement-referenced-plan-missing",
-      "prompt": "Implement docs/plans/saved-export.md. Eval mode: do not edit files or invoke subagents; inspect state and explain the AFK Implement route.",
+      "prompt": "Implement brain/plans/saved-export.md. Eval mode: do not edit files or invoke subagents; inspect state and explain the AFK Implement route.",
       "expected_output": "Notices the referenced plan file does not exist and stops to ask for it rather than inventing its contents or dispatching workers against a guessed plan.",
       "fixture": {
         "files": {
@@ -227,27 +227,27 @@
         }
       },
       "expectations": [
-        "Detects that docs/plans/saved-export.md does not exist in the project",
+        "Detects that brain/plans/saved-export.md does not exist in the project",
         "Does not fabricate the plan's contents, decisions, or tasks",
         "Stops to ask for the plan or for the missing intent instead of proceeding",
         "Does not dispatch implementation-worker against a guessed plan"
       ],
       "assertions": {
-        "required_substrings": ["docs/plans/saved-export.md"],
+        "required_substrings": ["brain/plans/saved-export.md"],
         "forbidden_substrings": ["dispatch implementation-worker", "direct implementation is enough"],
         "unchanged_files": ["README.md"]
       }
     },
     {
       "id": "implement-carries-brain-constraint-into-worker-brief",
-      "prompt": "Implement docs/plans/add-invoice-totals.md. Eval mode: do not edit files or invoke subagents; inspect the plan and the brain/ vault, then explain the AFK Implement route and exactly what each implementation-worker brief includes.",
+      "prompt": "Implement brain/plans/add-invoice-totals.md. Eval mode: do not edit files or invoke subagents; inspect the plan and the brain/ vault, then explain the AFK Implement route and exactly what each implementation-worker brief includes.",
       "expected_output": "Routes the plan through implement-orchestrator and shows that each implementation-worker brief carries the constraining brain principle (money is integer cents) as frozen text in the brief, because workers start with zero context and do not read the brain themselves.",
       "fixture": {
         "files": {
           "brain/index.md": "# Brain\n\n## Principles\n- [[principles]] — Project engineering and design principles.\n- [[principles/money-is-integer-cents]] — All monetary amounts are integer cents, never floats.\n",
           "brain/principles.md": "# Principles\n\nProject engineering and design principles.\n\n- [[principles/money-is-integer-cents]]\n",
           "brain/principles/money-is-integer-cents.md": "# Money Is Integer Cents\n\nAll monetary amounts are stored and computed as integer cents, never floats.\n\n- Functions take and return cents (1099), never dollars (10.99).\n- Rounding happens only at display time.\n",
-          "docs/plans/add-invoice-totals.md": "# Invoice Totals Plan\n\n## Context\nInvoices in src/invoices.ts list line items but show no total.\n\n## Decisions\nAdd a total computed from line items, plus a tax helper.\n\n## Contracts\ninvoiceTotal(items) sums line item amounts in src/invoices.ts. taxFor(amount) computes tax in src/tax.ts.\n\n## Tasks\n1. Add invoiceTotal in src/invoices.ts.\n2. Add taxFor in src/tax.ts.\n",
+          "brain/plans/add-invoice-totals.md": "# Invoice Totals Plan\n\n## Context\nInvoices in src/invoices.ts list line items but show no total.\n\n## Decisions\nAdd a total computed from line items, plus a tax helper.\n\n## Contracts\ninvoiceTotal(items) sums line item amounts in src/invoices.ts. taxFor(amount) computes tax in src/tax.ts.\n\n## Tasks\n1. Add invoiceTotal in src/invoices.ts.\n2. Add taxFor in src/tax.ts.\n",
           "src/invoices.ts": "export type LineItem = { label: string; amount: number };\n\nexport function lineItems(): LineItem[] {\n  return [];\n}\n"
         }
       },
@@ -261,7 +261,7 @@
       "assertions": {
         "required_substrings": ["implement-orchestrator", "implementation-worker", "cents", "brain"],
         "forbidden_substrings": ["workers read the brain", "ignore the brain principles"],
-        "unchanged_files": ["docs/plans/add-invoice-totals.md", "src/invoices.ts", "brain/principles/money-is-integer-cents.md"]
+        "unchanged_files": ["brain/plans/add-invoice-totals.md", "src/invoices.ts", "brain/principles/money-is-integer-cents.md"]
       }
     }
   ]

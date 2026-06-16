@@ -65,7 +65,8 @@ components use UI. State the assumption at the top of the prototype.
 
 ### 3. Capture the Verdict
 
-Create or update `docs/prototypes/<slug>.md` before handoff:
+Create or update `brain/prototypes/<slug>.md` before handoff (creating the vault
+if it does not exist yet):
 
 ```markdown
 # <Prototype Name>
@@ -107,7 +108,7 @@ Return:
 
 - The branch used: logic or UI.
 - The artifact path and run command.
-- The verdict note path under `docs/prototypes/`.
+- The verdict note path under `brain/prototypes/`.
 - The next AFK step: usually `afk:grill` for planning from the learning, or
   `afk:implement` when the winning behavior/design is already decided.
 

@@ -59,7 +59,7 @@ Use lead-orchestrated slices when any of these are true:
   APIs, complex tests, or risk that is hard to see in one diff.
 - A shared abstraction (component, type, helper, endpoint shape) is introduced
   or changed and then applied across several call sites.
-- A plan from `afk:grill` (`docs/plans/`) or `afk:plan` (`brain/plans/`) exists,
+- A plan from `afk:grill` or `afk:plan` (`brain/plans/`) exists,
   or the user provides a worked-out design.
 
 Per-edit size does not downgrade the triage. Many small, near-identical edits
@@ -106,9 +106,9 @@ which files or modules to change, write a delegation analysis, or build any
 part of the implementation before delegating — all of that is the
 orchestrator's job. The lead's only inputs to `implement-orchestrator` are:
 
-1. The plan itself, usually `docs/plans/<slug>.md` from `afk:grill` or
+1. The plan itself, usually `brain/plans/<slug>.md` from `afk:grill` or
    `brain/plans/<slug>/` from `afk:plan`, or the plan/design the user provided —
-   locate it (check both plan locations) and pass it directly.
+   locate it under `brain/plans/` and pass it directly.
 2. Any constraints or acceptance criteria the user stated that are not already
    captured in the plan.
 3. Rulings for any decision in the plan the orchestrator will treat as a hard

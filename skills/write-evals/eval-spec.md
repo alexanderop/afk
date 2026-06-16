@@ -99,7 +99,7 @@ substrings — origin and path:
 ```json
 {
   "id": "grill-plan-records-reference-repo",
-  "prompt": "Earlier we cloned https://github.com/acme/awesome-streamer into reference/awesome-streamer to copy its SSE pattern. Finish by writing docs/plans/streaming.md for a /chat SSE endpoint that follows that repo.",
+  "prompt": "Earlier we cloned https://github.com/acme/awesome-streamer into reference/awesome-streamer to copy its SSE pattern. Finish by writing brain/plans/streaming.md for a /chat SSE endpoint that follows that repo.",
   "fixture": {
     "files": {
       "reference/awesome-streamer/README.md": "Source: https://github.com/acme/awesome-streamer\n"
@@ -110,9 +110,9 @@ substrings — origin and path:
     "Points implementation at the real cloned source rather than memory"
   ],
   "assertions": {
-    "required_files": ["docs/plans/streaming.md"],
+    "required_files": ["brain/plans/streaming.md"],
     "required_file_substrings": {
-      "docs/plans/streaming.md": ["reference/awesome-streamer", "github.com/acme/awesome-streamer"]
+      "brain/plans/streaming.md": ["reference/awesome-streamer", "github.com/acme/awesome-streamer"]
     }
   }
 }

@@ -22,22 +22,20 @@ Use this skill when:
   of truth.
 
 Do not use this skill for tiny mechanical edits, direct bug fixes with an
-obvious cause, or execution of an already-written plan (`brain/plans/` or
-`docs/plans/`).
+obvious cause, or execution of an already-written plan (`brain/plans/`).
 
 ## Process
 
 1. Ground yourself before asking the first question. Read the relevant code,
    tests, configs, routes, schemas, package manifests, README instructions,
    and any nearby plans or specs.
-2. Read the domain context and project memory. Start with `CONTEXT.md`; if
-   `CONTEXT-MAP.md` exists, follow the map. Read relevant files in `docs/adr/`.
-   Then read the brain's principles if the vault has them: `brain/index.md`,
-   then `brain/principles.md` and each principle file it links. The SessionStart
-   hook surfaces the index; ground your questions and the plan in those
-   principles, and do not ask the user to restate anything the brain already
-   records. A fresh project may have no principles yet — that is fine; do not
-   invent them.
+2. Read the domain context and project memory from the brain vault. The
+   SessionStart hook injects `brain/index.md`; from it read `brain/context.md`
+   (the domain glossary), the relevant notes in `brain/decisions/` (ADRs), and
+   `brain/principles.md` plus each principle file it links. Ground your
+   questions and the plan in those, and do not ask the user to restate anything
+   the brain already records. A fresh project may have an empty or missing
+   vault — that is fine; do not invent content.
 3. Research real documentation automatically whenever the work touches a
    library, framework, SDK, API, CLI, or cloud service — before asking, and
    before writing any technical contract into the plan. Do not rely on training
@@ -59,7 +57,7 @@ obvious cause, or execution of an already-written plan (`brain/plans/` or
      documentation (via a docs MCP server such as Context7 when available, else
      fetched official docs). Report source URLs, version notes, exact API
      shapes, recommendations, and risks that affect the plan.
-   - Domain scout, when useful: read `CONTEXT.md`, `CONTEXT-MAP.md`, and ADRs.
+   - Domain scout, when useful: read `brain/context.md` and `brain/decisions/`.
      Report glossary conflicts, prior decisions, and terms needing precision.
 5. Synthesize the research yourself. Verify important claims against files or
    fetched sources before using them.
@@ -74,7 +72,7 @@ obvious cause, or execution of an already-written plan (`brain/plans/` or
 7. Ask the next best question, one at a time, and wait for the answer before
    continuing. Include your recommended answer and the reason for it.
 8. Challenge glossary conflicts immediately. If the user uses a term
-   differently from `CONTEXT.md`, say what the glossary says and ask which
+   differently from `brain/context.md`, say what the glossary says and ask which
    meaning is authoritative.
 9. Sharpen fuzzy or overloaded language. Propose canonical terms when concepts
    such as `account`, `user`, `customer`, `order`, or `cancellation` may mean
@@ -90,8 +88,8 @@ obvious cause, or execution of an already-written plan (`brain/plans/` or
     bar to fail it against.
 11. Cross-reference user claims against code and fetched sources. Surface
     contradictions explicitly and ask which source should win.
-12. Update `CONTEXT.md` immediately when a glossary term is resolved. Use it
-    only as a glossary: no implementation details, specs, scratch notes, or
+12. Update `brain/context.md` immediately when a glossary term is resolved. Use
+    it only as a glossary: no implementation details, specs, scratch notes, or
     plan content. If creating it, use [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 13. Offer an ADR only when the decision is hard to reverse, surprising without
     context, and the result of a real trade-off. If creating one, use
@@ -103,9 +101,8 @@ obvious cause, or execution of an already-written plan (`brain/plans/` or
     locally ("do it like that repo", "see the pattern in Y"), read it and record
     it in the plan: its origin (GitHub URL or name) and its local path, so
     implementation reads the real source instead of a remembered pattern.
-16. Write the agreed plan. If the brain vault exists (a `brain/` directory),
-    write to `brain/plans/<slug>.md` and add a wikilink to it in
-    `brain/plans/index.md`; otherwise write to `docs/plans/<slug>.md`. (Do not
+16. Write the agreed plan to `brain/plans/<slug>.md` and add a wikilink to it in
+    `brain/plans/index.md`, creating the vault if it does not exist yet. (Do not
     edit `brain/index.md` — the auto-index hook maintains it.) Include decisions
     made, contracts between parts, relevant glossary or ADR updates, an explicit
     `## Acceptance` bar for experience-bearing work (the user-visible quality
@@ -140,7 +137,7 @@ fetched primary sources.
 | "I can ask the user how the code works." | Read the code first and ask only when the code conflicts with intent or another source. |
 | "The plan is mostly obvious." | Non-trivial work needs explicit contracts, edge cases, and source-of-truth decisions before implementation. |
 | "The data contracts are nailed, so the plan is ready." | For experience-bearing work, contracts aren't the bar. Name the user-visible quality bar (the insight, what's legible at a glance) as `## Acceptance`, or implement ships something that runs but doesn't deliver. |
-| "I'll batch glossary updates at the end." | Update `CONTEXT.md` when the term is resolved so later questions use the canonical meaning. |
+| "I'll batch glossary updates at the end." | Update `brain/context.md` when the term is resolved so later questions use the canonical meaning. |
 | "This decision feels important, so it needs an ADR." | ADRs are only for decisions that are hard to reverse, surprising without context, and trade-off driven. |
 | "A subagent report is enough." | The lead must synthesize and verify important claims before asking or planning. |
 | "I know this library/API well enough to write the contract." | Training data drifts. Fetch the current docs and verify every API name, parameter, and version before it goes in the plan. |
@@ -148,8 +145,7 @@ fetched primary sources.
 
 ## Output
 
-Create the plan file (`brain/plans/<slug>.md` when the brain vault exists,
-otherwise `docs/plans/<slug>.md`) with this shape:
+Create the plan file (`brain/plans/<slug>.md`) with this shape:
 
 ```markdown
 # <Plan Title>
@@ -196,7 +192,7 @@ every slice, give the files it **owns** and what it **depends on**.
 ```
 
 End the session by telling the user the plan is ready, naming the exact plan
-path (`brain/plans/<slug>.md` or `docs/plans/<slug>.md`), and stating that it is
+path (`brain/plans/<slug>.md`), and stating that it is
 the input to `afk:implement`
 (or `afk:batch` when the plan splits into many independently-mergeable units the
 user wants implemented as parallel PRs).
