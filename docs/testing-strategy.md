@@ -24,7 +24,7 @@ bun run test
 |----------|-------|------|-----------------|---------|
 | Unit | One file or one deterministic rule | Zero token | `bun run test:unit` | Catch malformed manifests, invalid skill or agent frontmatter, overlong descriptions, oversized instruction files, and test pipeline shape regressions. |
 | Integration | Relationships across plugin files | Zero token | `bun run test:integration` | Catch mismatches between skill directory names, supporting files, eval specs, help catalog entries, README references, and plugin manifests. |
-| End-to-end | Claude Code loading or exercising the plugin | Model-backed | `bun run test:e2e`, `bun run test:evals` | Catch failures Claude Code would report only at runtime, such as plugin registration errors or behavioral regressions. |
+| End-to-end | Claude Code loading or exercising the plugin | Model-backed | `bun run test:e2e`, `bun run test:evals`, `bun run test:triggers` | Catch failures Claude Code would report only at runtime, such as plugin registration errors or behavioral regressions. |
 
 ## Unit Checks
 
@@ -102,6 +102,31 @@ Good future end-to-end checks:
 - Keep each E2E scenario to one or two turns unless it is explicitly an eval,
   not a smoke test.
 
+## Trigger-Activation Runner
+
+`bun run test:triggers` measures whether AFK skills fire organically from bare
+natural-language prompts (no `/afk:` prefix). It reads a single shared corpus
+at `tests/e2e/triggers/corpus.json`, sends each prompt headless through
+`claude -p`, and detects which AFK skill fires first (the first `Skill`
+tool-use naming an `afk:` skill).
+
+Three metrics are reported over the corpus:
+
+- **Activation %** — positive queries where any AFK skill fired.
+- **Accuracy %** — positive queries where the expected owner fired.
+- **False-positive %** — `none` queries where any AFK skill fired.
+
+The runner runs 3 trials per query (strict-majority vote per query) and prints
+a confusion matrix (expected owner × fired skill). It exits non-zero if
+activation < 80%, false-positive > 10%, or any per-query majority fails.
+
+Cost is approximately $10–14 per full suite. This check is local and
+pre-release only — it is not in `bun run test` and not in CI. Env knobs
+mirror `AFK_EVAL_*`: `AFK_TRIGGER_TRIALS`, `AFK_TRIGGER_MAX_BUDGET_USD`,
+`AFK_TRIGGER_TIMEOUT_SECONDS`, `AFK_TRIGGER_ACTIVATION_MIN`,
+`AFK_TRIGGER_FP_MAX`, `AFK_TRIGGER_OUT_DIR`, `AFK_TRIGGER_SKILL`,
+`AFK_TRIGGER_QUERY`.
+
 ## Behavioral Evals
 
 Behavioral evals are not the same as CI smoke tests. They specify expected
@@ -153,6 +178,7 @@ CI should keep the same shape as local checks:
 - Always run `bun run test`, which includes unit and integration checks.
 - Run end-to-end checks only when `ANTHROPIC_API_KEY` is configured.
 - Skip smoke cleanly for forks or unauthenticated environments.
+- `bun run test:triggers` is local pre-release only — never in CI.
 
 The current GitHub workflow follows this policy in
 `.github/workflows/checks.yml`.

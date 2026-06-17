@@ -9,7 +9,7 @@
     {
       "name": "afk",
       "source": "./",
-      "version": "1.11.0",
+      "version": "1.12.0",
       "description": "A help router plus a coding flow: prototype (throwaway logic/UI exploration) → grill (relentless plan interview, docs-aware) → implement (lead plans, workers run bounded TDD slices) → simplify (parallel cleanup) → qa (frontend/backend evidence verification). Plus a persistent brain/ memory vault the flow reads before acting and writes back to as it learns.",
       "category": "workflows",
       "keywords": ["afk", "help", "prototype", "grill", "delegation", "subagents", "deduplication", "browser-qa", "memory", "brain", "reflect", "obsidian"]

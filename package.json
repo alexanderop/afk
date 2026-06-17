@@ -8,6 +8,7 @@
     "test:unit": "bun tests/unit/run-unit-tests.ts",
     "test:integration": "bun tests/integration/run-integration-tests.ts",
     "test:e2e": "bun tests/e2e/plugin-load.ts",
-    "test:evals": "bun tests/e2e/evals/run-evals.ts"
+    "test:evals": "bun tests/e2e/evals/run-evals.ts",
+    "test:triggers": "bun tests/e2e/triggers/run-triggers.ts"
   }
 }

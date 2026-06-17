@@ -101,8 +101,6 @@ function checkEvalSpecs(): void {
 
     if (fileName === "evals.json") {
       checkBehavioralEvalSpec(evalJsonPath, json, evalSkill);
-    } else if (fileName === "triggers.json") {
-      checkTriggerSpec(evalJsonPath, json);
     } else {
       run.fail(`${rel(evalJsonPath)} has recognized eval filename`, fileName);
     }
@@ -171,16 +169,83 @@ function checkBehavioralEvalSpec(path: string, json: unknown, evalSkill: string)
   }
 }
 
-function checkTriggerSpec(path: string, json: unknown): void {
-  const valid =
-    Array.isArray(json) &&
-    json.length > 0 &&
-    json.every((entry) => isObject(entry) && typeof entry.query === "string" && entry.query.length > 0 && typeof entry.should_trigger === "boolean");
+function checkTriggerCorpus(): void {
+  run.section("trigger corpus");
 
-  if (valid) {
-    run.pass(`${rel(path)} trigger entries have required fields`);
+  const corpusPath = fromPluginRoot("tests", "e2e", "triggers", "corpus.json");
+
+  if (!existsSync(corpusPath)) {
+    run.fail(`${rel(corpusPath)} exists`);
+    return;
+  }
+
+  run.pass(`${rel(corpusPath)} exists`);
+
+  const json = assertJsonFile(corpusPath, rel(corpusPath));
+  if (!json) {
+    return;
+  }
+
+  if (!Array.isArray(json) || json.length === 0) {
+    run.fail(`${rel(corpusPath)} is a non-empty array`);
+    return;
+  }
+
+  run.pass(`${rel(corpusPath)} is a non-empty array`);
+
+  let entriesValid = true;
+  for (const entry of json) {
+    if (
+      !isObject(entry) ||
+      typeof entry.query !== "string" ||
+      entry.query.length === 0 ||
+      typeof entry.owner !== "string" ||
+      entry.owner.length === 0
+    ) {
+      entriesValid = false;
+      break;
+    }
+  }
+
+  if (entriesValid) {
+    run.pass(`${rel(corpusPath)} entries have required fields`);
   } else {
-    run.fail(`${rel(path)} trigger entries have required fields`);
+    run.fail(`${rel(corpusPath)} entries have required fields`);
+    return;
+  }
+
+  let ownersValid = true;
+  for (const entry of json as Array<{ query: string; owner: string }>) {
+    if (entry.owner !== "none" && !hasSkill(entry.owner)) {
+      run.fail(`${rel(corpusPath)} every owner is none or an existing skill`, `unknown owner: ${entry.owner}`);
+      ownersValid = false;
+      break;
+    }
+  }
+
+  if (ownersValid) {
+    run.pass(`${rel(corpusPath)} every owner is none or an existing skill`);
+  }
+
+  const coveredSkills = new Set(
+    (json as Array<{ query: string; owner: string }>)
+      .map((e) => e.owner)
+      .filter((o) => o !== "none")
+  );
+  const uncoveredSkills = [...validSkills].filter((s) => !coveredSkills.has(s));
+
+  if (uncoveredSkills.length === 0) {
+    run.pass(`${rel(corpusPath)} every skill covered by at least one query`);
+  } else {
+    run.fail(`${rel(corpusPath)} every skill covered by at least one query`, `uncovered: ${uncoveredSkills.join(", ")}`);
+  }
+
+  const hasNoneEntry = (json as Array<{ query: string; owner: string }>).some((e) => e.owner === "none");
+
+  if (hasNoneEntry) {
+    run.pass(`${rel(corpusPath)} has at least one none query`);
+  } else {
+    run.fail(`${rel(corpusPath)} has at least one none query`);
   }
 }
 
@@ -341,6 +406,7 @@ function checkMarketplace(): void {
 console.log("=== Integration tests (Bun, zero-token) ===");
 
 checkEvalSpecs();
+checkTriggerCorpus();
 checkInternalFileReferences();
 checkMarkdownLinks();
 checkSkillCatalog();

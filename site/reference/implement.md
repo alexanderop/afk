@@ -44,6 +44,8 @@ Invoke as `/afk:implement`. Load this skill before any repo-changing work: editi
 Implement triages complexity first, then routes accordingly. Simple test-free changes (docs, config, copy, a one-liner) run in the main conversation. Everything else, meaning any change that needs a test, goes through lead-orchestrated slices: a read-only `implement-orchestrator` decides architecture, contracts, slice boundaries, and sequencing, then bounded `implementation-worker` agents run local TDD slices (write failing test → implement smallest passing change → refactor → report evidence).
 
 - The lead does not research or design before delegating; that is the orchestrator's job.
+- Each slice is a **vertical tracer bullet**: one behavior with its test *and* its implementation owned by one worker. The orchestrator never splits a tests-only slice from an implementation-only slice (no horizontal slicing), and sequences the thinnest end-to-end path first as a tracer bullet.
+- Every worker test must clear a **test-quality bar**: verify observable behavior through the public interface; mock only at system boundaries (external APIs, database, time, randomness), never internal collaborators; and never assert on call counts/order or verify through a side channel. The reviewer rejects green-but-implementation-coupled tests.
 - Independent slices run in parallel; dependent slices run sequentially. Two workers never edit the same file concurrently.
 - After workers complete, the main conversation reads the actual diff, runs the full test suite, and verifies integration.
 

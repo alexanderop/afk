@@ -43,7 +43,9 @@ throwaway exploration before committed planning.
 The `brain/` vault skills (`init-brain`, `brain`, `reflect`, `ruminate`,
 `meditate`, `plan`, `review`) keep a persistent Obsidian-compatible store of
 your project's principles, gotchas, and decisions — wired into the flow
-automatically.
+automatically. `/afk:init-brain` also authors a tight `CLAUDE.md` (with an
+`AGENTS.md` symlink) that onboards any agent to the repo and points at the
+brain.
 
 For per-skill detail see the [Reference](https://alexanderop.github.io/afk/reference/help) section of the docs.
 
@@ -76,6 +78,7 @@ See [docs/testing-strategy.md](docs/testing-strategy.md) for the full approach.
 bun run test              # zero-token unit + integration checks (run on every edit)
 bun run test:e2e          # one cheap headless turn (~$0.01): plugin actually loads
 bun run test:evals        # model-backed behavioral evals via claude -p
+bun run test:triggers     # model-backed: do skills fire from bare prompts? (pre-release only)
 ```
 
 ## Credits

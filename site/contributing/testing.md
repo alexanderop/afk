@@ -6,10 +6,10 @@ levels, from instant zero-token static checks up to model-backed behavioral
 evals that make real LLM calls.
 
 ```
-unit + integration  →  e2e smoke  →  behavioral evals
-   bun run test          test:e2e        test:evals
-   zero tokens          ~$0.01         real LLM calls
-   every edit           before release  before release
+unit + integration  →  e2e smoke  →  behavioral evals  →  trigger activation
+   bun run test          test:e2e        test:evals          test:triggers
+   zero tokens          ~$0.01         real LLM calls       ~$10–14
+   every edit           before release  before release       before release
 ```
 
 The rule of thumb: **`bun run test` runs on every edit** (it costs nothing and
@@ -116,6 +116,26 @@ The invariant: **write the eval red first**. A case that cannot fail proves
 nothing. See [Eval-first](/concepts/eval-first) for how this drives the flow, and
 the [write-evals](/reference/write-evals) skill for scaffolding new specs.
 
+### Trigger activation: `bun run test:triggers`
+
+The Trigger-Activation Runner measures whether AFK skills fire *organically* from
+bare natural-language prompts — no `/afk:` prefix. It reads a single shared corpus
+at `tests/e2e/triggers/corpus.json`, sends each prompt headless through
+`claude -p`, and detects which AFK skill fires first (the first `Skill` tool-use
+naming an `afk:` skill).
+
+It reports three metrics over the corpus:
+
+- **Activation %** — positive queries where any AFK skill fired.
+- **Accuracy %** — positive queries where the expected owner fired.
+- **False-positive %** — `none` queries where any AFK skill fired.
+
+The runner runs 3 trials per query (strict-majority vote per query), prints a
+confusion matrix (expected owner × fired skill), and exits non-zero if activation
+< 80%, false-positive > 10%, or any per-query majority fails. Cost is roughly
+$10–14 per full suite, so this check is **local pre-release only** — it is not in
+`bun run test` and not in CI.
+
 ## Where things live
 
 | Path | What |
@@ -136,5 +156,5 @@ the [write-evals](/reference/write-evals) skill for scaffolding new specs.
   `tests/e2e/evals/specs/<skill>/evals.json` and prove it fails before your
   change makes it pass.
 
-Run `bun run test` before every commit; run `bun run test:e2e` and
-`bun run test:evals` before cutting a release.
+Run `bun run test` before every commit; run `bun run test:e2e`,
+`bun run test:evals`, and `bun run test:triggers` before cutting a release.

@@ -35,7 +35,7 @@ test runners. No build step for the plugin itself.
 
 ## Rules
 
-- `bun run test:e2e` and `bun run test:evals` make real LLM calls — run them before release,
+- `bun run test:e2e`, `bun run test:evals`, and `bun run test:triggers` make real LLM calls — run them before release,
   not on every edit. `bun run test` is the every-edit check.
 - Skill prose is the product: instruction-budget rules apply. Tight scope, no
   redundant instructions, pointers over copies. SKILL.md stays under 500 lines;

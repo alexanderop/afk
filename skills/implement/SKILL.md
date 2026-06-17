@@ -176,6 +176,10 @@ brief must include:
 - Code conventions to follow, with a concrete existing file to mimic.
 - The local TDD loop: write the failing test, implement the smallest passing
   change, refactor locally, and report evidence.
+- The test-quality bar: the test verifies observable behavior through the public
+  interface, mocks only at system boundaries (external APIs, database, time,
+  randomness) and never internal collaborators, and does not assert on call
+  counts/order or verify through a side channel.
 - The verification command to run before reporting back.
 - Hard boundaries: no neighboring refactors, no new dependencies, no renames,
   and no work outside the brief unless explicitly allowed.
@@ -183,6 +187,13 @@ brief must include:
 Use `implementation-worker` for edit-capable implementation slices by default.
 Only choose a different worker when the task clearly needs a specialized agent
 or a cheaper model for mechanical boilerplate.
+
+Each slice is a vertical tracer bullet: one behavior with its test and its
+implementation owned by one worker. Never split the work into a tests-only slice
+and a separate implementation-only slice — that is horizontal slicing, and it
+produces tests written against imagined behavior. Sequence the thinnest
+end-to-end path first to prove it works, then add edge cases as incremental
+slices.
 
 Maximize parallelism: dispatch independent slices (disjoint files, no shared
 contract) concurrently, in the waves the plan provides when it has them. Run
@@ -280,6 +291,8 @@ context and keep moving.
 | "I'll design the shared contract in the lead and just hand workers the call sites" | Contract design is the orchestrator's job. Designing it yourself is delegated architecture in reverse. Hand it the plan; let it freeze the contract and fan out the work. |
 | "The plan already fixed every contract, so I'll just execute it directly" | A decided plan is the orchestrator's input, not a reason to skip it. Frozen contracts still need bounded parallel slices and independent review. Hand the plan to `implement-orchestrator`. |
 | "Typecheck and unit tests are green, so it's done" | The static gate doesn't exercise runtime or cross-slice behavior. Boot the page, round-trip the form, run the migration chain. Green tests have shipped blank pages, 422s, and broken foreign keys. |
+| "One worker writes the tests, another writes the code" | That's horizontal slicing — tests written against imagined behavior. Each slice is one behavior with its test and implementation together, run red-green-refactor by one worker. |
+| "The test passes, so it's a good test" | A green test that mocks internal collaborators, asserts call counts/order, tests private methods, or verifies through a side channel is coupled to implementation and breaks on refactor. Reject it; tests verify observable behavior through the public interface. |
 
 ## Output
 

@@ -1,0 +1,107 @@
+[
+  { "query": "grill me on this feature idea", "owner": "grill" },
+  { "query": "Stress-test this migration plan before we build it", "owner": "grill" },
+  { "query": "I have a vague product idea and need to turn it into an implementation plan", "owner": "grill" },
+  { "query": "Ask me the questions needed before implementation", "owner": "grill" },
+  { "query": "Grill me before we build team billing", "owner": "grill" },
+  { "query": "Grill me on this vague billing idea", "owner": "grill" },
+
+  { "query": "What should I do next in AFK?", "owner": "help" },
+  { "query": "afk help", "owner": "help" },
+  { "query": "Which AFK skill should I use here?", "owner": "help" },
+  { "query": "Where am I in the AFK workflow?", "owner": "help" },
+  { "query": "Show me every AFK skill", "owner": "help" },
+
+  { "query": "Implement the plan in brain/plans/search.md", "owner": "implement" },
+  { "query": "Fix this bug and run the tests", "owner": "implement" },
+  { "query": "Build the checkout feature from this design", "owner": "implement" },
+  { "query": "Make the repo changes for this refactor", "owner": "implement" },
+  { "query": "Run the tests and fix the failing assertion", "owner": "implement" },
+  { "query": "The plan is written; implement brain/plans/auth.md", "owner": "implement" },
+  { "query": "Implement brain/plans/search.md", "owner": "implement" },
+
+  { "query": "Prototype this dashboard with a few different layouts", "owner": "prototype" },
+  { "query": "Let me play with this state machine before we build it", "owner": "prototype" },
+  { "query": "Mock up three settings page directions", "owner": "prototype" },
+  { "query": "Sanity-check the API shape before we commit to this design", "owner": "prototype" },
+
+  { "query": "Research the prior art for rate-limiting algorithms before we plan this", "owner": "research" },
+  { "query": "How do other teams solve multi-tenant billing? Scan the landscape.", "owner": "research" },
+  { "query": "What's the external best practice for vector database chunking right now?", "owner": "research" },
+  { "query": "Check competitor patterns and cross-domain analogies for our onboarding flow", "owner": "research" },
+  { "query": "What's the prior art for event-sourcing in a SaaS billing context?", "owner": "research" },
+
+  { "query": "Run the whole AFK flow and ship this feature", "owner": "ship" },
+  { "query": "Take this from plan to a ship/no-ship verdict", "owner": "ship" },
+  { "query": "Resume the AFK workflow and finish it to evidence", "owner": "ship" },
+  { "query": "Use afk:ship on brain/plans/auth.md", "owner": "ship" },
+  { "query": "Run the whole flow end to end and give me a go/no-go", "owner": "ship" },
+
+  { "query": "QA this browser flow and capture screenshots", "owner": "qa" },
+  { "query": "Verify this UI flow in the browser", "owner": "qa" },
+  { "query": "QA this browser flow", "owner": "qa" },
+  { "query": "Implementation is done — verify it actually works before we ship", "owner": "qa" },
+  { "query": "Make a ship/no-ship call on the auth change we just merged", "owner": "qa" },
+
+  { "query": "Simplify the changed code without looking for bugs", "owner": "simplify" },
+  { "query": "Simplify the changed code without hunting bugs", "owner": "simplify" },
+  { "query": "Simplify the current diff", "owner": "simplify" },
+  { "query": "DRY up the code we just landed", "owner": "simplify" },
+
+  { "query": "Review my changes for bugs before I open a PR", "owner": "review" },
+  { "query": "Code review these changes against our brain principles", "owner": "review" },
+  { "query": "Critique this PR and give me numbered findings", "owner": "review" },
+  { "query": "Assess the quality of the plan I just wrote", "owner": "review" },
+
+  { "query": "We're doing a codebase-wide rename of UserID to AccountID — run these as parallel PRs", "owner": "batch" },
+  { "query": "This migration touches 40 independent files — fan them out as separate PRs", "owner": "batch" },
+  { "query": "Apply this repeated pattern change across all service modules in parallel", "owner": "batch" },
+  { "query": "The spec breaks into 12 independently-mergeable units — batch them", "owner": "batch" },
+
+  { "query": "Add this architecture principle to the brain", "owner": "brain" },
+  { "query": "Remember this codebase gotcha about our DB connection pooling", "owner": "brain" },
+  { "query": "Add a note to brain/ about the rate-limiter edge case we just found", "owner": "brain" },
+  { "query": "Write this decision to brain so future sessions can read it", "owner": "brain" },
+
+  { "query": "Init brain for this new project", "owner": "init-brain" },
+  { "query": "Set up the brain vault here so I can start using memory skills", "owner": "init-brain" },
+  { "query": "Create the brain vault in this repo for the first time", "owner": "init-brain" },
+
+  { "query": "Meditate on the brain and prune anything outdated", "owner": "meditate" },
+  { "query": "Audit the brain vault and find cross-cutting principles", "owner": "meditate" },
+  { "query": "Review the brain for low-value notes and clean it up", "owner": "meditate" },
+
+  { "query": "Plan the auth refactor and write it to brain/plans/", "owner": "plan" },
+  { "query": "Break down this multi-file feature into a phased plan", "owner": "plan" },
+  { "query": "Plan this architectural change with principles from the brain", "owner": "plan" },
+  { "query": "Break this down into phases before we touch any code", "owner": "plan" },
+
+  { "query": "Reflect on what we just learned and persist it to the brain", "owner": "reflect" },
+  { "query": "We just fixed a tricky bug — reflect so we remember this", "owner": "reflect" },
+  { "query": "Wrap up this session and write any key learnings into the brain", "owner": "reflect" },
+
+  { "query": "Ruminate on my Claude conversation history for patterns I missed", "owner": "ruminate" },
+  { "query": "Mine my past sessions for corrections I never wrote into the brain", "owner": "ruminate" },
+  { "query": "Go through old conversations and extract knowledge for the brain vault", "owner": "ruminate" },
+
+  { "query": "Write evals for the new summarizer skill before we implement it", "owner": "write-evals" },
+  { "query": "Generate behavioral eval cases for this LLM-judge agent", "owner": "write-evals" },
+  { "query": "Scaffold an eval harness for the search feature we're about to build", "owner": "write-evals" },
+  { "query": "Add a failing eval for the routing behavior before we fix it", "owner": "write-evals" },
+
+  { "query": "Help me write a tight completion condition for this long-running agent task", "owner": "write-good-goal" },
+  { "query": "Refine the /goal so it has a clear definition of done", "owner": "write-good-goal" },
+  { "query": "Draft a bounded objective with success criteria for this feature", "owner": "write-good-goal" },
+  { "query": "Validate my goal statement — does it have a clear ship condition?", "owner": "write-good-goal" },
+
+  { "query": "Look up the exact signature of React's useEffect cleanup function", "owner": "none" },
+  { "query": "What's the weather in Berlin today?", "owner": "none" },
+  { "query": "Explain how a TCP three-way handshake works", "owner": "none" },
+  { "query": "What's the time complexity of quicksort?", "owner": "none" },
+  { "query": "What year was the Eiffel Tower built?", "owner": "none" },
+  { "query": "Write me a haiku about distributed systems", "owner": "none" },
+  { "query": "What's the capital of Australia?", "owner": "none" },
+  { "query": "Translate 'hello world' into Spanish", "owner": "none" },
+  { "query": "How do I center a div in CSS?", "owner": "none" },
+  { "query": "What's 17 multiplied by 83?", "owner": "none" }
+]

@@ -36,6 +36,15 @@ or run shell commands.
   straitjacket: when it does not survive contact with the code (wrong file
   ownership, a hidden dependency, or a task that must split into two
   differently-dependent slices), re-slice it and state why.
+- Slice vertically, never horizontally. Each slice is one behavior with its test
+  and its implementation owned by the same worker. Never carve a tests-only slice
+  and a separate implementation-only slice (or a tests wave then an implementation
+  wave) — that produces tests written against imagined behavior. If a plan task is
+  phrased that way ("write the test suite", then "implement it"), re-slice it into
+  per-behavior vertical slices and state why.
+- Sequence the thinnest end-to-end happy path first as a tracer bullet that
+  proves the whole path works, then add validation and edge cases as incremental
+  slices behind it.
 - Never assign two workers to edit the same file concurrently.
 - Delegate only when the slice has fixed inputs, fixed files, and a local
   verification command.
@@ -62,6 +71,11 @@ Each implementation-worker brief must include:
   brain note constrains the slice.
 - The required TDD loop: failing test, smallest passing implementation,
   local refactor, and final verification.
+- The test-quality bar: the slice's test verifies observable behavior through the
+  public interface (return values and retrievable state), mocks only at system
+  boundaries (external APIs, database, time, randomness) and never internal
+  collaborators, and does not assert on call counts/order or verify through a
+  side channel. A green test coupled to implementation is a defect, not evidence.
 - The exact verification command, scoped to the files the slice owns. Tell the
   worker that tests owned by other in-flight slices may be red because those
   slices have not landed yet, and that fixing them is not its job.
@@ -77,6 +91,10 @@ When workers report back:
    test that another in-flight slice owns — that is a scheduling artifact, not a
    defect. Confirm it against slice ownership before asking for a fix, and
    re-check once the owning slice has landed.
+   Also reject green-but-implementation-coupled tests: a test that mocks internal
+   collaborators, asserts on call counts/order, tests private methods, or verifies
+   through a side channel instead of the public interface is a defect even when it
+   passes — ask for a corrective pass that re-targets it at observable behavior.
 2. Ask for a corrective worker pass once when the problem is local and the
    contract is still sound.
 3. If the same slice fails twice, report that the lead should finish it in the

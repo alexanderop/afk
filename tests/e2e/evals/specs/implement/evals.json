@@ -263,6 +263,67 @@
         "forbidden_substrings": ["workers read the brain", "ignore the brain principles"],
         "unchanged_files": ["brain/plans/add-invoice-totals.md", "src/invoices.ts", "brain/principles/money-is-integer-cents.md"]
       }
+    },
+    {
+      "id": "implement-slices-vertically-not-horizontally",
+      "prompt": "Implement brain/plans/csv-parser.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain how AFK Implement turns it into implementation-worker slices — specifically, for each worker, whether it writes the test, the implementation, or both, and how a single worker's red-green-refactor loop runs.",
+      "expected_output": "Each worker slice is a vertical tracer bullet: one behavior with its failing test and its implementation owned by the same worker, run red-green-refactor inside the slice. The orchestrator re-slices the plan's test-suite-then-implement split and does not create a tests-only slice and a separate implementation-only slice (horizontal slicing).",
+      "fixture": {
+        "files": {
+          "brain/plans/csv-parser.md": "# CSV Parser Plan\n\n## Context\nWe need a small CSV parser in src/csv.ts.\n\n## Decisions\nParse rows and files; support quoted fields containing commas.\n\n## Contracts\nparseRow(line) returns an array of fields. parseFile(text) returns an array of rows. Quoted fields preserve embedded commas. All live in src/csv.ts.\n\n## Tasks\n1. Write the full test suite for parseRow, parseFile, and quoted fields.\n2. Implement parseRow, parseFile, and quoted-field handling to pass the suite.\n"
+        }
+      },
+      "expectations": [
+        "Routes the work through implement-orchestrator with implementation-worker slices",
+        "Each worker slice pairs one behavior's failing test with its implementation (a vertical slice), rather than one worker writing all tests and another writing all implementation",
+        "Rejects the plan's split into a tests-only task and a separate implementation-only task (horizontal slicing) and re-slices it vertically by behavior",
+        "Each slice runs red-green-refactor within its own boundary"
+      ],
+      "assertions": {
+        "required_substrings": ["implement-orchestrator", "implementation-worker", "vertical"],
+        "unchanged_files": ["brain/plans/csv-parser.md"]
+      }
+    },
+    {
+      "id": "implement-worker-brief-sets-test-quality-bar",
+      "prompt": "Implement brain/plans/checkout-charge.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain exactly what each implementation-worker brief says about HOW to write the slice's test — what the test should assert against, and how to handle the external payment client.",
+      "expected_output": "Each worker brief sets a test-quality bar: test observable behavior through the public interface; mock only at system boundaries (the external payment client), not internal collaborators; do not assert on call counts/order or test private methods. The review rejects green-but-implementation-coupled tests.",
+      "fixture": {
+        "files": {
+          "brain/plans/checkout-charge.md": "# Checkout Charge Plan\n\n## Context\ncheckout() in src/checkout.ts must charge an order total via an external payment client.\n\n## Decisions\nThe payment client is injected. checkout returns a confirmed result on success.\n\n## Contracts\ncheckout(cart, paymentClient) returns { status } and calls paymentClient.charge at the system boundary. paymentClient is the only external dependency.\n\n## Tasks\n1. Add checkout in src/checkout.ts that charges via the injected payment client.\n",
+          "src/checkout.ts": "export function checkout() {\n  return { status: 'pending' };\n}\n"
+        }
+      },
+      "expectations": [
+        "Routes the work through implement-orchestrator with an implementation-worker slice",
+        "The worker brief says the test verifies observable behavior through the public interface, not internal structure",
+        "The worker brief says to mock only at system boundaries (the external payment client), not internal collaborators",
+        "The worker brief or review forbids implementation-coupled tests such as asserting on call counts/order or testing private methods"
+      ],
+      "assertions": {
+        "required_substrings": ["implement-orchestrator", "boundary", "interface"],
+        "unchanged_files": ["brain/plans/checkout-charge.md", "src/checkout.ts"]
+      }
+    },
+    {
+      "id": "implement-first-slice-is-tracer-bullet",
+      "prompt": "Implement brain/plans/signup-flow.md. Eval mode: do not edit files or invoke subagents; inspect the plan and explain the ORDER in which AFK Implement sequences the worker slices — which slice runs first and why, before the edge cases.",
+      "expected_output": "The first slice is a thin end-to-end tracer bullet that proves the happy path through the whole flow; edge cases and validation come as incremental slices after the tracer bullet is green.",
+      "fixture": {
+        "files": {
+          "brain/plans/signup-flow.md": "# Signup Flow Plan\n\n## Context\nAdd user signup spanning src/signup.ts (logic) and src/signup-view.ts (form).\n\n## Decisions\nHappy path: a valid email and password create an account and return a session. Then add validation and duplicate-email handling.\n\n## Contracts\nsignup(email, password) creates an account and returns a session on the happy path. Edge cases: invalid email, weak password, duplicate email.\n\n## Tasks\n1. Implement the signup happy path end-to-end across src/signup.ts and src/signup-view.ts.\n2. Add email and password validation.\n3. Add duplicate-email handling.\n"
+        }
+      },
+      "expectations": [
+        "Routes the work through implement-orchestrator with implementation-worker slices",
+        "Sequences a thin end-to-end happy-path slice first as a tracer bullet that proves the whole path works",
+        "Schedules validation and duplicate-email edge cases as incremental slices after the tracer bullet is green",
+        "Does not start with edge cases or partial non-runnable layers before the end-to-end path exists"
+      ],
+      "assertions": {
+        "required_substrings": ["implement-orchestrator", "tracer"],
+        "unchanged_files": ["brain/plans/signup-flow.md"]
+      }
     }
   ]
 }
