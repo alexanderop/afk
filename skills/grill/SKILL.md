@@ -28,7 +28,12 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
 
 1. Ground yourself before asking the first question. Read the relevant code,
    tests, configs, routes, schemas, package manifests, README instructions,
-   and any nearby plans or specs.
+   and any nearby plans or specs. If `brain/codebase/` already maps the area
+   you are touching, read that map first and scope your own reading to the gaps
+   it leaves — do not re-discover what it already documents. Each map records the
+   commit it was mapped at; if `git rev-parse --short HEAD` has moved past that
+   and touched the mapped paths, treat the map as history and verify against the
+   current files.
 2. Read the domain context and project memory from the brain vault. The
    SessionStart hook injects `brain/index.md`; from it read `brain/context.md`
    (the domain glossary), the relevant notes in `brain/decisions/` (ADRs), and

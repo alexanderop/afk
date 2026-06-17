@@ -40,8 +40,8 @@ at that verdict). `/afk:batch` is the fan-out alternative to implement: one PR
 per independent unit, run in parallel worktrees. `/afk:prototype` builds a
 throwaway exploration before committed planning.
 
-The `brain/` vault skills (`init-brain`, `brain`, `reflect`, `ruminate`,
-`meditate`, `plan`, `review`) keep a persistent Obsidian-compatible store of
+The `brain/` vault skills (`init-brain`, `brain`, `map-codebase`, `reflect`,
+`ruminate`, `meditate`, `plan`, `review`) keep a persistent Obsidian-compatible store of
 your project's principles, gotchas, and decisions — wired into the flow
 automatically. `/afk:init-brain` also authors a tight `CLAUDE.md` (with an
 `AGENTS.md` symlink) that onboards any agent to the repo and points at the
@@ -54,8 +54,8 @@ For per-skill detail see the [Reference](https://alexanderop.github.io/afk/refer
 Invoke directly: `/afk:help`, `/afk:ship`, `/afk:grill`, `/afk:implement`,
 `/afk:batch`, `/afk:simplify`, `/afk:qa`, `/afk:prototype`,
 `/afk:write-good-goal`, `/afk:research`, and the brain skills `/afk:brain`,
-`/afk:init-brain`, `/afk:reflect`, `/afk:ruminate`, `/afk:meditate`,
-`/afk:plan`, `/afk:review`.
+`/afk:init-brain`, `/afk:map-codebase`, `/afk:reflect`, `/afk:ruminate`,
+`/afk:meditate`, `/afk:plan`, `/afk:review`.
 Run `/doctor` to check plugin loading.
 
 ## What lands in your repo
@@ -68,6 +68,7 @@ brain/decisions/NNNN-*.md    #   ADRs worth recording, offered sparingly by gril
 brain/plans/<slug>.md        #   the agreed plan, input to /afk:implement
 brain/prototypes/            #   prototype verdict notes for throwaway exploration
 brain/principles/            #   principles + gotchas the flow reads before acting
+brain/codebase/              #   as-is maps of how areas work, by /afk:map-codebase
 ```
 
 ## Testing the plugin

@@ -12,7 +12,8 @@ brain/
 ├── index.md          ← root entry point, links to everything (auto-built)
 ├── principles.md     ← index for principles/
 ├── principles/       ← engineering and design principles
-├── codebase/         ← project-specific knowledge and gotchas
+├── codebase.md       ← index for codebase/
+├── codebase/         ← as-is maps of how areas work, plus gotchas (from map-codebase)
 ├── sources.md        ← index for sources/ (when doc sites exist)
 ├── sources/          ← pointers to external authoritative docs
 └── plans/            ← feature plans from afk:grill and afk:plan
@@ -63,6 +64,7 @@ The flow is wired to the vault at both ends:
 |---|---|
 | [init-brain](/reference/init-brain) | Scaffold the vault in a project (also created on demand) |
 | [brain](/reference/brain) | Read or write the vault directly |
+| [map-codebase](/reference/map-codebase) | Map how an existing area works as-is into a commit-pinned `brain/codebase/` note that grill and implement read as ground |
 | [reflect](/reference/reflect) | Capture this session's learnings into the brain |
 | [ruminate](/reference/ruminate) | Mine past Claude Code conversations for patterns reflect missed |
 | [meditate](/reference/meditate) | Audit and prune the vault; distill cross-cutting principles |

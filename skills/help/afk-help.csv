@@ -9,6 +9,7 @@ afk:batch,Batch,B,Fan an independently-mergeable plan out into many parallel wor
 afk:simplify,Simplify,S,Run a focused cleanup pass over the implementation diff for reuse simplification efficiency and altitude issues.,3-cleanup,afk:implement,afk:qa,false,working tree,simplification fixes or a no-change report
 afk:qa,QA,Q,Route by project shape: dogfood-style browser QA for frontends and contract-level service QA for backends.,4-verify,afk:simplify,,false,qa,QA report plus screenshots or request-response evidence
 afk:brain,Brain,M,Read or write the persistent brain/ memory vault of principles and codebase knowledge.,memory,,,false,brain/,brain notes and updated indexes
+afk:map-codebase,Map Codebase,C,Map how an existing area of the codebase works as-is into a reusable commit-pinned brain note.,memory,,,false,brain/codebase,brain/codebase/<area>.md
 afk:init-brain,Init Brain,N,Scaffold the brain/ vault and index in a project for first use.,memory,,,false,brain/,brain/ folder and index.md
 afk:reflect,Reflect,R,Persist learnings from the session into the brain after a run.,memory,,,false,brain/,brain notes plus a reflect summary
 afk:ruminate,Ruminate,U,Mine past Claude Code conversations for uncaptured brain-worthy knowledge.,memory,,,false,brain/,table of findings plus approved brain updates

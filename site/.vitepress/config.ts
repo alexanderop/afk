@@ -76,6 +76,7 @@ export default defineConfig({
             items: [
               { text: 'init-brain', link: '/reference/init-brain' },
               { text: 'brain', link: '/reference/brain' },
+              { text: 'map-codebase', link: '/reference/map-codebase' },
               { text: 'reflect', link: '/reference/reflect' },
               { text: 'ruminate', link: '/reference/ruminate' },
               { text: 'meditate', link: '/reference/meditate' },

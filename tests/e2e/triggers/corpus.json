@@ -31,6 +31,12 @@
   { "query": "Check competitor patterns and cross-domain analogies for our onboarding flow", "owner": "research" },
   { "query": "What's the prior art for event-sourcing in a SaaS billing context?", "owner": "research" },
 
+  { "query": "Map how authentication is wired in this repo and save it to the brain", "owner": "map-codebase" },
+  { "query": "Document the billing module as-is so future sessions start grounded", "owner": "map-codebase" },
+  { "query": "How does the job queue work in this codebase? Write it down as a reusable map.", "owner": "map-codebase" },
+  { "query": "Survey this subsystem and persist a codebase map", "owner": "map-codebase" },
+  { "query": "Give me a durable map of how the API layer is structured today", "owner": "map-codebase" },
+
   { "query": "Run the whole AFK flow and ship this feature", "owner": "ship" },
   { "query": "Take this from plan to a ship/no-ship verdict", "owner": "ship" },
   { "query": "Resume the AFK workflow and finish it to evidence", "owner": "ship" },

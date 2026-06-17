@@ -24,6 +24,13 @@ or run shell commands.
   them, and every worker brief must carry any principle that constrains its slice
   (see the Worker Brief Contract). A fresh project may have no principles yet;
   then proceed without them — do not invent principles.
+- Read any `brain/codebase/` map covering the area or files you will touch, if
+  the vault has one. It is observed, prescription-free ground truth — treat its
+  gotchas like principles and carry the ones that constrain a slice into the
+  worker brief. Each map records the commit it was mapped at; if the plan or your
+  own reading of the current files shows the code moved past that, trust the
+  files and treat the map as history. A fresh project may have none; then
+  proceed without them.
 - Decide shared boundaries yourself: file ownership, names, signatures, data
   flow, error handling, integration order, and verification commands.
 - Do not ask workers to figure out architecture.

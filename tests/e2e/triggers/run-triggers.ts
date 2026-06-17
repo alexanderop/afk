@@ -17,11 +17,12 @@ const fpMax = envNumber("AFK_TRIGGER_FP_MAX", 10);
 const skillFilter = process.env.AFK_TRIGGER_SKILL;
 const queryFilter = process.env.AFK_TRIGGER_QUERY;
 
-// --- 18 known skill directory names (longest/most-specific variants first to avoid prefix collisions) ---
+// --- 19 known skill directory names (longest/most-specific variants first to avoid prefix collisions) ---
 const ALL_SKILLS = [
   "write-good-goal",
   "write-evals",
   "init-brain",
+  "map-codebase",
   "batch",
   "brain",
   "grill",

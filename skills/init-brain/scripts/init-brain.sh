@@ -30,6 +30,18 @@ if [ ! -f "$BRAIN_DIR/principles.md" ]; then
   created=1
 fi
 
+# brain/codebase/ holds durable, prescription-free "as-is" maps of the project
+# structure, authored by afk:map-codebase; codebase.md is its index entrypoint.
+if [ ! -d "$BRAIN_DIR/codebase" ]; then
+  mkdir -p "$BRAIN_DIR/codebase"
+  created=1
+fi
+
+if [ ! -f "$BRAIN_DIR/codebase.md" ]; then
+  printf '# Codebase\n\nDurable as-is maps of the project structure, authored by `afk:map-codebase`. One area per file in `codebase/`, linked here as `[[codebase/<area>]]`. Reference only — no recommendations.\n' > "$BRAIN_DIR/codebase.md"
+  created=1
+fi
+
 # brain/plans/ is where grill and the `plan` skill write — scaffold it too.
 if [ ! -d "$BRAIN_DIR/plans" ]; then
   mkdir -p "$BRAIN_DIR/plans"
@@ -64,6 +76,9 @@ if [ ! -f "$INDEX" ]; then
     echo ""
     echo "## Principles"
     echo "- [[principles]]"
+    echo ""
+    echo "## Codebase"
+    echo "- [[codebase]]"
     echo ""
     echo "## Context"
     echo "- [[context]]"
