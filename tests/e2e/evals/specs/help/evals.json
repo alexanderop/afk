@@ -14,7 +14,7 @@
     {
       "id": "help-no-plan",
       "prompt": "What should I do next?",
-      "expected_output": "Recommends afk:grill when no docs/plans artifact exists for a returning user.",
+      "expected_output": "Recommends afk:grill when no brain/plans artifact exists for a returning user.",
       "kind": "routing",
       "fixture": {
         "files": {

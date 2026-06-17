@@ -1,10 +1,9 @@
 # afk
 
-A Claude Code plugin: a help router plus a five-step coding flow — grill
+A Claude Code plugin: a help router plus a four-step coding flow — grill
 (plan interview) → implement (orchestrator plans, workers run bounded TDD slices) →
-simplify (parallel 4-angle cleanup pass) → qa (frontend/backend evidence verification) →
-work (ship-out: residual-findings gate, then commit, push, and open a PR with a
-post-deploy monitoring plan). `batch` is the fan-out alternative to implement: many
+simplify (parallel 4-angle cleanup pass) → qa (frontend/backend evidence verification).
+`batch` is the fan-out alternative to implement: many
 independent units run as parallel worktree workers, one PR each. The product is the
 markdown itself.
 

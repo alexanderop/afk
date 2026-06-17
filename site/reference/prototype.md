@@ -7,11 +7,11 @@ const scene: Scene = {
   width: 880,
   height: 320,
   nodes: [
-    { id: 'question', x: 20, y: 130, w: 160, h: 46, shape: 'pill', fontSize: 13, label: 'one question' },
+    { id: 'question', x: 20, y: 130, w: 160, h: 46, shape: 'pill', fontSize: 14, label: 'one question' },
     { id: 'route', x: 210, y: 108, w: 160, h: 92, shape: 'diamond', label: 'logic or UI?' },
-    { id: 'term', x: 420, y: 38, w: 210, h: 58, shape: 'round', accent: true, fontSize: 13, label: 'terminal app', sub: 'over pure module' },
-    { id: 'ui', x: 420, y: 200, w: 210, h: 58, shape: 'round', accent: true, fontSize: 13, label: 'UI variants', sub: '?variant= switcher' },
-    { id: 'verdict', x: 680, y: 110, w: 180, h: 88, shape: 'round', fontSize: 13, label: 'delete /', sub: 'absorb / continue' },
+    { id: 'term', x: 420, y: 38, w: 210, h: 58, shape: 'round', accent: true, fontSize: 14, label: 'terminal app', sub: 'over pure module' },
+    { id: 'ui', x: 420, y: 200, w: 210, h: 58, shape: 'round', accent: true, fontSize: 14, label: 'UI variants', sub: '?variant= switcher' },
+    { id: 'verdict', x: 680, y: 110, w: 180, h: 88, shape: 'round', fontSize: 14, label: 'delete /', sub: 'absorb / continue' },
   ],
   edges: [
     { from: 'question', to: 'route' },

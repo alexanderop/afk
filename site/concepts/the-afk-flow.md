@@ -1,6 +1,6 @@
 # The AFK Flow
 
-afk's five-step flow takes you from unclear intent to a verified, shipped
+afk's four-step flow takes you from unclear intent to a verified, shipped
 change. Each skill works standalone: run them in sequence for a feature, grab
 one on its own, or use `/afk:ship` to drive the planning-through-verdict loop
 automatically.
@@ -47,18 +47,9 @@ quality without hunting for bugs.
 changed flow. It routes by project shape: browser QA with direct screenshots
 and console checks for frontend, contract-level API or CLI verification for
 backend, both for hybrids. It ends with a SHIP, DO NOT SHIP, or SHIP WITH
-CAVEATS verdict backed by direct evidence, not just "tests pass".
-
-## work
-
-[work](/reference/work) ships the verdict out. It is the closer for the
-single-diff implement path: after a QA SHIP verdict it runs a residual-findings
-gate over any unresolved review or QA findings (fix, file, accept-and-record, or
-stop), then commits in logical units, pushes, and opens a PR whose description
-links the QA evidence and includes a post-deploy monitoring plan. It confirms
-the earlier gates ran rather than re-running them. `ship` stops at local
-evidence, so `work` is the step you run after it; `batch` already opens its own
-PRs.
+CAVEATS verdict backed by direct evidence, not just "tests pass". qa is the
+closer for the single-diff implement path: `ship` stops at this verdict, and
+`batch` opens its own PRs.
 
 ## batch
 

@@ -261,8 +261,9 @@ export function renderScene(svg: SVGSVGElement, scene: Scene, pal: Palette, font
     const r = resolved(n)
     const size = n.fontSize ?? 15
     if (n.sub) {
+      const subSize = Math.max(size - 2, 11)
       svg.appendChild(text(r.cx, r.cy - 8, n.label, { size, color: pal.text, family: fontFamily, weight: 700 }))
-      svg.appendChild(text(r.cx, r.cy + 11, n.sub, { size: size - 3, color: pal.subText, family: fontFamily }))
+      svg.appendChild(text(r.cx, r.cy + 11, n.sub, { size: subSize, color: pal.subText, family: fontFamily }))
     } else {
       svg.appendChild(text(r.cx, r.cy, n.label, { size, color: pal.text, family: fontFamily, weight: 700 }))
     }

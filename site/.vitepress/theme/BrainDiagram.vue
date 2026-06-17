@@ -13,7 +13,7 @@ const scene: Scene = {
   ],
   nodes: [
     { id: 'principles', x: 40, y: 92, w: 156, h: 58, label: 'principles', shape: 'cylinder', accent: true },
-    { id: 'codebase', x: 40, y: 178, w: 156, h: 58, label: 'codebase gotchas', shape: 'cylinder', accent: true, fontSize: 13 },
+    { id: 'codebase', x: 40, y: 178, w: 156, h: 58, label: 'codebase gotchas', shape: 'cylinder', accent: true, fontSize: 14 },
     { id: 'plans', x: 40, y: 264, w: 156, h: 58, label: 'plans', shape: 'cylinder', accent: true },
 
     { id: 'grill', x: 312, y: 92, w: 150, h: 54, label: 'grill', shape: 'round', accent: true },

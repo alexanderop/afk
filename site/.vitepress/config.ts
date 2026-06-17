@@ -9,6 +9,9 @@ export default defineConfig({
   lang: 'en-US',
   lastUpdated: true,
 
+  // Scratch/working files (e.g. tmp/) live under the docs root but are not pages.
+  srcExclude: ['tmp/**'],
+
   markdown: {
     // Register Starlight-style custom asides: ::: principle / ::: gotcha
     config(md) {
@@ -63,7 +66,6 @@ export default defineConfig({
               { text: 'batch', link: '/reference/batch' },
               { text: 'simplify', link: '/reference/simplify' },
               { text: 'qa', link: '/reference/qa' },
-              { text: 'work', link: '/reference/work' },
               { text: 'write-good-goal', link: '/reference/write-good-goal' },
               { text: 'write-evals', link: '/reference/write-evals' }
             ]

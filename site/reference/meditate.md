@@ -7,11 +7,11 @@ const scene: Scene = {
   width: 900,
   height: 360,
   nodes: [
-    { id: 'brain', x: 20, y: 50, w: 160, h: 58, shape: 'cylinder', accent: true, fontSize: 12, label: 'brain/ snapshot' },
-    { id: 'skills', x: 20, y: 200, w: 160, h: 58, shape: 'cylinder', accent: true, fontSize: 12, label: 'skills/ snapshot' },
+    { id: 'brain', x: 20, y: 50, w: 160, h: 58, shape: 'cylinder', accent: true, fontSize: 13, label: 'brain/ snapshot' },
+    { id: 'skills', x: 20, y: 200, w: 160, h: 58, shape: 'cylinder', accent: true, fontSize: 13, label: 'skills/ snapshot' },
     { id: 'auditor', x: 230, y: 120, w: 160, h: 64, shape: 'round', accent: true, label: 'auditor', sub: 'staleness · orphans' },
     { id: 'gate', x: 440, y: 112, w: 140, h: 84, shape: 'diamond', label: '≥3 items?' },
-    { id: 'skip', x: 440, y: 240, w: 140, h: 44, shape: 'pill', fontSize: 12, label: 'skip review' },
+    { id: 'skip', x: 440, y: 240, w: 140, h: 44, shape: 'pill', fontSize: 13, label: 'skip review' },
     { id: 'reviewer', x: 630, y: 120, w: 170, h: 64, shape: 'round', accent: true, label: 'reviewer', sub: 'distill · prune' },
   ],
   edges: [

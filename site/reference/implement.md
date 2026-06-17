@@ -5,19 +5,19 @@ import type { Scene } from '../.vitepress/theme/rough/render'
 // goes orchestrator → parallel TDD workers → integration.
 const scene: Scene = {
   width: 1000,
-  height: 320,
+  height: 330,
   groups: [
-    { x: 625, y: 86, w: 190, h: 196, label: 'workers · parallel' },
+    { x: 628, y: 96, w: 196, h: 202, label: 'workers · parallel' },
   ],
   nodes: [
-    { id: 'change', x: 20, y: 142, w: 130, h: 46, shape: 'pill', label: 'code change' },
-    { id: 'triage', x: 180, y: 122, w: 140, h: 86, shape: 'diamond', label: 'needs a test?' },
-    { id: 'simple', x: 380, y: 26, w: 180, h: 54, shape: 'round', fontSize: 13, label: 'main conversation', sub: 'docs · config · 1-liner' },
-    { id: 'orch', x: 430, y: 140, w: 160, h: 64, shape: 'round', accent: true, label: 'orchestrator', sub: 'architecture + slices' },
-    { id: 'w1', x: 640, y: 100, w: 160, h: 44, shape: 'round', accent: true, fontSize: 13, label: 'TDD slice' },
-    { id: 'w2', x: 640, y: 156, w: 160, h: 44, shape: 'round', accent: true, fontSize: 13, label: 'TDD slice' },
-    { id: 'w3', x: 640, y: 212, w: 160, h: 44, shape: 'round', accent: true, fontSize: 13, label: 'TDD slice' },
-    { id: 'integrate', x: 850, y: 140, w: 150, h: 64, shape: 'round', accent: true, label: 'integrate', sub: 'diff + full suite' },
+    { id: 'change', x: 20, y: 187, w: 134, h: 48, shape: 'pill', label: 'code change' },
+    { id: 'triage', x: 176, y: 163, w: 168, h: 96, shape: 'diamond', label: 'needs a test?' },
+    { id: 'simple', x: 384, y: 24, w: 196, h: 60, shape: 'round', fontSize: 15, label: 'main conversation', sub: 'docs · config · 1-liner' },
+    { id: 'orch', x: 432, y: 178, w: 168, h: 66, shape: 'round', accent: true, label: 'orchestrator', sub: 'architecture + slices' },
+    { id: 'w1', x: 644, y: 130, w: 164, h: 46, shape: 'round', accent: true, fontSize: 15, label: 'TDD slice' },
+    { id: 'w2', x: 644, y: 188, w: 164, h: 46, shape: 'round', accent: true, fontSize: 15, label: 'TDD slice' },
+    { id: 'w3', x: 644, y: 246, w: 164, h: 46, shape: 'round', accent: true, fontSize: 15, label: 'TDD slice' },
+    { id: 'integrate', x: 848, y: 178, w: 152, h: 66, shape: 'round', accent: true, label: 'integrate', sub: 'diff + full suite' },
   ],
   edges: [
     { from: 'change', to: 'triage' },

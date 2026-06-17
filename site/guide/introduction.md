@@ -1,13 +1,13 @@
 # Introduction
 
-afk is a Claude Code plugin that gives you one help router, a five-step coding
+afk is a Claude Code plugin that gives you one help router, a four-step coding
 flow, a fan-out batch mode, and a persistent memory vault: the steps that
 matter for going from idea to shipped.
 
-## The five-step flow
+## The four-step flow
 
 ```
-grill → implement → simplify → qa → work
+grill → implement → simplify → qa
 ```
 
 **grill** interviews you about the plan one decision at a time, challenges it
@@ -25,12 +25,8 @@ behavior-preserving fixes.
 
 **qa** routes by project shape: browser QA for frontend, contract-level checks
 for backend, both for hybrids. It ends with a SHIP / DO NOT SHIP / SHIP WITH
-CAVEATS verdict backed by direct evidence.
-
-**work** ships that verdict out. After QA, it runs a residual-findings gate,
-then commits in logical units, pushes, and opens a PR with a post-deploy
-monitoring plan. It is the closer for the single-diff implement path (`ship`
-stops at local evidence; `batch` opens its own PRs).
+CAVEATS verdict backed by direct evidence, and closes the single-diff implement
+path (`ship` stops at that verdict; `batch` opens its own PRs).
 
 **batch** is the fan-out alternative to implement: it splits an
 independently-mergeable plan into many units and runs one parallel worktree

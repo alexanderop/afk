@@ -7,15 +7,15 @@ const scene: Scene = {
   width: 880,
   height: 300,
   nodes: [
-    { id: 'intent', x: 20, y: 120, w: 160, h: 46, shape: 'pill', label: 'vague intent' },
-    { id: 'shape', x: 230, y: 108, w: 220, h: 70, shape: 'round', accent: true, fontSize: 11, label: 'shape the condition', sub: 'Achieve · Prove · Preserve · Stop' },
-    { id: 'check', x: 510, y: 98, w: 150, h: 90, shape: 'diamond', fontSize: 12, label: '6 criteria pass?' },
-    { id: 'goal', x: 710, y: 108, w: 150, h: 70, shape: 'round', accent: true, label: '/goal', sub: 'agent-evaluable' },
+    { id: 'intent', x: 20, y: 120, w: 162, h: 48, shape: 'pill', label: 'vague intent' },
+    { id: 'shape', x: 228, y: 106, w: 224, h: 72, shape: 'round', accent: true, fontSize: 14, label: 'shape the condition', sub: 'Achieve · Prove · Preserve · Stop' },
+    { id: 'check', x: 508, y: 96, w: 184, h: 96, shape: 'diamond', fontSize: 14, label: '6 criteria pass?' },
+    { id: 'goal', x: 712, y: 108, w: 152, h: 72, shape: 'round', accent: true, label: '/goal', sub: 'agent-evaluable' },
   ],
   edges: [
     { from: 'intent', to: 'shape' },
     { from: 'shape', to: 'check', fromSide: 'right', toSide: 'left' },
-    { from: 'check', to: 'goal', fromSide: 'right', toSide: 'left', label: 'pass' },
+    { from: 'check', to: 'goal', fromSide: 'right', toSide: 'left', label: 'pass', labelAt: { x: 702, y: 128 } },
     {
       from: 'check', to: 'shape', fromSide: 'bottom', toSide: 'bottom',
       via: [{ x: 585, y: 250 }, { x: 340, y: 250 }], dashed: true,

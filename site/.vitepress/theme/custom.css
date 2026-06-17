@@ -3,6 +3,17 @@
  * and a glowing gradient hero, closer in feel to Astro Starlight / Vite docs.
  */
 
+/* Excalifont — the actual hand-drawn font Excalidraw ships, so our rough.js
+   diagrams match real Excalidraw boards. Latin subset, SIL OFL (see
+   fonts/LICENSE.txt). */
+@font-face {
+  font-family: 'Excalifont';
+  src: url('./fonts/Excalifont-Regular.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Brand ramp (light) */
   --vp-c-brand-1: #7c3aed; /* primary text/links — passes contrast on white */

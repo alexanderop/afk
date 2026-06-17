@@ -109,7 +109,7 @@ the words a future agent or user is likely to use:
 
 - User phrases: `implement the plan`, `what now`, `verify this`, `goal`.
 - Symptoms: `vague`, `blocked`, `missing plan`, `unexpected behavior`.
-- Artifacts: `docs/plans/`, `CONTEXT.md`, `qa/`, `git diff`.
+- Artifacts: `brain/plans/`, `brain/context.md`, `qa/`, `git diff`.
 - Commands or tools when they are central to the skill.
 
 Prefer verb-first or action-oriented names: `write-good-goal`,

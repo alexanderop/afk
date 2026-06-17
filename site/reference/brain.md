@@ -7,11 +7,11 @@ const scene: Scene = {
   width: 820,
   height: 300,
   nodes: [
-    { id: 'knowledge', x: 20, y: 120, w: 160, h: 46, shape: 'pill', fontSize: 13, label: 'candidate note' },
-    { id: 'test', x: 230, y: 96, w: 180, h: 96, shape: 'diamond', fontSize: 13, label: 'prompt-worthy?' },
-    { id: 'write', x: 500, y: 40, w: 200, h: 56, shape: 'cylinder', accent: true, fontSize: 13, label: 'brain/ note', sub: 'one topic / file' },
-    { id: 'index', x: 500, y: 122, w: 200, h: 48, shape: 'round', fontSize: 12, label: 'index.md (auto)' },
-    { id: 'discard', x: 500, y: 200, w: 200, h: 46, shape: 'pill', fontSize: 12, label: 'stays in plan / skill' },
+    { id: 'knowledge', x: 20, y: 120, w: 160, h: 46, shape: 'pill', fontSize: 14, label: 'candidate note' },
+    { id: 'test', x: 230, y: 96, w: 180, h: 96, shape: 'diamond', fontSize: 14, label: 'prompt-worthy?' },
+    { id: 'write', x: 500, y: 40, w: 200, h: 56, shape: 'cylinder', accent: true, fontSize: 14, label: 'brain/ note', sub: 'one topic / file' },
+    { id: 'index', x: 500, y: 122, w: 200, h: 48, shape: 'round', fontSize: 13, label: 'index.md (auto)' },
+    { id: 'discard', x: 500, y: 200, w: 200, h: 46, shape: 'pill', fontSize: 13, label: 'stays in plan / skill' },
   ],
   edges: [
     { from: 'knowledge', to: 'test' },

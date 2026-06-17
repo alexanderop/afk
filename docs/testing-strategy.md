@@ -132,7 +132,7 @@ can make a model call.
     {
       "id": "help-no-plan",
       "prompt": "What should I do next?",
-      "expected_output": "Recommends afk:grill when docs/plans is missing.",
+      "expected_output": "Recommends afk:grill when brain/plans is missing.",
       "expectations": [
         "Inspects project state",
         "Does not list every skill",

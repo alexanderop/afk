@@ -223,7 +223,7 @@
       "expected_output": "Notices the referenced plan file does not exist and stops to ask for it rather than inventing its contents or dispatching workers against a guessed plan.",
       "fixture": {
         "files": {
-          "README.md": "# Fixture\n\nA small app. There is no docs/plans directory yet.\n"
+          "README.md": "# Fixture\n\nA small app. There is no brain/plans directory yet.\n"
         }
       },
       "expectations": [

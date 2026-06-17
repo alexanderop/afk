@@ -13,7 +13,6 @@
     "vitepress": "^1.6.3"
   },
   "dependencies": {
-    "@fontsource/kalam": "^5.2.8",
     "roughjs": "^4.6.6"
   }
 }

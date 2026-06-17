@@ -9,12 +9,12 @@ const scene: Scene = {
   nodes: [
     { id: 'ship', x: 390, y: 20, w: 160, h: 58, shape: 'round', accent: true, label: 'afk:ship', sub: 'orchestrator' },
     { id: 'grill', x: 40, y: 150, w: 120, h: 56, shape: 'round', label: 'grill' },
-    { id: 'implement', x: 180, y: 150, w: 120, h: 56, shape: 'round', fontSize: 13, label: 'implement' },
-    { id: 'simplify', x: 320, y: 150, w: 120, h: 56, shape: 'round', fontSize: 13, label: 'simplify' },
+    { id: 'implement', x: 180, y: 150, w: 120, h: 56, shape: 'round', fontSize: 14, label: 'implement' },
+    { id: 'simplify', x: 320, y: 150, w: 120, h: 56, shape: 'round', fontSize: 14, label: 'simplify' },
     { id: 'review', x: 460, y: 138, w: 120, h: 80, shape: 'diamond', label: 'review' },
     { id: 'qa', x: 600, y: 150, w: 120, h: 56, shape: 'round', label: 'qa' },
-    { id: 'verdict', x: 760, y: 150, w: 160, h: 56, shape: 'pill', fontSize: 13, label: 'SHIP verdict' },
-    { id: 'reflect', x: 760, y: 244, w: 160, h: 54, shape: 'round', accent: true, fontSize: 13, label: 'reflect → brain' },
+    { id: 'verdict', x: 760, y: 150, w: 160, h: 56, shape: 'pill', fontSize: 14, label: 'SHIP verdict' },
+    { id: 'reflect', x: 760, y: 244, w: 160, h: 54, shape: 'round', accent: true, fontSize: 14, label: 'reflect → brain' },
   ],
   edges: [
     { from: 'ship', to: 'grill', fromSide: 'bottom', toSide: 'top', dashed: true },

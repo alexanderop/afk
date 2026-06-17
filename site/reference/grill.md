@@ -7,10 +7,10 @@ const scene: Scene = {
   width: 720,
   height: 240,
   nodes: [
-    { id: 'sources', x: 235, y: 20, w: 250, h: 58, shape: 'cylinder', accent: true, fontSize: 12, label: 'CONTEXT · ADRs · brain · live docs' },
+    { id: 'sources', x: 235, y: 20, w: 250, h: 58, shape: 'cylinder', accent: true, fontSize: 13, label: 'CONTEXT · ADRs · brain · live docs' },
     { id: 'idea', x: 20, y: 132, w: 150, h: 46, shape: 'pill', label: 'vague idea' },
     { id: 'grill', x: 255, y: 124, w: 170, h: 62, shape: 'round', accent: true, label: 'grill', sub: 'one question at a time' },
-    { id: 'plan', x: 505, y: 122, w: 195, h: 66, shape: 'round', accent: true, fontSize: 13, label: 'brain/plans/<slug>', sub: 'decisions · contracts' },
+    { id: 'plan', x: 505, y: 122, w: 195, h: 66, shape: 'round', accent: true, fontSize: 14, label: 'brain/plans/<slug>', sub: 'decisions · contracts' },
   ],
   edges: [
     { from: 'idea', to: 'grill' },

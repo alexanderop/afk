@@ -7,11 +7,11 @@ const scene: Scene = {
   width: 860,
   height: 320,
   nodes: [
-    { id: 'change', x: 20, y: 130, w: 150, h: 46, shape: 'pill', fontSize: 12, label: 'implemented change' },
-    { id: 'classify', x: 200, y: 110, w: 150, h: 88, shape: 'diamond', label: 'classify system' },
-    { id: 'browser', x: 400, y: 30, w: 200, h: 58, shape: 'round', accent: true, fontSize: 13, label: 'agent-browser', sub: 'screenshots · console' },
-    { id: 'api', x: 400, y: 200, w: 200, h: 58, shape: 'round', accent: true, fontSize: 13, label: 'exercise contract', sub: 'req/resp transcripts' },
-    { id: 'verdict', x: 650, y: 110, w: 180, h: 84, shape: 'round', fontSize: 13, label: 'SHIP / NO-SHIP', sub: 'on stated intent' },
+    { id: 'change', x: 18, y: 130, w: 158, h: 48, shape: 'pill', fontSize: 14, label: 'implemented change' },
+    { id: 'classify', x: 196, y: 106, w: 184, h: 96, shape: 'diamond', fontSize: 14, label: 'classify system' },
+    { id: 'browser', x: 408, y: 28, w: 200, h: 60, shape: 'round', accent: true, fontSize: 14, label: 'agent-browser', sub: 'screenshots · console' },
+    { id: 'api', x: 408, y: 200, w: 200, h: 60, shape: 'round', accent: true, fontSize: 14, label: 'exercise contract', sub: 'req/resp transcripts' },
+    { id: 'verdict', x: 654, y: 108, w: 184, h: 86, shape: 'round', fontSize: 14, label: 'SHIP / NO-SHIP', sub: 'on stated intent' },
   ],
   edges: [
     { from: 'change', to: 'classify' },

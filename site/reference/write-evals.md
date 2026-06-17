@@ -7,12 +7,12 @@ const scene: Scene = {
   width: 1000,
   height: 340,
   nodes: [
-    { id: 'behavior', x: 20, y: 138, w: 150, h: 46, shape: 'pill', fontSize: 12, label: 'one behavior' },
-    { id: 'harness', x: 200, y: 116, w: 150, h: 90, shape: 'diamond', label: 'harness exists?' },
-    { id: 'scaffold', x: 205, y: 20, w: 180, h: 50, shape: 'round', fontSize: 13, label: 'scaffold harness' },
-    { id: 'write', x: 400, y: 124, w: 180, h: 66, shape: 'round', accent: true, fontSize: 11, label: 'write case', sub: 'fixture · prompt · asserts' },
-    { id: 'run', x: 620, y: 112, w: 160, h: 94, shape: 'diamond', fontSize: 11, label: 'red for the right reason?' },
-    { id: 'handoff', x: 820, y: 124, w: 160, h: 66, shape: 'round', accent: true, label: 'hand off', sub: '→ implement' },
+    { id: 'behavior', x: 18, y: 140, w: 156, h: 48, shape: 'pill', fontSize: 14, label: 'one behavior' },
+    { id: 'harness', x: 186, y: 118, w: 176, h: 96, shape: 'diamond', fontSize: 14, label: 'harness exists?' },
+    { id: 'scaffold', x: 214, y: 20, w: 184, h: 52, shape: 'round', fontSize: 14, label: 'scaffold harness' },
+    { id: 'write', x: 404, y: 130, w: 180, h: 68, shape: 'round', accent: true, fontSize: 14, label: 'write case', sub: 'fixture · prompt · asserts' },
+    { id: 'run', x: 606, y: 116, w: 200, h: 100, shape: 'diamond', fontSize: 13, label: 'red for the right reason?' },
+    { id: 'handoff', x: 836, y: 130, w: 164, h: 68, shape: 'round', accent: true, fontSize: 14, label: 'hand off', sub: '→ implement' },
   ],
   edges: [
     { from: 'behavior', to: 'harness' },
@@ -20,11 +20,11 @@ const scene: Scene = {
     { from: 'scaffold', to: 'write', fromSide: 'right', toSide: 'top' },
     { from: 'harness', to: 'write', fromSide: 'right', toSide: 'left', label: 'yes' },
     { from: 'write', to: 'run', fromSide: 'right', toSide: 'left' },
-    { from: 'run', to: 'handoff', fromSide: 'right', toSide: 'left', label: 'red ✓' },
+    { from: 'run', to: 'handoff', fromSide: 'right', toSide: 'left', label: 'red ✓', labelAt: { x: 821, y: 148 } },
     {
       from: 'run', to: 'write', fromSide: 'bottom', toSide: 'bottom',
-      via: [{ x: 700, y: 300 }, { x: 490, y: 300 }], dashed: true,
-      label: 'not red — fix', labelAt: { x: 595, y: 300 },
+      via: [{ x: 706, y: 312 }, { x: 494, y: 312 }], dashed: true,
+      label: 'not red — fix', labelAt: { x: 600, y: 312 },
     },
   ],
 }

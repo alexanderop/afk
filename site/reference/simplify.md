@@ -15,7 +15,7 @@ const scene: Scene = {
     { id: 'simpl', x: 220, y: 124, w: 260, h: 52, shape: 'round', fontSize: 14, label: 'simplification' },
     { id: 'eff', x: 220, y: 196, w: 260, h: 52, shape: 'round', fontSize: 14, label: 'efficiency' },
     { id: 'alt', x: 220, y: 268, w: 260, h: 52, shape: 'round', fontSize: 14, label: 'altitude' },
-    { id: 'lead', x: 560, y: 148, w: 200, h: 64, shape: 'round', accent: true, fontSize: 12, label: 'lead', sub: 'dedupe → apply safe fixes' },
+    { id: 'lead', x: 560, y: 148, w: 200, h: 64, shape: 'round', accent: true, fontSize: 13, label: 'lead', sub: 'dedupe → apply safe fixes' },
   ],
   edges: [
     { from: 'diff', to: 'reuse', fromSide: 'right', toSide: 'left' },

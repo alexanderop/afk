@@ -11,12 +11,12 @@ const scene: Scene = {
   ],
   nodes: [
     { id: 'project', x: 20, y: 140, w: 140, h: 46, shape: 'pill', label: 'project root' },
-    { id: 'scaffold', x: 190, y: 136, w: 170, h: 62, shape: 'round', accent: true, fontSize: 13, label: 'scaffold', sub: 'never overwrites' },
-    { id: 'index', x: 450, y: 52, w: 180, h: 46, shape: 'round', accent: true, fontSize: 13, label: 'index.md' },
-    { id: 'principles', x: 450, y: 108, w: 180, h: 46, shape: 'round', fontSize: 13, label: 'principles.md' },
-    { id: 'plans', x: 650, y: 52, w: 190, h: 46, shape: 'round', fontSize: 13, label: 'plans/' },
-    { id: 'prindir', x: 650, y: 108, w: 190, h: 46, shape: 'round', fontSize: 12, label: 'principles/' },
-    { id: 'sources', x: 450, y: 180, w: 390, h: 56, shape: 'round', fontSize: 12, label: 'sources/<name>.md', sub: 'if doc site detected' },
+    { id: 'scaffold', x: 190, y: 136, w: 170, h: 62, shape: 'round', accent: true, fontSize: 14, label: 'scaffold', sub: 'never overwrites' },
+    { id: 'index', x: 450, y: 52, w: 180, h: 46, shape: 'round', accent: true, fontSize: 14, label: 'index.md' },
+    { id: 'principles', x: 450, y: 108, w: 180, h: 46, shape: 'round', fontSize: 14, label: 'principles.md' },
+    { id: 'plans', x: 650, y: 52, w: 190, h: 46, shape: 'round', fontSize: 14, label: 'plans/' },
+    { id: 'prindir', x: 650, y: 108, w: 190, h: 46, shape: 'round', fontSize: 13, label: 'principles/' },
+    { id: 'sources', x: 450, y: 180, w: 390, h: 56, shape: 'round', fontSize: 13, label: 'sources/<name>.md', sub: 'if doc site detected' },
   ],
   edges: [
     { from: 'project', to: 'scaffold' },
