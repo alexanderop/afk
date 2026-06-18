@@ -61,6 +61,7 @@ export default defineConfig({
               { text: 'help', link: '/reference/help' },
               { text: 'ship', link: '/reference/ship' },
               { text: 'grill', link: '/reference/grill' },
+              { text: 'research', link: '/reference/research' },
               { text: 'prototype', link: '/reference/prototype' },
               { text: 'implement', link: '/reference/implement' },
               { text: 'batch', link: '/reference/batch' },

@@ -14,6 +14,8 @@ brain/
 ├── principles/       ← engineering and design principles
 ├── codebase.md       ← index for codebase/
 ├── codebase/         ← as-is maps of how areas work, plus gotchas (from map-codebase)
+├── context.md        ← domain glossary afk:grill grows as terms resolve
+├── decisions/        ← architecture decision records (ADRs) afk:grill records
 ├── sources.md        ← index for sources/ (when doc sites exist)
 ├── sources/          ← pointers to external authoritative docs
 └── plans/            ← feature plans from afk:grill and afk:plan
@@ -53,7 +55,9 @@ The flow is wired to the vault at both ends:
 
 - **grill**, the **implement orchestrator**, and **qa** read `brain/principles.md`
   and its linked principle files before acting, grounding plans and reviews in
-  your project's accumulated decisions.
+  your project's accumulated decisions. grill also reads `brain/context.md`
+  (the domain glossary) and the relevant ADRs in `brain/decisions/`, and writes
+  back to both as terms resolve and trade-off-driven decisions get recorded.
 - **ship** calls [reflect](/reference/reflect) after a run, which scans the
   session for durable learnings (mistakes, corrections, codebase gotchas,
   tool quirks) and writes them back to the vault so future sessions benefit.

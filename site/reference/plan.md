@@ -39,7 +39,7 @@ Invoke as `/afk:plan`. Use it to break a medium-to-large task (new features, mul
 
 ## What it does
 
-Plan reads the brain's principles fresh, resolves scope and constraints with the user, delegates large-scale codebase exploration to subagents, checks for installed domain skills, then writes plan files under `brain/plans/`. Plans use small phases (one function/type + tests, or one bug fix per phase; 1–2 files max), ordered with shared types and infrastructure first and features after.
+Plan reads the brain's principles fresh, resolves scope and constraints with the user, delegates large-scale codebase exploration to subagents, checks for installed domain skills, then writes plan files under `brain/plans/`. Plans use small phases (one function/type + tests, or one bug fix per phase; 2–3 files max), ordered with shared types and infrastructure first and features after.
 
 - For 3+ phases, creates a directory: `brain/plans/NN-slug/overview.md` + phase files.
 - Overview files include: Context, Scope, Constraints, Applicable skills, Phases (ordered wikilinks), and Verification commands.
