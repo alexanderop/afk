@@ -5,9 +5,12 @@ description: Use when the user says "grill me", asks to stress-test a plan, offe
 
 # Grill
 
-Grill turns unclear intent into an implementation-ready plan by interviewing
-the user one decision at a time. The core principle is: ask only questions the
-repo, docs, glossary, ADRs, or fetched primary sources cannot answer.
+Grill turns unclear intent into an implementation-ready plan. It researches
+first — grounding itself in the code, docs, and brain and writing a research doc
+*before* engaging the user — then interviews only on what that research could not
+resolve. The core principle is: ask only questions the repo, docs, glossary,
+ADRs, or fetched primary sources cannot answer. A well-grounded grill may ask
+very few questions, or none; that is the goal, not a shortcut.
 
 ## When to Use
 
@@ -26,7 +29,10 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
 
 ## Process
 
-1. Ground yourself before asking the first question. Read the relevant code,
+1. Ground yourself before asking the first question. If the user already
+   supplied a ticket, issue, spec, or written idea, read it fully first — it is
+   the seed for what to research, not a substitute for researching. Then read the
+   relevant code,
    tests, configs, routes, schemas, package manifests, README instructions,
    and any nearby plans or specs. If `brain/codebase/` already maps the area
    you are touching, read that map first and scope your own reading to the gaps
@@ -64,18 +70,31 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
      shapes, recommendations, and risks that affect the plan.
    - Domain scout, when useful: read `brain/context.md` and `brain/decisions/`.
      Report glossary conflicts, prior decisions, and terms needing precision.
-5. Synthesize the research yourself. Verify important claims against files or
-   fetched sources before using them.
-6. Open with a Background written like a product owner, before any question.
-   In a few sentences, restate what the user is asking for as a product owner
-   framing the work: the problem, who it is for, the outcome they want, and the
-   scope as you currently understand it from the request and your grounding.
-   Ground it in what you read — do not invent requirements. End by stating your
-   read of the intent and inviting the user to correct it, then begin the
-   interview. This gives the user something concrete to react to instead of a
-   cold first question.
-7. Ask the next best question, one at a time, and wait for the answer before
-   continuing. Include your recommended answer and the reason for it.
+5. Synthesize the research yourself and write the research doc as your first
+   artifact, before you engage the user with a Background or any question.
+   Verify important claims against files or fetched sources before using them.
+   When the scouts surfaced enough to be worth keeping — a non-trivial codebase
+   area, external/API facts, testing patterns — persist that synthesis as a
+   durable, descriptive research doc at
+   `brain/plans/<slug>.research.md` using [RESEARCH-FORMAT.md](./RESEARCH-FORMAT.md):
+   what the codebase and sources ARE today, citation-heavy, no recommendations.
+   It is the companion to the plan and the reusable input every later phase
+   (`afk:implement`, `afk:qa`) reads instead of re-discovering. Skip it only for
+   trivial plans that needed no research.
+6. Open with a Background written like a product owner, after the research doc
+   exists and before any question. In a few sentences, restate what the user is
+   asking for as a product owner framing the work: the problem, who it is for,
+   the outcome they want, and the scope as you currently understand it from the
+   request, the ticket, and your research. Ground it in what you found — do not
+   invent requirements. Then list what the research already resolved (so the user
+   sees what you will *not* be asking about) and state your read of the intent,
+   inviting correction. This gives the user something concrete to react to
+   instead of a cold first question.
+7. Now interview only on what the ticket and the research left unresolved. Ask
+   the next best such question, one at a time, waiting for each answer, with your
+   recommended answer and its reason. If the ticket plus research already resolved
+   everything, say so and go straight to the plan — do not manufacture questions
+   to fill an interview.
 8. Challenge glossary conflicts immediately. If the user uses a term
    differently from `brain/context.md`, say what the glossary says and ask which
    meaning is authoritative.
@@ -108,7 +127,12 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
     implementation reads the real source instead of a remembered pattern.
 16. Write the agreed plan to `brain/plans/<slug>.md` and add a wikilink to it in
     `brain/plans/index.md`, creating the vault if it does not exist yet. (Do not
-    edit `brain/index.md` — the auto-index hook maintains it.) Include decisions
+    edit `brain/index.md` — the auto-index hook maintains it.) If you wrote a
+    research doc in step 5, link it from the plan's `## Research` line so the plan
+    stays the single entrypoint, and where a decision or contract rests on a
+    specific finding, cite it (`[[<slug>.research#<finding>]]`) so the plan's
+    prescription is traceable back to the descriptive evidence — keep the finding
+    in research, the choice in the plan, never duplicate the prose. Include decisions
     made, contracts between parts, relevant glossary or ADR updates, an explicit
     `## Acceptance` bar for experience-bearing work (the user-visible quality
     criteria, so `afk:implement` has a target and `afk:qa` has a bar), and the
@@ -140,6 +164,8 @@ fetched primary sources.
 | Thought | Reality |
 |---------|---------|
 | "I can ask the user how the code works." | Read the code first and ask only when the code conflicts with intent or another source. |
+| "Let me start interviewing to understand the task." | Research first and write the research doc; the interview opens only after, and only on what research and the ticket left unresolved. |
+| "There's a ticket, so I can skip research and just clarify it." | A ticket is the seed for research, not a replacement. Research it, then ask only what stays unclear. |
 | "The plan is mostly obvious." | Non-trivial work needs explicit contracts, edge cases, and source-of-truth decisions before implementation. |
 | "The data contracts are nailed, so the plan is ready." | For experience-bearing work, contracts aren't the bar. Name the user-visible quality bar (the insight, what's legible at a glance) as `## Acceptance`, or implement ships something that runs but doesn't deliver. |
 | "I'll batch glossary updates at the end." | Update `brain/context.md` when the term is resolved so later questions use the canonical meaning. |
@@ -155,16 +181,19 @@ Create the plan file (`brain/plans/<slug>.md`) with this shape:
 ```markdown
 # <Plan Title>
 
+## Research
+- [[<slug>.research]] — descriptive findings the scouts produced (omit if none written)
+
 ## Context
 - <What is being changed and why>
 - <Relevant code, glossary, ADR, or external source constraints>
 - <Reference repos the user cloned to copy a pattern: origin (GitHub URL) and local path>
 
 ## Decisions
-- <Resolved decision and rationale>
+- <Resolved decision and rationale> — grounds: [[<slug>.research#<finding>]] (cite the finding it rests on, when one does)
 
 ## Contracts
-- <Interface, data, lifecycle, permission, or ownership contract>
+- <Interface, data, lifecycle, permission, or ownership contract> — grounds: [[<slug>.research#<finding>]] (cite the finding it rests on, when one does)
 
 ## Acceptance
 <For experience-bearing work (UI, dashboards, reports). The user-visible quality
@@ -197,7 +226,8 @@ every slice, give the files it **owns** and what it **depends on**.
 ```
 
 End the session by telling the user the plan is ready, naming the exact plan
-path (`brain/plans/<slug>.md`), and stating that it is
+path (`brain/plans/<slug>.md`) and the research doc if you wrote one
+(`brain/plans/<slug>.research.md`), and stating that it is
 the input to `afk:implement`
 (or `afk:batch` when the plan splits into many independently-mergeable units the
 user wants implemented as parallel PRs).

@@ -17,7 +17,11 @@ or run shell commands.
 ## Operating Rules
 
 - Read the supplied plan, relevant source files, tests, and neighboring code
-  before deciding contracts.
+  before deciding contracts. If the plan links a research doc
+  (`brain/plans/<slug>.research.md`), read it first — it is grill's descriptive
+  map of the area (citations, testing patterns, external/API facts) captured at a
+  pinned commit, so you re-discover only what it leaves open or what the code has
+  moved past.
 - Read the brain's principles first if the vault has them: `brain/principles.md`
   and each principle file it links. These are the project's standing engineering
   principles — your architecture, contracts, and slice boundaries must honor

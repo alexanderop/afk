@@ -31,6 +31,9 @@ actually works", or "can this ship?"
    - Capture the change's **stated intent** — what the user should be able to
      understand or do once it ships (the plan's `## Acceptance` bar if present).
      QA judges delivery of that intent, not just that the code executes.
+   - If the plan links a research doc (`brain/plans/<slug>.research.md`), read it
+     for the existing testing patterns, data flow, and entry points it already
+     mapped — reuse them instead of re-discovering how the area is exercised.
    - Read local run instructions from `README`, `CLAUDE.md`, package scripts,
      Procfile or compose files, Makefile, and framework config.
    - If the vault has principles, skim `brain/principles.md` for any that set an
