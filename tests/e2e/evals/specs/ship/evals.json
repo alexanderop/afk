@@ -76,6 +76,32 @@
         "expect": ["afk:grill", "Route:"],
         "forbid": ["Verdict: SHIP", "afk:implement ->", "trivial enough to ship"]
       }
+    },
+    {
+      "id": "ship-e2e-decided-plan-to-verdict",
+      "prompt": "Run AFK Ship for brain/plans/slugify.md. The plan resolves every decision and contract. Take it all the way through to a ship/no-ship verdict, actually writing the code and verifying it.",
+      "expected_output": "A fully-decided, testable plan runs end-to-end: ship skips grill, implement writes the function plus a test, and QA runs the test suite and returns a ship verdict backed by the passing run — not by inspection.",
+      "kind": "judged",
+      "max_budget_usd": 5.0,
+      "fixture": {
+        "files": {
+          "brain/index.md": "# Brain\n\nNo principles recorded yet.\n",
+          "package.json": "{\n  \"name\": \"slugify-fixture\",\n  \"module\": \"src/slugify.ts\",\n  \"type\": \"module\",\n  \"scripts\": { \"test\": \"bun test\" }\n}\n",
+          "brain/plans/slugify.md": "# Slugify Plan\n\n## Context\nWe need one pure slugify helper for turning titles into URL slugs. No dependencies, no I/O.\n\n## Decisions\nLives in src/slugify.ts as a named export. Pure function. Rules, in order: lowercase the input; replace any run of non-alphanumeric characters with a single '-'; trim leading and trailing '-'.\n\n## Contracts\nslugify(input: string): string.\n- slugify('Hello, World!') === 'hello-world'\n- slugify('  A  B  ') === 'a-b'\n- Idempotent: slugify(slugify(x)) === slugify(x) for all x.\n\n## Tasks\n1. Implement src/slugify.ts per the contract.\n2. Add src/slugify.test.ts (bun test) covering the three contract examples.\n"
+        }
+      },
+      "assertions": {
+        "required_files": ["src/slugify.ts", "src/slugify.test.ts"],
+        "required_file_substrings": {
+          "src/slugify.ts": ["export", "slugify"],
+          "src/slugify.test.ts": ["hello-world"]
+        }
+      },
+      "expectations": [
+        "Implemented the slugify function and a test for it without bouncing back to grill, because the plan was already fully decided.",
+        "Actually ran the test suite (e.g. bun test) and reported the real observed result, rather than assuming or asserting it passes without running it.",
+        "Concluded with an explicit ship or no-ship verdict that is justified by the test evidence it gathered, not merely by reading the code."
+      ]
     }
   ]
 }
