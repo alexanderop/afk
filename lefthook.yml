@@ -1,0 +1,10 @@
+# Git hooks for AFK, run by lefthook.
+# Only the zero-token suite runs here — `bun run test` (unit + integration) is
+# fast and makes no LLM calls. The model-backed suites (test:e2e, test:evals,
+# test:triggers) cost real money and stay out of the commit path; run them
+# before a release, not on every commit.
+pre-commit:
+  commands:
+    test:
+      run: bun run test
+      fail_text: "Zero-token tests failed — fix before committing (or `git commit --no-verify` to bypass)."

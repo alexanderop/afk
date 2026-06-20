@@ -1,6 +1,8 @@
 # QA reports and evidence are per-run artifacts — verdicts belong in the PR
 # body, not the repo.
 /qa/
+# Dependencies (lefthook and any future devDeps) — installed via `bun install`.
+/node_modules/
 site/node_modules/
 site/.vitepress/dist/
 site/.vitepress/cache/
