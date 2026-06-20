@@ -1,16 +1,14 @@
 ---
 name: review
-description: Use when asked to review, critique, or assess the quality of code changes, PRs, or plans against the brain's principles, producing numbered findings and a verdict without making changes; triggers include "review", "review this", "code review".
+description: Use when asked to review, critique, or assess the quality of code changes, PRs, or plans against the brain's principles, producing numbered findings and a verdict without making changes.
 ---
 
 # Review
 
-Thorough, principle-grounded review of code changes, PRs, or plans. **Do NOT make
-changes — the review is the deliverable.** The invariant: every finding is
-numbered, severity-rated, mapped to a principle, and offered with options, so the
-user can act on it deliberately.
-
-Track progress step by step, marking each done before starting the next.
+Principle-grounded review of every changed file in a PR, plan, or set of code
+changes. **Do NOT make changes — the review is the deliverable.** The invariant:
+every finding is numbered, severity-rated, mapped to a principle, and offered with
+options, so the user can act on it deliberately.
 
 ## When to Use
 
@@ -101,11 +99,13 @@ style/docs/minor — note, don't block.
 
 STOP and ask only when scope is genuinely uninferable (nothing in the message,
 diff, or referenced plan to go on). Otherwise present all sections together, then
-ask for direction once at the end. Do not make changes; do not assume priorities
-on timeline or scale.
+ask for direction once at the end. Do not assume priorities on timeline or scale.
 
 ## Output
 
-A numbered list of findings (severity, options, recommendation per issue) grouped
-by section, followed by a single overall verdict (Accept / Accept with notes /
-Revise). No code changes.
+Numbered findings grouped by section, then one overall verdict.
+
+## Red Flags
+
+- "The fix is one line — I'll just apply it." Review diagnoses; it never edits.
+  Write it up as a numbered finding and let the user decide.

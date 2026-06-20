@@ -25,6 +25,8 @@ explanation of AFK itself.
 - Domain glossary: `brain/context.md`
 - Decisions: `brain/decisions/`
 - Plans: `brain/plans/` (from `afk:grill` and `afk:plan`)
+- External grounding: `brain/sources/` (from `afk:research`)
+- Codebase maps: `brain/codebase/` (from `afk:map-codebase`)
 - QA evidence: `qa/`
 - Current implementation state: `git status --short` and `git diff --stat`
 
@@ -63,6 +65,10 @@ explanation of AFK itself.
 - The user asks to prototype, mock up, try a few designs, create UI variants,
   make something playable, or sanity-check a state model/API/data shape by
   interacting with it: recommend `afk:prototype`.
+- The user asks for prior art, external best practice, how other teams or
+  libraries solve a problem, competitor patterns, or a scan of the landscape
+  before planning: recommend `afk:research` to turn the open question into an
+  external-grounding digest. It feeds `afk:grill`.
 - No concrete plan in `brain/plans/`: recommend `afk:grill` to
   interview a vague idea into a plan, or `afk:plan` to decompose an
   already-clear task into phased plans. Both feed `afk:implement`.
@@ -79,8 +85,9 @@ explanation of AFK itself.
   learnings, or the `brain/` vault: recommend the memory skills — `afk:reflect`
   to capture a session, `afk:ruminate` to mine past conversations, `afk:meditate`
   to audit and prune, `afk:brain` for direct read/write, `afk:init-brain` to
-  scaffold, `afk:plan` for phased plans, and `afk:review` for a principle-grounded
-  review. These run anytime, not as a fixed flow phase.
+  scaffold, `afk:map-codebase` to map an existing area as-is, `afk:plan` for
+  phased plans, and `afk:review` for a principle-grounded review. These run
+  anytime, not as a fixed flow phase.
 - The user asks about AFK itself: answer from the catalog and this plugin's
   README-level flow.
 - The user asks for release checks beyond browser QA: recommend the project's

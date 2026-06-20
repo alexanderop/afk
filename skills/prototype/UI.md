@@ -7,11 +7,12 @@ If the question is about logic or state transitions, use [LOGIC.md](LOGIC.md).
 
 ## Shape
 
-Strongly prefer mounting variants inside an existing page. Real header,
+Mount variants inside an existing page whenever one exists. Real header,
 navigation, auth, data, and density make the prototype easier to judge.
 
 - **Existing page:** keep route, data fetching, params, and auth. Swap only the
-  rendered subtree based on `?variant=`.
+  rendered subtree based on `?variant=`. Use this unless there is no sensible
+  host page.
 - **Throwaway page:** create a clearly named prototype route only when there is
   no sensible host page.
 
@@ -50,6 +51,12 @@ return (
    - Hide in production builds.
 6. Add one run command through the existing task runner.
 7. Capture the answer in `brain/prototypes/<slug>.md`.
+
+## Red Flags
+
+| Thought | Reality |
+|---------|---------|
+| "Three UI variants can share one layout with different colors." | UI variants must disagree structurally, not cosmetically. |
 
 ## Anti-Patterns
 

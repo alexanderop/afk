@@ -8,29 +8,17 @@ description: Use when breaking a medium-to-large task into phased, principle-gro
 Produce implementation plans grounded in the brain's principles and write them to
 `brain/plans/`. **Do NOT implement anything — the plan is the deliverable.**
 
-Track progress step by step, marking each done before starting the next.
-
 ## When to Use
 
-Use this skill when:
-
-- A change spans 3+ files or introduces new architecture.
-- There are multiple valid approaches and the user should weigh in.
-- The task has unclear scope or cross-cutting concerns.
-- The user explicitly asks for a plan or to "break this down".
-
-Do not use this skill for trivially small tasks (1–2 files, obvious approach) —
-implement directly. For interview-style stress-testing of a vague idea before a
-plan exists, use `afk:grill`; `plan` assumes intent is already clear enough to
-decompose.
+For interview-style stress-testing of a vague idea before a plan exists, use
+`afk:grill`; `plan` assumes intent is already clear enough to decompose.
 
 ## Process
 
 ### Step 0 — Triage complexity
 
 If the task is trivially small (1–2 files, obvious approach), tell the user it
-doesn't need a plan and suggest implementing directly. **Stop — do not
-implement.** Otherwise proceed.
+doesn't need a plan and suggest implementing directly. Otherwise proceed.
 
 ### Step 1 — Load principles
 
@@ -143,4 +131,4 @@ do not begin implementation. The user decides when and how to execute.
 
 Plan files under `brain/plans/` (`NN-slug/overview.md` + phase files, or a single
 `NN-plan-name.md`), plus an updated `brain/plans/index.md`. Hand off to
-`afk:implement` (or the user) for execution — `plan` never implements.
+`afk:implement` (or the user) for execution.

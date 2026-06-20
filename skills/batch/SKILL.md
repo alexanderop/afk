@@ -7,7 +7,7 @@ description: Use when a plan or spec splits into many independently-mergeable un
 
 Batch is the parallel, PR-per-unit way to implement a plan. Where `afk:implement`
 drives one working tree through sequential TDD slices, Batch decomposes the work
-into many **independent** units and farms each out to its own background worker in
+into many **independent** units and farms each out to its own worker in
 its own git worktree. Each worker implements, simplifies, tests, and opens a PR
 on its own branch.
 
@@ -67,9 +67,14 @@ this plan to the user and **wait for approval before spawning any worker.**
 
 ### 4. Spawn one worker per unit, in parallel
 
-After approval, launch one background agent per unit with `isolation: "worktree"`
-(its own git worktree) and `run_in_background: true`. Send all independent
-workers in one message so they run concurrently.
+After approval, launch one worker per unit with `isolation: "worktree"` (its own
+git worktree) by sending all the `Agent` calls in a single message — the harness
+runs them concurrently. Do **not** run the workers in background mode: a
+background subagent auto-denies any tool call that would otherwise prompt, so a
+worker's `Bash` verification (the test command, the e2e recipe, `gh pr create`)
+fails silently and the worker reports a green PR it never proved. Synchronous
+concurrent workers keep those prompts answerable — that review-each-result model
+is the safety mechanism (see `docs/skills-and-agents-reference.md`).
 
 Every worker brief is fully self-contained (subagents start with zero context).
 Each must include:
@@ -90,9 +95,9 @@ Each must include:
 
 ### 5. Track progress to a status table
 
-Maintain a status table of every unit: number, summary, state (running / PR open
-/ failed / blocked), and PR link. Update it as workers report back. Do not invent
-a PR link or a pass a worker did not report.
+Maintain a status table of every unit: number, summary, state (PR open / failed
+/ blocked), and PR link. Fill it in as each worker returns its result. Do not
+invent a PR link or a pass a worker did not report.
 
 ### 6. Report and triage
 
@@ -131,13 +136,13 @@ missing decision or for approval before the spawn in step 3.
 
 ## Output
 
-While running, keep a live status table:
+Keep a status table, filled in as workers return:
 
 ```markdown
 | # | Unit | State | PR |
 |---|------|-------|-----|
 | 1 | Migrate <file> to <pattern> | PR open | <url> |
-| 2 | … | running | — |
+| 2 | … | blocked | — |
 ```
 
 Finish with this shape:

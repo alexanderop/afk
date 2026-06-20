@@ -39,6 +39,12 @@ If the question is "what should this look like", use [UI.md](UI.md).
 
 The whole frame should fit on one screen.
 
+## Red Flags
+
+| Thought | Reality |
+|---------|---------|
+| "The TUI can contain the state logic." | The terminal shell is disposable; keep the logic portable. |
+
 ## Anti-Patterns
 
 - Do not add tests.

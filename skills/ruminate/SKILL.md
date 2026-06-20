@@ -44,12 +44,16 @@ not use it to audit existing brain content — use `meditate`.
 5. **Synthesize.** Read all findings, cross-reference with the brain, dedupe
    across batches, then filter by **frequency** (recurring, not one-off),
    **factual accuracy** (anything now wrong in the brain is always worth fixing),
-   and **impact**. Discard aggressively — 3 high-signal findings beat 9 noisy ones.
+   and **impact**. Discard aggressively. Done means every mined finding is
+   resolved: either promoted to a proposed brain/skill update, or dismissed with
+   a one-line reason — none left in limbo.
 6. **Present and apply.** Show findings in a table (finding, frequency/evidence,
-   proposed action); be honest about one-offs vs. patterns. Route skill-specific
-   learnings into the relevant SKILL.md (read it first). Apply only approved
-   changes, following brain writing conventions; update the relevant index
-   entrypoint. Quote the user's words when a finding stems from a correction.
+   proposed action). A one-off is a dismissed-with-reason row; a pattern is a
+   promoted row — so the table is the resolved set from step 5, no unresolved
+   findings. Route skill-specific learnings into the relevant SKILL.md (read it
+   first). Apply only approved changes, following brain writing conventions;
+   update the relevant index entrypoint. Quote the user's words when a finding
+   stems from a correction.
 7. **Clean up.** `rm -rf "$OUT_DIR"` and shut down idle agents.
 
 ## Stop and Ask

@@ -118,5 +118,3 @@ Return:
 |---------|---------|
 | "The prototype passed QA." | Prototypes do not produce shipping evidence. Delete or absorb them before QA. |
 | "This should be robust in case we keep it." | Keeping it is a separate implementation task. The prototype answers one question fast. |
-| "Three UI variants can share one layout with different colors." | UI variants must disagree structurally, not cosmetically. |
-| "The TUI can contain the state logic." | The terminal shell is disposable; keep the logic portable. |

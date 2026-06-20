@@ -12,19 +12,13 @@ future behavior, not just the brain by default.
 
 ## When to Use
 
-Use this skill when:
-
-- A session is wrapping up and it produced durable knowledge.
-- The user corrected a mistake or approach and that correction should stick.
-- Significant codebase knowledge, a gotcha, or a decision rationale was gained.
-- The user says "reflect" or "remember this".
-
 Do not use this skill for trivia already captured in the brain, or for
 plan-specific notes that belong in the plan's docs.
 
 ## Process
 
-1. **Read `brain/index.md`** to understand what notes already exist.
+1. **Read `brain/index.md`** to understand what notes already exist. If `brain/`
+   does not exist, run `afk:init-brain` first.
 2. **Scan the conversation** for: mistakes and corrections, user preferences and
    workflow patterns, codebase knowledge (architecture, gotchas, patterns),
    tool/library quirks, decisions and their rationale, friction in skill

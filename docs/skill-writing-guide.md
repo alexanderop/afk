@@ -8,6 +8,27 @@ This format is inspired by `obra/superpowers` and adapted to AFK's own voice:
 concise, operational, and strict where skipping a step would break the
 workflow.
 
+## The one principle: predictability
+
+A skill exists to wrangle determinism out of a stochastic system. The thing you
+are fixing is the *process* — the agent taking the same path every run — not the
+output (a brainstorming skill should predictably diverge). Every rule below is a
+lever on that one goal. When an edit is unclear, ask the deciding question: *does
+this make the agent behave more predictably, or does it just look tidier?* Only
+the first earns its place.
+
+Two consequences worth internalising before you write a line:
+
+- **Skill prose is executable.** A literal-minded machine will do exactly what
+  the steps say. A wrong instruction is not a typo, it is a runtime defect — a
+  worker told to verify in a mode that silently skips verification will ship
+  broken work and report success. Read every step as if it will be obeyed to the
+  letter, because it will.
+- **The `description` is permanent rent.** It sits in the agent's context on
+  every turn whether the skill fires or not. So the body earns ordinary pruning;
+  the description earns *harder* pruning. Every word there must do invocation
+  work.
+
 ## Core Rules
 
 - A skill is reusable process documentation, not a story about how one task was
@@ -101,6 +122,63 @@ Use red-flag tables when they prevent predictable mistakes:
 |---------|---------|
 | "The subagent can decide the approach" | Then the lead has delegated architecture. Decide first, brief second. |
 ```
+
+## Failure modes to hunt when revising
+
+Most skill rot is one of a few named shapes. Learn to see them and you can hunt
+them across a whole skill suite. Each has a cheap test.
+
+- **No-op** — a line the model already obeys by default, so you pay context for
+  nothing. Test: *does this change behaviour versus the default?* "Track progress
+  step by step" or a bare "Be thorough" usually fails — the agent already does
+  it. The fix is deletion, or a stronger, concrete bound — never a synonym.
+- **Description restated in the body** — a `## When to Use` section that re-lists
+  the frontmatter triggers adds no decision value once the skill has loaded.
+  Keep `When to Use` for what the description *cannot* carry: the negative
+  boundary (`Do not use this for…`) and cross-skill disambiguation. (The lint
+  still requires the heading to exist — fill it with the boundary, do not delete
+  it.)
+- **Duplication** — the same meaning in more than one place. State an invariant
+  once, at its natural risk point. If it is tempting to violate, add *one* Red
+  Flag — and word that flag as the *rationalisation* ("it ran with no errors, so
+  ship"), not a second copy of the rule. A Red Flag row that merely repeats a
+  Process step is duplication; cut it.
+- **Sediment** — stale lines that accumulate because adding feels safe and
+  removing feels risky. Hand-copied inventories of a script's output are the
+  classic case: they drift the moment the source changes. Point at the source of
+  truth instead of transcribing it.
+- **Sprawl** — a skill that is simply too long, even when every line is live.
+  The cure is the hierarchy: push reference into sibling files behind a pointer,
+  and split branch-specific material so each path carries only what it needs.
+- **Premature completion** — ending a step before it is truly done. The defence
+  is a *checkable* completion criterion ("every mined finding is promoted or
+  dismissed with a reason"), not a vague one ("synthesis reached"). Sharpen the
+  bound first; only hide later steps (by splitting) if a sharp bound still rushes.
+
+Three judgement calls the tests do not settle for you:
+
+- **Not all repetition is duplication.** Repeating a *meaning* is duplication;
+  repeating a *token* on purpose to recruit attention is a technique. Several Red
+  Flag rows that look alike but each name a *distinct* rationalisation converging
+  on one wrong action are doing real work — keep them.
+- **Co-locate what is used together.** Put a definition next to the step that
+  consumes it. Reviewer angles defined in an aggregation step, away from the
+  dispatch that needs them, read as a phantom second review and invite mistakes.
+- **Know when not to optimise.** Do not risk a routing regression on the
+  most-fired skill to save a few description tokens. The marginal token is rarely
+  worth the variance.
+
+## Leading words
+
+A leading word is a compact concept already in the model's pretraining that the
+agent can think *with* — *lesson*, *fog of war*, *tracer bullets*, *red/green*,
+a *tight* loop. One token recruits a whole region of behaviour for free, where a
+spelled-out triad ("fast, deterministic, low-overhead") spends three. Repeat the
+*word*, never the sentence — that is the deliberate inverse of duplication. When
+revising, hunt for restated phrases that collapse into one pretrained word: you
+win fewer tokens *and* a sharper hook for the agent's reasoning. Coining your own
+works only if you define it clearly; a made-up word recruits no priors, so reach
+for an existing one first.
 
 ## Discoverability
 

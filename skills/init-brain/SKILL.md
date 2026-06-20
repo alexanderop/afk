@@ -1,6 +1,6 @@
 ---
 name: init-brain
-description: Use when setting up a project for AFK for the first time — scaffolds the brain/ vault and authors a tight CLAUDE.md (with an AGENTS.md symlink) that points at the brain; triggers include "init brain", "set up the brain", "create the brain vault", "generate a CLAUDE.md", "set up AGENTS.md", "onboard the agent to this repo".
+description: Use when setting up a project for AFK for the first time — scaffolds the brain/ vault and authors a tight CLAUDE.md (with an AGENTS.md symlink) that points at the brain; triggers include "init brain", "set up the brain", "create the brain vault", or "generate a CLAUDE.md to onboard the agent to this repo".
 ---
 
 # Init Brain
@@ -28,8 +28,6 @@ Use this skill when:
 - A project has no `brain/` vault yet and the user wants to set it up up front.
 - The user wants a good `CLAUDE.md`/`AGENTS.md` for the repo, or to "onboard the
   agent" to the codebase.
-- The user says "init brain", "set up the brain", "create the brain vault",
-  "generate a CLAUDE.md", or "set up AGENTS.md".
 
 The brain scaffold is idempotent, so it is safe to re-run to add the
 CLAUDE.md/AGENTS.md to a project that already has a vault.
@@ -43,21 +41,13 @@ CLAUDE.md/AGENTS.md to a project that already has a vault.
    bash "${CLAUDE_PLUGIN_ROOT}/skills/init-brain/scripts/init-brain.sh"
    ```
 
-   It creates, only if missing:
-   - `brain/` — the vault root (an Obsidian vault)
-   - `brain/index.md` — the index the SessionStart hook injects
-   - `brain/principles.md` + `brain/principles/` — the principles the flow reads
-     before acting (starts empty; grown by `afk:reflect` and `afk:meditate`)
-   - `brain/context.md` — the domain glossary `afk:grill` grows as terms resolve
-   - `brain/decisions/` + `brain/decisions/index.md` — ADRs `afk:grill` records
-     for hard-to-reverse, trade-off-driven decisions
-   - `brain/plans/` + `brain/plans/index.md` — where `afk:grill` and the `plan`
-     skill write plans
-   - `brain/sources.md` + `brain/sources/<name>.md` — **only when the project
-     already has a doc site** (VitePress, VuePress, Docusaurus, Astro Starlight,
-     Nextra, MkDocs, Sphinx). The script seeds one stub note per detected site
-     so the brain *points at* the docs rather than absorbing them. The team
-     keeps their docs where they are — nothing in the repo moves.
+   It creates the vault structure only if missing — see
+   [scripts/init-brain.sh](./scripts/init-brain.sh) for the exact set of files.
+   The one part the next step acts on: when the project already has a doc site
+   (VitePress, VuePress, Docusaurus, Astro Starlight, Nextra, MkDocs, Sphinx),
+   the script seeds a `brain/sources/<name>.md` stub per detected site so the
+   brain *points at* those docs rather than absorbing them — nothing in the repo
+   moves.
 
 2. **Refine the seeded source stubs.** If the script printed a "Detected doc
    sites" report, open each detected docs root (its landing page / sidebar

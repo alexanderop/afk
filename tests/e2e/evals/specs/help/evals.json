@@ -58,6 +58,21 @@
       }
     },
     {
+      "id": "help-recommends-research-for-prior-art",
+      "prompt": "Which AFK skill should I use to scan the prior art for how other teams do multi-tenant rate limiting before we plan this?",
+      "expected_output": "Recommends afk:research to turn the open question into an external-grounding digest before grilling/planning.",
+      "kind": "routing",
+      "fixture": {
+        "files": {
+          "brain/index.md": "# Brain\n\nReturning AFK user.\n"
+        }
+      },
+      "routing": {
+        "expect": ["afk:research"],
+        "forbid": ["afk:implement", "Next step: [Q]"]
+      }
+    },
+    {
       "id": "help-specific-skill-question",
       "prompt": "When should I use afk:simplify?",
       "expected_output": "Explains simplify, when to use it, and what it produces.",

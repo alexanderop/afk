@@ -79,8 +79,7 @@ Do not use this skill for:
      resolve them before QA, or carry the unresolved findings as a caveat or
      `DO NOT SHIP`. Do not advance to QA pretending high-severity findings are
      absent.
-   - Skip review for the same tiny/mechanical/generated/formatting-only or
-     documentation-only changes that skip simplify, and say why.
+   - Skip review for the same changes that skip simplify (step 4), and say why.
 
 6. Run QA for behavior-bearing work.
    - Invoke `afk:qa` when the change affects user-visible behavior, an API,

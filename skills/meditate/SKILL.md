@@ -13,14 +13,6 @@ else is noise — a lean, precise brain outperforms a comprehensive but bloated 
 
 ## When to Use
 
-Use this skill when:
-
-- The brain has accumulated content and may hold stale, redundant, or low-value
-  notes.
-- You want to surface unstated principles hiding across multiple notes, or check
-  skills against the brain's principles.
-- The user says "meditate" or "audit the brain".
-
 Do not use this skill to capture the current session (use `reflect`) or to mine
 old conversations (use `ruminate`).
 

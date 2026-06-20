@@ -10,18 +10,9 @@ brain is the foundation of the whole flow — every skill and session reads it, 
 low-quality or speculative content degrades everything downstream.
 
 The invariant this skill protects: every brain file is reachable from
-`brain/index.md`, holds one topic, and earns its place. Before adding anything,
-ask "Does this genuinely improve how the system operates?" If the answer isn't a
-clear yes, don't write it.
+`brain/index.md`, holds one topic, and earns its place (see Durability test).
 
 ## When to Use
-
-Use this skill when:
-
-- A task needs durable knowledge written to `brain/` — a principle, codebase
-  gotcha, decision, or pattern.
-- You need to ground the current work in existing memory before acting.
-- The user says "add to brain", "remember this in the brain", or edits `brain/`.
 
 Do not use this skill for:
 

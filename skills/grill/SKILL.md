@@ -141,8 +141,8 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
     slices are independent (disjoint files, no shared contract) so they run
     concurrently, and which depend on earlier slices; give every slice the files
     it owns and what it depends on. Every contract that depends on a library,
-    SDK, or API must be doc-verified (not written from memory) and cite the
-    source URL and version it was checked against.
+    SDK, or API must cite the source URL and version it was doc-verified against
+    (per step 3).
 
 ## Stop and Ask
 
@@ -171,8 +171,7 @@ fetched primary sources.
 | "I'll batch glossary updates at the end." | Update `brain/context.md` when the term is resolved so later questions use the canonical meaning. |
 | "This decision feels important, so it needs an ADR." | ADRs are only for decisions that are hard to reverse, surprising without context, and trade-off driven. |
 | "A subagent report is enough." | The lead must synthesize and verify important claims before asking or planning. |
-| "I know this library/API well enough to write the contract." | Training data drifts. Fetch the current docs and verify every API name, parameter, and version before it goes in the plan. |
-| "I'll check the docs if the user asks." | Doc research is automatic the moment external libraries/APIs are involved — don't wait to be told. |
+| "I know this library/API well enough to write the contract." | Training data drifts. Fetch the current docs and verify every API name, parameter, and version before it goes in the plan (per step 3). |
 
 ## Output
 

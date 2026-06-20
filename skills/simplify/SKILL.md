@@ -38,39 +38,37 @@ the review target. Otherwise, review the current changed-code diff.
 2. Launch four independent review agents in parallel.
 
    Use the Task tool in a single message so all four run concurrently. Pass
-   each agent the diff and exactly one cleanup angle: reuse, simplification,
-   efficiency, or altitude.
+   each agent the diff and exactly one cleanup angle, with its definition:
+
+   - Reuse: Flag new code that re-implements something the codebase already
+     has. Grep shared or utility modules and files adjacent to the change, then
+     name the existing helper to call instead.
+
+   - Simplification: Flag unnecessary complexity added by the diff: redundant or
+     derivable state, copy-paste with slight variation, deep nesting, or dead
+     code left behind. Name the simpler form that does the same job.
+
+   - Efficiency: Flag wasted work added by the diff: redundant computation,
+     repeated I/O, independent operations run sequentially, or blocking work
+     added to startup or hot paths. Also flag long-lived objects built from
+     closures or captured environments because they keep the enclosing scope
+     alive for the object's lifetime; prefer a class or struct that copies only
+     the fields it needs. Name the cheaper alternative.
+
+   - Altitude: Check that each change is implemented at the right depth, not as
+     a fragile bandaid. Special cases layered on shared infrastructure indicate
+     the fix may not be deep enough; prefer generalizing the underlying
+     mechanism over adding special cases.
 
    Require each agent to return findings with `file`, `line`, a one-line
    `summary`, and the concrete cost: what is duplicated, wasted, or harder to
    maintain.
 
-3. Review from the four cleanup angles.
-
-   Reuse: Flag new code that re-implements something the codebase already has.
-   Grep shared or utility modules and files adjacent to the change, then name
-   the existing helper to call instead.
-
-   Simplification: Flag unnecessary complexity added by the diff: redundant or
-   derivable state, copy-paste with slight variation, deep nesting, or dead
-   code left behind. Name the simpler form that does the same job.
-
-   Efficiency: Flag wasted work added by the diff: redundant computation,
-   repeated I/O, independent operations run sequentially, or blocking work
-   added to startup or hot paths. Also flag long-lived objects built from
-   closures or captured environments because they keep the enclosing scope
-   alive for the object's lifetime; prefer a class or struct that copies only
-   the fields it needs. Name the cheaper alternative.
-
-   Altitude: Check that each change is implemented at the right depth, not as a
-   fragile bandaid. Special cases layered on shared infrastructure indicate the
-   fix may not be deep enough; prefer generalizing the underlying mechanism over
-   adding special cases.
-
-4. Apply the fixes.
+3. Aggregate and apply the fixes.
 
    Wait for all four agents to complete. Deduplicate findings that point at the
-   same line or mechanism. Fix each remaining valid finding directly.
+   same line or mechanism. Do not re-review the diff yourself; the agents
+   already did the review. Fix each remaining valid finding directly.
 
    Skip findings whose fix would change intended behavior, require changes well
    outside the reviewed diff, or appear to be false positives. Note each skip

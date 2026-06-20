@@ -1,12 +1,11 @@
 ---
 name: write-good-goal
-description: Use when the user asks to write, refine, improve, validate, or draft a /goal, completion condition, objective, success criteria, definition of done, or bounded outcome for long-running agent work
+description: Use when the user asks to write, refine, draft, or validate a /goal, completion condition, objective, success criteria, definition of done, or bounded outcome for long-running agent work
 ---
 
 # Write Good Goal
 
-Turn the user's intent into a concrete `/goal` condition that an agent can
-evaluate from its own transcript.
+Turn the user's intent into a concrete `/goal` condition.
 
 Core principle: write the goal text only. Do not start the goal, run `/goal`,
 or begin implementation unless the user explicitly approves the final wording
@@ -14,18 +13,15 @@ and asks you to set it.
 
 ## When to Use
 
-Use this skill for requests to draft, tighten, validate, or repair:
-
-- a `/goal` command
-- an objective or completion condition
-- success criteria or a definition of done
-- bounded outcomes for long-running Codex or Claude Code work
+This skill shapes the `/goal` wording — nothing more. Do not use it to interview
+a vague feature into a plan (that is `afk:grill`) or to do the work the goal
+describes. Reach for it when an objective needs to become a single,
+transcript-checkable completion condition before a long-running run.
 
 ## Process
 
 1. Identify the user's intended outcome.
-2. If the request is vague, ask only the minimum questions needed to make the
-   goal verifiable.
+2. If the request is vague, see **Stop and Ask** below.
 3. Convert the intent into a single completion condition that an agent can
    evaluate from its own transcript.
 4. Include the desired end state, proof, constraints, and a stop bound when the
@@ -64,7 +60,7 @@ STOP before drafting if any of these are missing and cannot be inferred:
 - Verification: which observable evidence should prove completion when no
   reasonable default fits the project shape.
 
-Do not ask when the user gave enough detail. Draft the goal directly.
+Do not ask when the user gave enough detail.
 
 ## Quality Checks
 
@@ -73,10 +69,6 @@ Before presenting the final goal, check that it is:
 - Specific: names the thing to change, build, finish, or verify.
 - Measurable: has a test, command, metric, count, artifact, checklist, or
   observable acceptance criterion.
-- Agent-observable: the agent can surface proof in the transcript.
-- Evidence-shaped: frontend goals ask for real browser verification when it
-  makes sense, while non-frontend goals use contract or command evidence.
-- Bounded: includes scope and, when useful, turn or time limits.
 - Non-ambiguous: avoids words like "better", "clean", "done", or "complete"
   unless they are defined by concrete evidence.
 

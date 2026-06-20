@@ -282,16 +282,12 @@ context and keep moving.
 | "The brief is getting long, I'll just say 'follow the plan'" | The subagent has never seen the plan. Always paste the full spec verbatim, alongside the slice task. |
 | "It reported success and tests pass" | Whose tests? Read the diff. Workers can delete failing tests, hardcode fixtures, or stub the hard part with a TODO. |
 | "The orchestrator is read-only, so it verified everything" | Read-only means no shell verification. The main conversation must run final checks after workers edit. |
-| "Nested subagents are supported, so use them for every task" | Hierarchy is overhead. Keep AFK's default tree shallow unless the branches are independent and bounded. |
 | "This task is too hard for sonnet, I'll write a smarter prompt" | If it needs a smarter prompt, it needs a smarter model: do it yourself. |
-| "I'll dispatch all tasks at once" | Parallelism only belongs across genuinely independent files and contracts. |
 | "The edits are tiny, so I'll just do all N inline" | Per-edit size doesn't change the triage. N near-identical edits across N files is multi-file work: freeze the shared contract, then fan out. |
 | "The brief would be longer than the diff" | True for one-off local work, not a fan-out. Across N files you write one parameterized brief and reuse it — the per-file diff is the wrong unit. |
 | "The shared component keeps changing, so workers would collide" | That's a sequencing problem, not a reason to stay direct. The orchestrator freezes the shared file first, then dispatches the call-site edits in parallel. |
 | "I'll design the shared contract in the lead and just hand workers the call sites" | Contract design is the orchestrator's job. Designing it yourself is delegated architecture in reverse. Hand it the plan; let it freeze the contract and fan out the work. |
 | "The plan already fixed every contract, so I'll just execute it directly" | A decided plan is the orchestrator's input, not a reason to skip it. Frozen contracts still need bounded parallel slices and independent review. Hand the plan to `implement-orchestrator`. |
-| "Typecheck and unit tests are green, so it's done" | The static gate doesn't exercise runtime or cross-slice behavior. Boot the page, round-trip the form, run the migration chain. Green tests have shipped blank pages, 422s, and broken foreign keys. |
-| "One worker writes the tests, another writes the code" | That's horizontal slicing — tests written against imagined behavior. Each slice is one behavior with its test and implementation together, run red-green-refactor by one worker. |
 | "The test passes, so it's a good test" | A green test that mocks internal collaborators, asserts call counts/order, tests private methods, or verifies through a side channel is coupled to implementation and breaks on refactor. Reject it; tests verify observable behavior through the public interface. |
 
 ## Output

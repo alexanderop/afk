@@ -16,15 +16,6 @@ the brain; a source note points at the doc, it does not copy it.
 
 ## When to Use
 
-Use this skill when:
-
-- `grill` or `plan` needs prior art, competitor patterns, or current facts
-  before committing to an approach.
-- The user says "research this", "what's the prior art", "how do others solve
-  X", "scan the landscape", "external best practice for Y".
-- A version, pricing, or capability claim needs confirmation against live
-  sources.
-
 Do not use this skill for:
 
 - Exact API signatures or version-specific reference for a named library —
@@ -76,7 +67,6 @@ Do not ask about facts discoverable by reading `brain/` or the repo.
 | "More searches means a better answer" | Padding wastes the caller's context. Stop when sources repeat. |
 | "The snippet says it, good enough" | Fetch and confirm load-bearing claims; snippets misquote and go stale. |
 | "The brain has nothing useful, skip it" | Read it first anyway — a pinned source may already answer the question and save the whole sweep. |
-| "They want the exact API signature, I'll search the web" | That's a docs-lookup job. Route to `documentation-lookup`/Context7 instead of guessing or sweeping. |
 
 ## Output
 

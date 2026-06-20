@@ -23,6 +23,27 @@
       }
     },
     {
+      "id": "batch-workers-verify-not-silently-skipped",
+      "prompt": "Implement brain/plans/extract-validators.md by fanning it out. Eval mode: do not edit files, spawn workers, or open PRs; inspect the plan and explain how each worker is spawned and what guarantees its test command, e2e check, and `gh pr create` actually run rather than being silently skipped.",
+      "expected_output": "Workers run as concurrent worktree subagents (sent in one message), not in background mode — a background worker auto-denies prompting tool calls, so its Bash verification would fail silently; the synchronous review-each-result model keeps test/e2e/PR steps answerable and verified.",
+      "kind": "routing",
+      "fixture": {
+        "files": {
+          "brain/plans/extract-validators.md": "# Extract Validators Plan\n\n## Context\nEach module in src/ hand-rolls input validation inline, duplicated logic.\n\n## Decisions\nExtract a validator per module into its own file with shared shape checks, error formatting, and tests.\n\n## Contracts\nEach validate<Name>(input) returns {ok, errors}. No two modules share a file.\n\n## Tasks\n1. Extract and test validateOrder in src/order-validator.ts.\n2. Extract and test validateUser in src/user-validator.ts.\n3. Extract and test validateInvoice in src/invoice-validator.ts.\n",
+          "src/order.ts": "export function placeOrder() { return true; }\n",
+          "src/user.ts": "export function createUser() { return true; }\n",
+          "src/invoice.ts": "export function makeInvoice() { return true; }\n"
+        }
+      },
+      "routing": {
+        "expect": ["worktree", "verif"],
+        "forbid": ["run_in_background", "background mode", "skip the tests"]
+      },
+      "assertions": {
+        "unchanged_files": ["brain/plans/extract-validators.md", "src/order.ts", "src/user.ts", "src/invoice.ts"]
+      }
+    },
+    {
       "id": "batch-runs-simplify-before-pr-when-substantial",
       "prompt": "Implement brain/plans/extract-validators.md by fanning it out. Eval mode: do not edit files, spawn workers, or open PRs; inspect the plan and explain the per-unit worker loop — specifically what each worker does between finishing the change and opening its PR, and why.",
       "expected_output": "Each worker runs afk:simplify on its own diff before opening the PR, because the per-unit changes are substantial enough to warrant a cleanup pass.",

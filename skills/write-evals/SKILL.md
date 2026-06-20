@@ -1,6 +1,6 @@
 ---
 name: write-evals
-description: Use when the user wants to add or generate behavioral evals, LLM-judge tests, or eval cases for a skill, agent, prompt, or feature, write a failing eval before implementing, or scaffold an eval harness in a repo that has none
+description: Use when the user wants to generate behavioral evals, LLM-judge tests, or eval cases for a skill, agent, prompt, or feature, write a failing eval before implementing, or scaffold an eval harness in a repo that has none
 ---
 
 # Write Evals
@@ -12,14 +12,6 @@ a case that can't fail proves nothing. If the repo has no harness, scaffold one
 before writing cases.
 
 ## When to Use
-
-Use this skill when:
-
-- The user asks to generate evals, add eval cases, write LLM-judge tests, or
-  cover a behavior with an eval.
-- A new behavior was just specified and should be locked in test-first (the AFK
-  pattern: failing eval, then implement).
-- The repo has no eval runner and needs one scaffolded.
 
 Do not use this skill for ordinary unit/integration tests with no model in the
 loop — use the project's normal test tooling. Do not use it to *implement* the

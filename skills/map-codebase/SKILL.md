@@ -20,9 +20,6 @@ which is why grill, the implement orchestrator, and qa can all read it as ground
 
 Use this skill when:
 
-- You want a durable map of how an existing area works — "map the codebase",
-  "document how auth is wired today", "survey the billing module", "how is X
-  wired in this repo".
 - grill or implement keep re-discovering the same area, and you want that
   grounding persisted once instead of re-derived every run.
 - A complex subsystem is worth onboarding into the brain so future sessions
@@ -85,9 +82,6 @@ Do not ask about anything discoverable by reading the repo or the vault.
 | Thought | Reality |
 |---------|---------|
 | "This code is messy — I'll note it should be refactored." | Document what IS. Recommendations belong to `review`/`simplify`/`plan`; an opinionated map biases the next task and rots. No exceptions. |
-| "A scout reported it, I'll write it down." | Verify load-bearing claims against the actual files yourself before they enter the map. |
-| "I'll capture the whole repo in one note." | One area per file, under ~50 lines. Split large areas into linked notes; a repo dump is unscannable and goes stale everywhere at once. |
-| "The brain already maps this area — I'll add a second note." | Update the existing note. Duplicates fragment the map and disagree over time. |
 | "I'll skip the commit pin." | Without it a reader cannot tell whether the map is stale. Capture the sha and covered paths; flag a dirty tree. |
 
 ## Output
