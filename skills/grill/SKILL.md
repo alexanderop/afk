@@ -10,7 +10,11 @@ first — grounding itself in the code, docs, and brain and writing a research d
 *before* engaging the user — then interviews only on what that research could not
 resolve. The core principle is: ask only questions the repo, docs, glossary,
 ADRs, or fetched primary sources cannot answer. A well-grounded grill may ask
-very few questions, or none; that is the goal, not a shortcut.
+very few questions, or none; that is the goal, not a shortcut. Research is
+scoped to a fixed surface taxonomy and recorded in a coverage ledger; the
+ledger's open rows *are* the question list, so completeness is an enumerable
+check rather than a matter of when the interviewer runs out of ideas. See
+[RESEARCH-GATE.md](./RESEARCH-GATE.md).
 
 ## When to Use
 
@@ -46,55 +50,76 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
    `brain/principles.md` plus each principle file it links. Ground your
    questions and the plan in those, and do not ask the user to restate anything
    the brain already records. A fresh project may have an empty or missing
-   vault — that is fine; do not invent content.
-3. Research real documentation automatically whenever the work touches a
-   library, framework, SDK, API, CLI, or cloud service — before asking, and
-   before writing any technical contract into the plan. Do not rely on training
-   data for version-specific behavior, method signatures, config keys, or
-   request/response shapes; it drifts and is often wrong. Use a documentation
-   tool when one is available (a docs MCP server such as Context7, or the
-   project's configured doc lookup); otherwise fetch the current official docs,
-   migration guides, RFCs, or maintainer-authored sources by URL. Verify every
-   API name, parameter, and version detail against what you fetched, and record
-   the source URL plus version so it can go in the plan. Prefer current
-   official and maintainer sources over blogs. Treat this as a hard
-   prerequisite, not a fallback: never make the user ask you to check the docs.
-4. For broad or unfamiliar work, dispatch bounded read-only subagents in
-   parallel:
+   vault — that is fine; do not invent content. When a brain note conflicts with
+   what the current code shows, flag the conflict and cite the note's date; never
+   let stale memory override present evidence.
+3. Decide whether external research adds value, and what kind — run the
+   three-stage cascade every time (full detail in
+   [RESEARCH-GATE.md](./RESEARCH-GATE.md)). (a) An explicit request wins: if the
+   ticket or user asks for prior art, alternatives, best practices, official
+   docs, or names an external technology, external research is required; only an
+   explicit opt-out overrides it. (b) Otherwise weigh implicit signals — lean in
+   on high-risk topics (security, payments, privacy, migrations, compliance,
+   external APIs), when there are fewer than three direct local examples, or on
+   an adjacent-domain match (a near neighbour exists but not the exact case);
+   lean out when a strong, recently-touched local pattern already covers it. An
+   ADR-worthy decision forces the deeper path. (c) Classify the intent so step 4
+   routes it: implementation-guidance (approach settled → doc-verify), landscape
+   (what options exist → delegate to `afk:research`), or mixed (landscape first
+   to shortlist, then doc-verify the choice — sequential). Doc-verification is a
+   hard prerequisite for any library, API, SDK, CLI, or cloud service the plan
+   will touch: never trust training data for signatures, config keys, or
+   versions — fetch Context7 or current official docs, record the URL and
+   version, and run the deprecation/sunset check before any external API enters a
+   contract. Announce the decision in one line.
+4. Whenever step 3 found research adds value, dispatch bounded read-only
+   subagents in parallel; scale depth to the step-3 signals (a throwaway gets the
+   codebase scout only; a payments or migration decision gets the full set plus
+   landscape delegation). Scouts report findings only — never recommendations;
+   prescription is the plan's job.
    - Codebase scout: inspect entrypoints, neighboring files, tests, schemas,
      configs, and existing patterns. Report file paths, current behavior,
-     contradictions, and open questions.
-   - Research scout: read relevant external primary sources and library/API
-     documentation (via a docs MCP server such as Context7 when available, else
-     fetched official docs). Report source URLs, version notes, exact API
-     shapes, recommendations, and risks that affect the plan.
+     contradictions, untested surfaces, open questions, and the
+     three-examples / adjacent-domain verdict from step 3.
+   - External research: for landscape or mixed intent, the grill lead calls the
+     `afk:research` skill (it forks its own context — never nest it inside a
+     scout). For implementation-guidance, doc-verify the specific library, API,
+     SDK, or CLI per step 3. Report source URLs, versions, exact API shapes,
+     deprecation status, and risks.
    - Domain scout, when useful: read `brain/context.md` and `brain/decisions/`.
      Report glossary conflicts, prior decisions, and terms needing precision.
 5. Synthesize the research yourself and write the research doc as your first
-   artifact, before you engage the user with a Background or any question.
-   Verify important claims against files or fetched sources before using them.
-   When the scouts surfaced enough to be worth keeping — a non-trivial codebase
-   area, external/API facts, testing patterns — persist that synthesis as a
-   durable, descriptive research doc at
-   `brain/plans/<slug>.research.md` using [RESEARCH-FORMAT.md](./RESEARCH-FORMAT.md):
-   what the codebase and sources ARE today, citation-heavy, no recommendations.
-   It is the companion to the plan and the reusable input every later phase
-   (`afk:implement`, `afk:qa`) reads instead of re-discovering. Skip it only for
-   trivial plans that needed no research.
+   artifact, before you engage the user with a Background or any question. Verify
+   important claims against files or fetched sources first — a subagent report is
+   not truth, and an absence claim ("there is no X") must be checked against the
+   repo before it is recorded. The trigger is positive, not discretionary: if any
+   scout ran or any external fact was fetched, you write
+   `brain/plans/<slug>.research.md` using [RESEARCH-FORMAT.md](./RESEARCH-FORMAT.md)
+   — what the codebase and sources ARE today, citation-heavy, no recommendations,
+   opening with a one-line research-value rating (high/moderate/low) and closing
+   with the Coverage ledger (the fixed surface taxonomy in RESEARCH-GATE.md, each
+   surface marked resolved-by-evidence, open-needs-user, or n/a-derived). It is
+   the companion to the plan and the reusable input every later phase
+   (`afk:implement`, `afk:qa`) reads instead of re-discovering. Skip the doc only
+   when no scout ran and no external fact was fetched (a genuinely trivial plan).
 6. Open with a Background written like a product owner, after the research doc
    exists and before any question. In a few sentences, restate what the user is
    asking for as a product owner framing the work: the problem, who it is for,
    the outcome they want, and the scope as you currently understand it from the
    request, the ticket, and your research. Ground it in what you found — do not
-   invent requirements. Then list what the research already resolved (so the user
-   sees what you will *not* be asking about) and state your read of the intent,
-   inviting correction. This gives the user something concrete to react to
-   instead of a cold first question.
-7. Now interview only on what the ticket and the research left unresolved. Ask
-   the next best such question, one at a time, waiting for each answer, with your
-   recommended answer and its reason. If the ticket plus research already resolved
-   everything, say so and go straight to the plan — do not manufacture questions
-   to fill an interview.
+   invent requirements. Then preview the ledger: list the surfaces research
+   already resolved (so the user sees what you will *not* ask about) and how many
+   open rows remain ("3 decisions need you; here's the first"), and state your
+   read of the intent, inviting correction. This gives the user something
+   concrete to react to instead of a cold first question.
+7. Now interview the ledger's open-needs-user rows, in priority order
+   (blast-radius and irreversibility first, then the experience bar, then edge
+   cases, then cosmetics). Ask one at a time, waiting for each answer, each as
+   (the question, why it matters / what breaks, and your recommended
+   default-if-silent). Silence or "your call" resolves a non-blocking row to its
+   stated default — except the Stop-and-Ask surfaces below, which must be asked
+   as real questions even when a default exists. If research already closed every
+   row, say so and go straight to the plan — do not manufacture questions.
 8. Challenge glossary conflicts immediately. If the user uses a term
    differently from `brain/context.md`, say what the glossary says and ask which
    meaning is authoritative.
@@ -111,16 +136,20 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
     implementation ships something that runs but does not deliver, and QA has no
     bar to fail it against.
 11. Cross-reference user claims against code and fetched sources. Surface
-    contradictions explicitly and ask which source should win.
+    contradictions explicitly and ask which source should win. When an answer
+    surfaces a new what-is fact, append it to the research doc before the plan
+    cites it — research is ground truth, not a write-once snapshot.
 12. Update `brain/context.md` immediately when a glossary term is resolved. Use
     it only as a glossary: no implementation details, specs, scratch notes, or
     plan content. If creating it, use [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 13. Offer an ADR only when the decision is hard to reverse, surprising without
     context, and the result of a real trade-off. If creating one, use
     [ADR-FORMAT.md](./ADR-FORMAT.md).
-14. Continue until the decision tree is resolved enough for implementation:
-    contracts are clear, ambiguous terms are defined, key edge cases have an
-    agreed answer, and source-of-truth conflicts are settled.
+14. Continue until the coverage ledger closes: every surface is
+    resolved-by-evidence, resolved-by-user, default-accepted, or n/a-derived
+    (with a one-line reason) — none left open. This is an enumerable check, not a
+    feel; contracts clear, ambiguous terms defined, key edge cases answered, and
+    source-of-truth conflicts settled all fall out of it.
 15. If during the interview the user pointed you at a reference repo they cloned
     locally ("do it like that repo", "see the pattern in Y"), read it and record
     it in the plan: its origin (GitHub URL or name) and its local path, so
@@ -129,10 +158,12 @@ obvious cause, or execution of an already-written plan (`brain/plans/`).
     `brain/plans/index.md`, creating the vault if it does not exist yet. (Do not
     edit `brain/index.md` — the auto-index hook maintains it.) If you wrote a
     research doc in step 5, link it from the plan's `## Research` line so the plan
-    stays the single entrypoint, and where a decision or contract rests on a
-    specific finding, cite it (`[[<slug>.research#<finding>]]`) so the plan's
-    prescription is traceable back to the descriptive evidence — keep the finding
-    in research, the choice in the plan, never duplicate the prose. Include decisions
+    stays the single entrypoint. Every decision or contract that rests on a
+    finding must cite it (`[[<slug>.research#<finding>]]`) so the plan's
+    prescription is traceable back to the descriptive evidence; a choice made in
+    the interview with no finding behind it carries an explicit
+    `(no research — chosen in interview)` tag instead. Keep the finding in
+    research, the choice in the plan, never duplicate the prose. Include decisions
     made, contracts between parts, relevant glossary or ADR updates, an explicit
     `## Acceptance` bar for experience-bearing work (the user-visible quality
     criteria, so `afk:implement` has a target and `afk:qa` has a bar), and the
@@ -172,6 +203,8 @@ fetched primary sources.
 | "This decision feels important, so it needs an ADR." | ADRs are only for decisions that are hard to reverse, surprising without context, and trade-off driven. |
 | "A subagent report is enough." | The lead must synthesize and verify important claims before asking or planning. |
 | "I know this library/API well enough to write the contract." | Training data drifts. Fetch the current docs and verify every API name, parameter, and version before it goes in the plan (per step 3). |
+| "The interview feels done." | It's done when every coverage-ledger surface is non-open with a recorded status, not when you run out of questions. |
+| "This work is small, so skip the research doc." | Write whenever any scout ran or any external fact was fetched. Skip only when neither happened. |
 
 ## Output
 
@@ -189,10 +222,10 @@ Create the plan file (`brain/plans/<slug>.md`) with this shape:
 - <Reference repos the user cloned to copy a pattern: origin (GitHub URL) and local path>
 
 ## Decisions
-- <Resolved decision and rationale> — grounds: [[<slug>.research#<finding>]] (cite the finding it rests on, when one does)
+- <Resolved decision and rationale> — grounds: [[<slug>.research#<finding>]] (or `(no research — chosen in interview)`)
 
 ## Contracts
-- <Interface, data, lifecycle, permission, or ownership contract> — grounds: [[<slug>.research#<finding>]] (cite the finding it rests on, when one does)
+- <Interface, data, lifecycle, permission, or ownership contract> — grounds: [[<slug>.research#<finding>]] (or `(no research — chosen in interview)`)
 
 ## Acceptance
 <For experience-bearing work (UI, dashboards, reports). The user-visible quality

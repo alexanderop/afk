@@ -26,6 +26,9 @@ date: <ISO date>
 
 # Research: <Topic>
 
+**Research value: <high | moderate | low>** — <one line: which plan decisions
+these findings ground, or that external signal was thin>
+
 ## Summary
 
 2–4 paragraphs synthesizing what was found — the architecture, data flow, and
@@ -52,8 +55,10 @@ e2e), mocks, fixtures. If untested, say so — that is a finding.
 ## External sources
 
 Library / API / SDK facts that the plan depends on, each doc-verified (not from
-memory) with the source URL and version it was checked against.
-- <fact> — <source URL>, version <x.y>
+memory) with the source URL, the version it was checked against, and its
+deprecation status (the deprecation/sunset check is a prerequisite before any
+external API enters a plan contract).
+- <fact> — <source URL>, version <x.y>, deprecated: <no | YYYY-MM, migration URL>
 
 ## Code references
 
@@ -61,6 +66,25 @@ Comprehensive, grouped list a developer can navigate the whole area from. Note
 when a group is exhaustive vs. covers key files only.
 - `path/to/file.ts:28-36` — what's there
 - `path/to/dir/` — directory contents (key files listed, others exist)
+
+## Coverage ledger
+
+The fixed surface taxonomy (see grill's RESEARCH-GATE.md), each row carrying its
+status so grill's interview and coverage gate can walk it. Descriptive: it
+records what is known vs. still open, not what to do. Status is one of
+`resolved-by-evidence` (cite the finding — produces no question),
+`open-needs-user` (becomes a question carrying a default), or `n/a-derived`
+(a one-line reason it does not apply).
+
+| Surface | Status | Note / grounding / default |
+|---------|--------|----------------------------|
+| Contracts (interface / data / API) | resolved-by-evidence | <finding heading> |
+| Lifecycle & state transitions | open-needs-user | default: <…> |
+| Failure modes & error/retry | <status> | <…> |
+| Permission & ownership boundaries | <status> | <…> |
+| Source-of-truth / conflict resolution | <status> | <…> |
+| Experience quality bar | n/a-derived | CLI tool, no UI |
+| External / version facts & deprecation | resolved-by-evidence | <source>, deprecated: no |
 
 ## Open questions
 
@@ -86,5 +110,14 @@ If none, say "None."
 - **Give findings stable headings.** The plan links decisions back to findings
   (`[[<slug>.research#<finding>]]`), so each finding section needs a clear,
   durable heading to anchor to. Name findings for the concept, not "Finding 1".
-- **Write it once, lazily.** Only create the doc when grill actually did
-  research worth persisting. A trivial plan needs no research doc.
+- **Write whenever research ran.** Create the doc whenever any scout ran or any
+  external fact was fetched — the trigger is positive, not a judgment call. Skip
+  only when neither happened (a genuinely trivial plan).
+- **Recommendations feed the plan, not this doc.** Anything a scout or
+  `afk:research` proposes becomes a plan decision or a ledger default; the
+  research doc stays strictly descriptive.
+- **Drop non-load-bearing findings.** Every finding must surface in a plan
+  decision, contract, acceptance criterion, or risk. If it shaped nothing, it
+  was not load-bearing — cut it rather than padding an appendix.
+- **Keep it fresh within the session.** When the interview surfaces a new
+  what-is fact, append it as a finding before the plan cites it.
