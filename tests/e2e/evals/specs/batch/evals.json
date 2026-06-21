@@ -84,6 +84,29 @@
       "assertions": {
         "unchanged_files": ["brain/plans/bump-copyright.md", "pkg-a/LICENSE", "pkg-b/LICENSE", "pkg-c/LICENSE"]
       }
+    },
+    {
+      "id": "batch-rejects-horizontal-tests-then-impl-split",
+      "prompt": "Implement brain/plans/extract-validators-horizontal.md by fanning it out. Eval mode: do not edit files, spawn workers, or open PRs; inspect the plan's two units and explain how AFK Batch should decompose this work into units and why.",
+      "expected_output": "Recognizes the plan's two units are a horizontal split — one tests-only unit and one implementation-only unit — and re-scopes the work into vertical units (one validator with its test and implementation together), rather than fanning the tests-only and implementation-only units out as separate parallel PRs.",
+      "fixture": {
+        "files": {
+          "brain/plans/extract-validators-horizontal.md": "# Extract Validators Plan\n\n## Context\nEach module in src/ hand-rolls input validation inline, duplicated logic.\n\n## Decisions\nExtract a validator per module into its own file with shared shape checks and tests.\n\n## Contracts\nEach validate<Name>(input) returns {ok, errors}.\n\n## Tasks\n1. Write the full test suite for all three validators in tests/validators.test.ts.\n2. Implement validateOrder (src/order-validator.ts), validateUser (src/user-validator.ts), and validateInvoice (src/invoice-validator.ts) so the tests pass.\n",
+          "src/order.ts": "export function placeOrder() { return true; }\n",
+          "src/user.ts": "export function createUser() { return true; }\n",
+          "src/invoice.ts": "export function makeInvoice() { return true; }\n"
+        }
+      },
+      "expectations": [
+        "Recognizes the plan's two units are a horizontal split — a tests-only unit and a separate implementation-only unit — not vertical slices",
+        "Declines to fan the tests-only and implementation-only units out as separate parallel PRs",
+        "Re-scopes the work into vertical units where each unit is one validator with its implementation and its own test together",
+        "Notes that being independently mergeable does not make a tests-only or implementation-only unit an acceptable batch unit"
+      ],
+      "assertions": {
+        "required_substrings": ["vertical"],
+        "unchanged_files": ["brain/plans/extract-validators-horizontal.md", "src/order.ts", "src/user.ts", "src/invoice.ts"]
+      }
     }
   ]
 }

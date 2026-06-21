@@ -1,6 +1,6 @@
 ---
 name: grill
-description: Use when the user says "grill me", asks to stress-test a plan, offers a vague feature idea, or wants grounded planning before non-trivial implementation
+description: Use when the user says "grill me", asks to stress-test a plan, wants to be interviewed or asked the questions needed before building, offers a vague feature idea, or wants grounded planning before non-trivial implementation
 ---
 
 # Grill
@@ -244,6 +244,12 @@ Group implementation into waves so the orchestrator can delegate the schedule
 without re-deriving it. Slices in one wave touch disjoint files and share no
 contract, so they run in parallel; each later wave depends on earlier ones. For
 every slice, give the files it **owns** and what it **depends on**.
+
+Each slice is one vertical behavior — its test and its implementation together,
+never a tests-only slice and a separate implementation-only slice (that is
+horizontal slicing). Make Wave 1 the thinnest end-to-end happy path as a tracer
+bullet that proves the whole path works; later waves add validation and edge
+cases behind it.
 
 - **Wave 1 — parallel:**
   - <slice> · owns `<file(s)>` · depends: none

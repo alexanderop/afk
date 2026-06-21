@@ -55,6 +55,9 @@ Split the work into 5–30 units. Each unit must be:
   the work is dependent; merge those units into one or stop and re-scope.
 - **Self-verifiable** — has a concrete check (unit tests, a build, a curl, a
   browser step) proving it works in isolation.
+- **A complete vertical slice** — one end-to-end behavior with its test and
+  implementation together. Never make a unit a test-only or implementation-only
+  PR; "independently mergeable" does not make a horizontal slice acceptable.
 
 If a clean independent split is not possible, STOP — see Stop and Ask.
 

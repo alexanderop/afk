@@ -1,5 +1,9 @@
 # Grill Research-Phase Redesign
 
+> **Status: implemented in 1.16.0.** Research is proactive, docs are
+> auto-generated, and the interview closes on a coverage ledger — see
+> `skills/grill/`. Retained as the design record behind those changes.
+>
 > Proposal — output of a multi-agent design pass (4 lensed designs, adversarially
 > scored: minimal-surgical 22 / gap-driven 21 / proactive-auto 19 / intent-routed-fleet 17).
 > Synthesizes the gap-driven completeness engine onto a minimal-surgical base.

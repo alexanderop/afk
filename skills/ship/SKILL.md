@@ -33,6 +33,20 @@ Do not use this skill for:
 
 ## Process
 
+Always track the run with the TodoWrite tool. As soon as the route is chosen
+(steps 1–2), write one todo per phase that will actually run — skipped phases
+are omitted — and keep it updated: mark the active phase `in_progress` and each
+finished phase `completed` before starting the next. The list gives the user a
+live view of the flow, for example:
+
+```
+◼ Implement vim-trainer MVP via orchestrator
+◻ Simplify implementation diff
+◻ Review diff (afk:review)
+◻ QA behavior (afk:qa)
+◻ Reflect learnings (afk:reflect)
+```
+
 1. Inspect current state before routing.
    - Read the user's request, `git status --short`, `git diff --stat`,
      available plans (`brain/plans/` from `afk:grill` and `afk:plan`), and

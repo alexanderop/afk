@@ -86,6 +86,19 @@ red.
   implementation.
 - Eval-mode prompts do not mutate fixture files.
 
+## Grill and Batch Slice Coverage
+
+Decomposition is where horizontal slicing leaks in, so `afk:grill` and
+`afk:batch` evals should lock the vertical-slice invariant:
+
+- A grill plan slices vertically — each slice is one behavior carrying its own
+  test and implementation together — and sequences the thinnest end-to-end happy
+  path first as a tracer bullet, never a tests-only slice then an
+  implementation-only slice.
+- A batch decomposition rejects a horizontally-sliced plan (a tests-only unit
+  and a separate implementation-only unit) and re-scopes into vertical units,
+  rather than fanning the horizontal halves out as separate PRs.
+
 ## Review Checklist
 
 Before accepting a new eval:

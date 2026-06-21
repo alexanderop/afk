@@ -126,6 +126,26 @@
       }
     },
     {
+      "id": "grill-plan-slices-vertically-tracer-bullet",
+      "prompt": "We have resolved the decisions. Finish the grill session by writing brain/plans/promo-codes.md. Decisions: add promo-code redemption at checkout in src/checkout/. Behaviors: a valid code applies its percentage discount to the order total; an expired code is rejected with a message; an already-redeemed code is rejected; an unknown code is rejected. Contracts: redeemPromo(code, order) returns {ok, discount, error}; checkout calls it and renders the discounted total or the error. Ship the happy path end to end first, then add the rejection cases.",
+      "expected_output": "Writes a plan whose tasks slice vertically — each slice is one behavior carrying its own test and its implementation together — and sequences the valid-code happy path end to end first as a tracer bullet, with the rejection cases as later incremental slices, never a tests-only slice and a separate implementation-only slice.",
+      "expectations": [
+        "Creates a brain/plans/<slug>.md artifact with the standard sections",
+        "Slices the work vertically: each slice is one behavior carrying its own test and its implementation together",
+        "Does not produce a tests-only slice (or wave) and a separate implementation-only slice (or wave)",
+        "Sequences the valid-code-applies-discount happy path end to end first as a tracer bullet that proves the whole path works",
+        "Schedules the expired, already-redeemed, and unknown-code rejection cases as later incremental slices behind the happy path",
+        "States that the plan is ready for afk:implement"
+      ],
+      "assertions": {
+        "required_substrings": ["afk:implement"],
+        "required_files": ["brain/plans/promo-codes.md"],
+        "required_file_substrings": {
+          "brain/plans/promo-codes.md": ["## Tasks", "Wave"]
+        }
+      }
+    },
+    {
       "id": "grill-plan-records-reference-repo",
       "prompt": "Earlier in this session we cloned the GitHub repo https://github.com/acme/awesome-streamer into reference/awesome-streamer so we could copy its SSE streaming pattern — I want to do the chat endpoint like that repo. We have resolved the decisions. Finish the grill session by writing brain/plans/streaming.md. Decisions: add a GET /chat SSE endpoint that follows the awesome-streamer pattern, reuse its event framing, and keep our existing JSON routes unchanged. Contracts: the endpoint streams text/event-stream and emits one `data:` frame per token like the reference implementation in reference/awesome-streamer/src/stream.ts.",
       "expected_output": "Writes brain/plans/streaming.md that records the cloned reference repo the user pointed at — both its GitHub origin and its local path — so implementation reads the real source instead of a remembered pattern.",
