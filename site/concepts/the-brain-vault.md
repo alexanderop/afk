@@ -44,8 +44,9 @@ Two hooks run the vault plumbing automatically:
   of every Claude Code session so each session knows what principles and
   knowledge the vault holds.
 - **PostToolUse** (`auto-index-brain.sh`) rebuilds `brain/index.md` whenever
-  a file inside `brain/` is written or deleted, keeping the index
-  current without manual maintenance.
+  a file inside `brain/` is written or edited (Write/Edit/MultiEdit); since it
+  reconciles against the files on disk, a removed note drops out on the next
+  write — keeping the index current without manual maintenance.
 
 ## How the flow reads and writes it
 

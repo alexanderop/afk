@@ -45,7 +45,7 @@ Invoke as `/afk:batch`. Use it when a plan splits into 5–30 units that are eac
 
 ## What it does
 
-Batch is the parallel, PR-per-unit alternative to `afk:implement`. It decomposes the work into non-overlapping independent units, presents the decomposition for user approval, then spawns one background worker per unit in its own git worktree. Each worker implements, runs tests, optionally runs `afk:simplify` on substantial diffs, commits, pushes, and opens a PR, reporting back a single `PR: <url>` line.
+Batch is the parallel, PR-per-unit alternative to `afk:implement`. It decomposes the work into non-overlapping independent units, presents the decomposition for user approval, then spawns one worker per unit in its own git worktree, run concurrently (synchronously, not in background mode — so each worker's test and PR-creation prompts stay answerable). Each worker implements, runs tests, optionally runs `afk:simplify` on substantial diffs, commits, pushes, and opens a PR, reporting back a single `PR: <url>` line.
 
 - Units must be independently mergeable (no shared interface still being designed) and non-overlapping (no two units touch the same file).
 - If a clean independent split is not possible, Batch stops and routes to the `afk:implement` freeze-then-fan-out recipe instead.

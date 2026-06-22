@@ -28,12 +28,12 @@ Invoke as `/afk:grill`. Use it when you have a vague feature idea, a non-trivial
 
 ## What it does
 
-Grill runs a structured planning interview, asking one decision at a time, but only questions the repo, docs, ADRs, or fetched primary sources cannot answer. It opens with a product-owner framing (Background) before asking anything, then works through glossary terms, edge cases, failure modes, and contracts until the decision tree is settled. It fetches live documentation for any libraries or APIs involved rather than relying on training data.
+Grill is research-first: it grounds itself in the code, docs, ADRs, and brain — dispatching read-only scout subagents and fetching live documentation for any libraries or APIs involved — and writes a standalone research doc *before* engaging you. The interview then asks one decision at a time, but only the questions that research could not resolve (the open rows of its coverage ledger). It opens with a product-owner framing (Background) before asking anything, then works through glossary terms, edge cases, failure modes, and contracts until the decision tree is settled.
 
-- Reads `brain/context.md`, ADRs in `brain/decisions/`, the brain's principles, and relevant source files before asking.
+- Reads `brain/context.md`, ADRs in `brain/decisions/`, the brain's principles, and relevant source files, and dispatches read-only scout subagents across a fixed surface taxonomy before asking.
 - Challenges glossary conflicts and proposes canonical terms for overloaded domain words.
 - Updates `brain/context.md` immediately when terms are resolved; offers ADRs only for hard-to-reverse trade-off decisions.
 
-**Output artifact:** `brain/plans/<slug>.md` (the vault is created lazily if absent). The plan holds decisions, contracts, wave-sequenced tasks, and an optional `## Acceptance` bar for experience-bearing work. This plan is the direct input to `afk:implement` or `afk:batch`.
+**Output artifacts:** `brain/plans/<slug>.md` plus a companion `brain/plans/<slug>.research.md` (the vault is created lazily if absent). The plan holds decisions, contracts, wave-sequenced tasks, and an optional `## Acceptance` bar for experience-bearing work; the research doc holds citation-heavy descriptive findings, written whenever a scout ran or an external fact was fetched, and is the reusable input that `afk:implement` and `afk:qa` read instead of re-discovering. This plan is the direct input to `afk:implement` or `afk:batch`.
 
 [View the full skill on GitHub](https://github.com/alexanderop/afk/blob/main/skills/grill/SKILL.md)
