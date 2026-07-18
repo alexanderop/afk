@@ -102,6 +102,8 @@ An agent is a markdown file under `agents/<name>.md` with YAML frontmatter.
 | `memory` | no | `user`/`project`/`local` persistent memory | **avoid** (see below) |
 | `effort` | no | `low`…`max` reasoning effort | **unreliable** |
 | `initialPrompt` | no | first user turn when run as a main session | n/a |
+| `observer` | no | agent type auto-spawned as a background watcher of this agent | **experimental** (see below) |
+| `observerMessage` | no | extra standing instructions appended to each digest the observer receives | **experimental** |
 
 \* `tools` and `model` are optional in Claude Code generally, but AFK's lint
 **requires** them on the two named agents — see "Pin the tier, pin the tools".
@@ -162,6 +164,35 @@ These are plugin-viable in principle but not worth adopting today:
 
 Re-evaluate these as Claude Code evolves; verify behavior on your installed
 version before trusting any of them.
+
+### `observer` — experimental watchdog pairing (flag-gated)
+
+Claude Code ≥ 2.1.207 ships an undocumented observer-agent feature: declaring
+`observer: <agent-type>` on an agent auto-spawns that type as a read-only
+background watcher whenever the agent runs. The observer receives a truncated
+activity digest after each of the worker's turns (entries capped at 2,000
+chars) and has exactly one tool, `ObserverReport`, which queues one advisory
+message (≤ 1,000 chars) to the worker. It cannot block or stop the worker, and
+the worker is told the report carries no user authority. Observers cannot
+themselves be observed.
+
+AFK pairs `implementation-worker` with `slice-watchdog`, which watches for
+exactly the failures the orchestrator's Review Contract otherwise catches only
+after the fact: test gaming, a skipped red step, out-of-slice edits,
+implementation-coupled tests, and completion claims without verification.
+
+Caveats:
+
+- **Dual-gated.** Inert unless the session runs with
+  `CLAUDE_CODE_EXPERIMENTAL_OBSERVER_AGENTS=1` *and* Anthropic's remote gate
+  (`tengu_observer_agents_enabled`) is live. With the flag off the field is
+  ignored, so shipping it is safe.
+- **Unverified in plugin context.** Whether the `observer:` type resolves for
+  plugin-shipped agents (vs `.claude/agents/`) has not been e2e-verified —
+  plugin agent types are namespaced when installed. Verify on your installed
+  version before relying on it; the fields `hooks`/`mcpServers`/
+  `permissionMode` precedent shows plugin agents can silently drop frontmatter.
+- **Costs a second Sonnet agent** for the duration of each worker slice.
 
 ### Candidates worth considering
 
