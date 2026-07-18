@@ -421,17 +421,22 @@ function checkAgentFrontmatter(file: string): void {
   // declare an observer itself — the harness ignores observers-on-observers.
   if (keys.includes("observer")) {
     const observerName = frontmatterValue(parsed.frontmatter, "observer");
-    const observerFile = fromPluginRoot("agents", `${observerName}.md`);
-    if (observerName.length > 0 && existsSync(observerFile)) {
-      run.pass(`${expectedName}: observer points at an existing agent`);
-      const observerParsed = parseFrontmatter(observerFile, observerName);
-      if (observerParsed && frontmatterKeys(observerParsed.frontmatter).includes("observer")) {
-        run.fail(`${expectedName}: observer agent does not declare its own observer`, observerName);
-      } else {
-        run.pass(`${expectedName}: observer agent does not declare its own observer`);
-      }
+    if (!skillNamePattern.test(observerName)) {
+      run.fail(`${expectedName}: observer is a valid agent name`, observerName || "empty observer: line");
     } else {
-      run.fail(`${expectedName}: observer points at an existing agent`, observerName || "empty observer: line");
+      run.pass(`${expectedName}: observer is a valid agent name`);
+      const observerFile = fromPluginRoot("agents", `${observerName}.md`);
+      if (existsSync(observerFile)) {
+        run.pass(`${expectedName}: observer points at an existing agent`);
+        const observerParsed = parseFrontmatter(observerFile, observerName);
+        if (observerParsed && frontmatterKeys(observerParsed.frontmatter).includes("observer")) {
+          run.fail(`${expectedName}: observer agent does not declare its own observer`, observerName);
+        } else {
+          run.pass(`${expectedName}: observer agent does not declare its own observer`);
+        }
+      } else {
+        run.fail(`${expectedName}: observer points at an existing agent`, observerName);
+      }
     }
   }
 
