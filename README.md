@@ -58,6 +58,45 @@ Invoke directly: `/afk:help`, `/afk:ship`, `/afk:grill`, `/afk:implement`,
 `/afk:meditate`, `/afk:plan`, `/afk:review`.
 Run `/doctor` to check plugin loading.
 
+## Experimental: the slice watchdog (observer agent)
+
+Claude Code ≥ 2.1.207 ships an undocumented, flag-gated observer-agent feature:
+an agent can declare a second agent that is auto-spawned as a read-only
+background watcher whenever it runs. AFK uses it to pair every
+`implementation-worker` with a `slice-watchdog` that watches the worker's
+activity digest in real time and fires one advisory `ObserverReport` only when
+the worker is about to break its contract — weakening a test instead of fixing
+the code, skipping the failing-test step, editing outside its slice, writing
+implementation-coupled tests, or claiming done without verification output.
+
+It complements (not replaces) the orchestrator's after-the-fact review: the
+watchdog catches the shortcut mid-slice, the orchestrator still reviews every
+worker report at the end.
+
+To enable it, launch your session with the experimental flag:
+
+```bash
+CLAUDE_CODE_EXPERIMENTAL_OBSERVER_AGENTS=1 claude
+```
+
+then run the implement flow as usual (`/afk:implement` or `/afk:ship`). With
+the flag off the pairing is inert and AFK behaves exactly as before. Notes:
+
+- The feature is also gated server-side by Anthropic and may appear or vanish
+  without a Claude Code version bump — treat it as provisional.
+- The report is advisory only: the watchdog cannot pause or block a worker.
+- Each worker slice costs one extra background Sonnet agent (it reads a
+  truncated digest, not the worker's full context, so overhead is modest).
+- If the auto-spawn does not fire from the plugin-installed agents (look for an
+  `[observer auto-spawn] Watch agent implementation-worker` task in the
+  transcript), copy `agents/slice-watchdog.md` into your project's
+  `.claude/agents/` — plugin agents have precedent for dropping frontmatter
+  fields.
+
+See the "observer" section of
+[docs/skills-and-agents-reference.md](docs/skills-and-agents-reference.md) for
+the full mechanics.
+
 ## What lands in your repo
 
 ```

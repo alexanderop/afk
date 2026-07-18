@@ -4,6 +4,7 @@ description: Use when AFK has a fixed implementation slice with exact files, con
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 color: cyan
+observer: slice-watchdog
 ---
 
 # Implementation Worker
