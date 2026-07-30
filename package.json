@@ -5,14 +5,17 @@
   "scripts": {
     "//docs": "Docs site lives in site/ (own deps). Start the VitePress dev server: `cd site && bun install && bun run docs:dev` (http://localhost:5173/afk/). Build: `bun run docs:build`. Preview: `bun run docs:preview`.",
     "prepare": "lefthook install",
-    "test": "bun tests/check.ts",
-    "test:unit": "bun tests/unit/run-unit-tests.ts",
-    "test:integration": "bun tests/integration/run-integration-tests.ts",
-    "test:e2e": "bun tests/e2e/plugin-load.ts",
-    "test:evals": "bun tests/e2e/evals/run-evals.ts",
-    "test:triggers": "bun tests/e2e/triggers/run-triggers.ts"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "AFK_E2E=1 vitest run --project smoke",
+    "test:evals": "AFK_E2E=1 vitest run --project evals",
+    "test:triggers": "AFK_E2E=1 vitest run --project triggers",
+    "eval:audit": "bun scripts/eval-audit.ts"
   },
   "devDependencies": {
-    "lefthook": "^2.1.9"
+    "lefthook": "^2.1.9",
+    "vitest": "^4.1.10"
   }
 }

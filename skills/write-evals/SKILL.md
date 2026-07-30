@@ -41,8 +41,9 @@ feature; this skill writes the eval and hands off.
    with a `routing` block (`expect`/`forbid`) instead — code-graded, judge-free,
    and scored by strict-majority over trials. See
    [eval-spec.md](./eval-spec.md) for the full schema and a worked example.
-5. **Confirm it's red.** Run only the new case (the AFK harness filters via
-   `AFK_EVAL_ID=<id>`; the template via `EVAL_ID=<id>`) and verify it fails for
+5. **Confirm it's red.** Run only the new case (the AFK plugin's vitest harness
+   filters via `bun run test:evals -- -t "<test name>"`; the template via
+   `EVAL_ID=<id>`) and verify it fails for
    the right reason — the behavior is absent, not the fixture or assertion
    malformed. **Carve-out:** coverage cases that lock in already-correct
    behavior — negative gate twins, edge-case classes, routing-volume cases —
@@ -85,8 +86,8 @@ Do not ask about facts discoverable by reading the repo's existing evals.
 
 Report:
 
-- The spec file path and the new case `id`(s).
-- The exact run command (e.g. `AFK_EVAL_ID=<id> bun run test:evals`).
+- The spec file path and the new case `id`(s) or test name(s).
+- The exact run command (e.g. `bun run test:evals -- -t "<test name>"`).
 - Whether the case is currently **red** (pre-fix) or **green**, and — if
   scaffolded — the harness files created.
 

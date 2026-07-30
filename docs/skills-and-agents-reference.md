@@ -9,7 +9,7 @@ mistake.
 For authoring *style* (voice, section shape, description wording), see
 [skill-writing-guide.md](./skill-writing-guide.md). This doc is about *what
 knobs exist and when to turn them*. Most of the invariants below are enforced by
-the zero-token lint in `tests/unit/run-unit-tests.ts`.
+the zero-token lint in `tests/unit/` (`skills.test.ts`, `agents.test.ts`).
 
 ## Skills vs agents — pick the right one
 
@@ -188,7 +188,8 @@ version before trusting any of them.
 
 ## What the lint enforces
 
-`tests/unit/run-unit-tests.ts` validates, with zero tokens, on every edit:
+The unit suite (`tests/unit/skills.test.ts`, `tests/unit/agents.test.ts`)
+validates, with zero tokens, on every edit:
 
 - required fields present; only allow-listed frontmatter keys;
 - `name` charset/length/reserved-word/XML-tag rules; `description` length and

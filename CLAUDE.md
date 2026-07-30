@@ -16,21 +16,25 @@ The brain skills are derived from brainmaxxing by Lauren Tan (MIT) — see
 
 ## Stack
 
-Markdown skills + YAML frontmatter (Claude Code plugin format), with Bun-based
-test runners. No build step for the plugin itself.
+Markdown skills + YAML frontmatter (Claude Code plugin format), with a Vitest
+test suite (Bun as package manager; vitest runs under Node). No build step for
+the plugin itself.
 
 ## Map
 
 - `skills/` — the skills, one directory each (`SKILL.md` + supporting files)
 - `hooks/` — `hooks.json` plus the brain hooks: `inject-brain.sh` (SessionStart, injects `brain/index.md`) and `auto-index-brain.sh` (PostToolUse, rebuilds the index on `brain/` writes). Auto-discovered from `hooks/hooks.json` at plugin root
-- `tests/unit/` — file-level checks; `tests/integration/` — cross-file checks; `tests/e2e/` — model-backed smoke and evals; `tests/lib/` — shared Bun test helpers
+- `tests/unit/` — file-level checks; `tests/integration/` — cross-file checks; `tests/e2e/` — model-backed smoke and evals; `tests/lib/` — shared test helpers (frontmatter/lint rules, skill/agent catalog, claude CLI runner, the eval harness: `harness.ts` for tasks and graders, `trials.ts` for trials and the LLM judge, `report.ts` for the run rollup)
 - `.claude-plugin/` — plugin manifest (version lives here) and marketplace manifest
 
 ## Commands
 
 - Test: `bun run test` (zero tokens, run on every edit)
+- Watch mode: `bun run test:watch` (reruns on skill/agent/hook edits)
 - Unit only: `bun run test:unit`
 - Integration only: `bun run test:integration`
+- Single test: `bun run test -- -t "<name>"` (e.g. `-t grill`)
+- Audit judge verdicts from the latest eval run: `bun run eval:audit`
 - Run the plugin: `claude --plugin-dir . -p "<prompt>"` (working tree, no install)
 
 ## Rules

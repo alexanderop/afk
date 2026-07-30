@@ -24,12 +24,13 @@ lands in the plan's `## Acceptance` section so implement has a target and qa
 has something to fail against. Without it, implementation ships something that
 runs but does not deliver.
 
-## Eval specs
+## Eval tasks
 
-Behavioral eval specs live under `tests/e2e/evals/specs/`. They use
+Behavioral evals are Vitest tests, one file per skill under
+`tests/e2e/evals/<skill>.eval.ts`. They follow
 [write-evals](/reference/write-evals) conventions: a fixture, a prompt, and
 machine-checkable assertions, with an optional LLM judge for behaviors
-substrings cannot express. The invariant: write the eval red first. A case
+substrings cannot express. The invariant: write the eval red first. A task
 that cannot fail proves nothing.
 
 Run evals before release with `bun run test:evals`. They make real LLM calls;
