@@ -70,8 +70,8 @@ Current integration coverage:
 - Agent names referenced from skill prose point to existing `agents/*.md`
   definitions.
 - Marketplace metadata references the same plugin name as `plugin.json`.
-- Eval spec directories under `tests/e2e/evals/specs/` match actual skill names.
-- Eval files are valid JSON and have the required shape.
+- Eval files under `tests/e2e/evals/` are named after actual skills and use the
+  shared eval kit (their shape is otherwise TypeScript's job).
 - Plugin manifests and skill files are checked together in CI.
 
 Good future integration checks:
@@ -117,8 +117,10 @@ Three metrics are reported over the corpus:
 - **False-positive %** — `none` queries where any AFK skill fired.
 
 The runner runs 3 trials per query (strict-majority vote per query) and prints
-a confusion matrix (expected owner × fired skill). It exits non-zero if
-activation < 80%, false-positive > 10%, or any per-query majority fails.
+a confusion matrix (expected owner × fired skill) plus a pass^k line (queries
+where every trial was correct — the consistency bar users actually experience).
+It exits non-zero if activation < 80%, false-positive > 10%, or any per-query
+majority fails.
 
 Cost is approximately $10–14 per full suite. This check is local and
 pre-release only — it is not in `bun run test` and not in CI. Env knobs
@@ -130,16 +132,23 @@ mirror `AFK_EVAL_*`: `AFK_TRIGGER_TRIALS`, `AFK_TRIGGER_MAX_BUDGET_USD`,
 ## Behavioral Evals
 
 Behavioral evals are not the same as CI smoke tests. They specify expected
-agent behavior for realistic prompts and can be reviewed manually before a
-runner exists. The lint harness validates their JSON shape, but does not run
-the prompts through a model.
+agent behavior for realistic prompts. They are ordinary Vitest tests written
+against the eval harness (`tests/lib/harness.ts`, with trials and the judge in
+`tests/lib/trials.ts`), so TypeScript owns their shape; the zero-token suite
+only checks each file targets a real skill and uses the `task()` primitive.
+
+Vocabulary follows Anthropic's [Demystifying evals for AI
+agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents):
+a **task** is one test (prompt + environment + success criteria), a **trial** is
+one attempt at it, a **grader** scores some aspect of a trial, an **assertion**
+is one check inside a grader, and the **outcome** is the environment's final
+state.
 
 Use [eval-quality-guide.md](eval-quality-guide.md) when adding or revising eval
-cases. Prefer deterministic artifact checks over substring-only assertions when
+tasks. Prefer deterministic artifact checks over substring-only assertions when
 the runner can verify the behavior directly.
 
-Use JSON files under `tests/e2e/evals/specs/<skill>/`. Current specs cover
-`help`, `grill`, `implement`, and `ship`.
+Evals live as code in `tests/e2e/evals/<skill>.eval.ts`, one file per skill.
 Run them with:
 
 ```bash
@@ -150,26 +159,59 @@ This requires Claude Code non-interactive auth. In CI, set
 `ANTHROPIC_API_KEY`. Locally, first verify that a plain `claude -p 'Reply ok'`
 can make a model call.
 
-```json
-{
-  "skill_name": "help",
-  "evals": [
-    {
-      "id": "help-no-plan",
-      "prompt": "What should I do next?",
-      "expected_output": "Recommends afk:grill when brain/plans is missing.",
-      "expectations": [
-        "Inspects project state",
-        "Does not list every skill",
-        "Recommends exactly one next step",
-        "Names afk:grill"
-      ]
-    }
-  ]
-}
-```
+Grading semantics:
 
-Add a runner only after the expectations are stable.
+- Rubric-graded tasks pass when **every assertion is met in a strict majority of
+  trials** (judge verdicts are met / unmet / unknown; unknown counts as unmet).
+  A mean-score gate is available per task via
+  `toPassRubric(assertions, { threshold })` for genuinely fuzzy behavior.
+- **Infra failures are not skill evidence.** A trial that dies on timeout or a
+  nonzero exit is retried (`AFK_EVAL_TRIAL_RETRIES`, default 1); a trial that
+  still fails is excluded from grading. Verdicts then need a **quorum** — a
+  strict majority of attempted trials must have completed (and, for
+  rubric-graded tasks, scored) — or the task fails as inconclusive rather than
+  gating on thin evidence.
+- `expect.soft(trial).toUseTools({ required, forbidden, ordered })` grades the
+  trial's actual tool calls deterministically — the outcome-not-self-report
+  check for tool behavior (e.g. `{ required: ["Task"] }` proves workers were
+  dispatched; a needle with a paren like `"Edit(brain/"` scopes to a path).
+- `capability: true` on either grader marks a **capability task**: scored and
+  reported (never failing) until the behavior lands, then graduated to a
+  regression task by removing the flag.
+- `run(prompt, { execution: true })` marks an **execution task**: the skill
+  actually does the work and grading is on the outcome (files,
+  `trial.exec(...)` exit codes), not the agent's self-report. These cost more;
+  keep only a few per skill.
+- **Re-judge mode**: `AFK_EVAL_REJUDGE=<run-dir>` (or `latest`) replays the
+  saved transcripts and outcomes of a previous run instead of spawning
+  skills, so iterating on assertion wording, needles, or the judge prompt
+  costs only judge calls. Task and trial artifacts are matched by name, so it
+  only covers tasks the previous run executed.
+- **Fast mode**: `AFK_EVAL_FAST=1` skips the rubric grader for a task whose
+  code-based graders already failed — the test fails either way. Dev-loop
+  only; never use it for a release run.
+- Every run appends a rollup to `qa/evals/history.jsonl` (per-task verdicts,
+  rubric percentages, cost, mean turns / tool calls / duration, `pass@k` and
+  `pass^k`, model id, and a `pluginHash` of skills/agents/hooks/manifests) and
+  prints a delta against the previous run — an unchanged hash means any drift
+  is model- or judge-side, not a plugin edit. `pass@k` counts tasks passing at
+  least one trial; `pass^k` counts tasks passing every trial.
+- `bun run test:evals` includes a judge self-check
+  (`tests/e2e/judge-selfcheck.test.ts`): canned ideal and sabotaged transcripts
+  that must pass and fail respectively, proving assertions are gradeable.
+- `bun run eval:audit` prints sampled judge verdicts next to the agent's final
+  result from the latest run — the read-the-transcripts habit as one command.
+
+A task is a prompt, an environment, and success criteria:
+
+```ts
+task("recommends one next step when there is no plan", async ({ run, expect }) => {
+  const result = await run("What should I do next?", { files: {} });
+
+  for (const trial of result.trials) expect.soft(trial.output).toContainAll(["afk:grill"]);
+  await expect(result).toPassRubric(["Inspects project state", "Recommends exactly one next step"]);
+});
+```
 
 ## CI Policy
 

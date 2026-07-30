@@ -1,8 +1,10 @@
 # Eval case schema
 
 An eval is a failing test for one observable behavior. A spec file is JSON named
-`<suite>.evals.json` (the AFK plugin stores them as `specs/<suite>/evals.json` —
-match whatever an existing harness already uses):
+`<suite>.evals.json` (match whatever an existing harness already uses; the AFK
+plugin itself writes its evals as code — vitest tests in
+`tests/e2e/evals/<skill>.eval.ts` — so this JSON schema applies to the
+scaffolded template harness):
 
 ```json
 {
@@ -64,6 +66,10 @@ grades faithfully and cheaply.
 
 - A **trial is correct** iff every `expect` substring is present (case-insensitive,
   over the agent's prose + final result) **and** no `forbid` substring is present.
+- Substrings must be identifiers (skill/agent/file names) or output-template
+  markers, never prose phrases: a forbidden phrase false-fails on negated
+  mentions ("we do *not* dispatch …"), and an expected phrase punishes valid
+  rephrasing. When the behavior is a meaning, use a judged expectation instead.
 - A **routing case passes** iff a strict majority of trials are correct (≥2/3 at the
   default `AFK_EVAL_TRIALS=3`). Per-case agreement is reported `N/trials`; a case with
   mixed trials (some correct, some not) is flagged **flaky** in the summary.
@@ -77,8 +83,16 @@ grades faithfully and cheaply.
 The judge is instructed to first reason inside a single `<thinking>…</thinking>`
 block, then output STRICT JSON only after the closing tag:
 `{"results":[{"reason":"...","met":true}]}`, one entry per expectation in order.
-The harness discards the `<thinking>` block and reads `met` **by key**, so field
-order and the reasoning prose don't affect grading.
+`met` is `true`, `false`, or `"unknown"` — the escape hatch when the transcript
+lacks evidence either way, which counts as unmet so thin transcripts fail
+loudly instead of being confidently misgraded. The harness discards the
+`<thinking>` block and reads `met` **by key**, so field order and the reasoning
+prose don't affect grading.
+
+A judged case passes when **every expectation is met in a strict majority of
+trials** — a mean score would let one systematically failing expectation hide
+behind the others. (The AFK harness supports a per-case mean-score opt-out for
+genuinely fuzzy behavior.)
 
 ## Design rules
 

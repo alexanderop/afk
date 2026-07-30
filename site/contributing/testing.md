@@ -20,8 +20,10 @@ change.
 
 ### Unit: `bun run test:unit`
 
-File-level checks that read one file at a time. Zero tokens, runs in
-[`tests/unit/run-unit-tests.ts`](https://github.com/alexanderopalic/afk/blob/main/tests/unit/run-unit-tests.ts).
+File-level checks that read one file at a time. Zero tokens, one Vitest file per
+concern in
+[`tests/unit/`](https://github.com/alexanderopalic/afk/tree/main/tests/unit)
+(`manifests`, `skills`, `agents`, `brain-hook`, `pipeline`).
 
 It validates:
 
@@ -41,19 +43,20 @@ It validates:
 - **The brain index hook**: runs `auto-index-brain.sh` against a throwaway temp
   vault and asserts summary lines become entry descriptions, list markers are
   stripped, title-only notes stay bare wikilinks, and a rebuild is idempotent.
-- **No `.sh` test runners**: the test pipeline is Bun/TypeScript only.
+- **No `.sh` test runners**: the test pipeline is TypeScript only, and no test
+  file may import Bun-only modules (Vitest workers run under Node).
 
 ### Integration: `bun run test:integration`
 
 Cross-file checks that verify references between files line up. Also zero tokens,
-in [`tests/integration/run-integration-tests.ts`](https://github.com/alexanderopalic/afk/blob/main/tests/integration/run-integration-tests.ts).
+in [`tests/integration/`](https://github.com/alexanderopalic/afk/tree/main/tests/integration).
 
 It validates:
 
-- **Eval specs**: every `evals.json` / `triggers.json` under
-  `tests/e2e/evals/specs/` belongs to a real skill and has the required shape
-  (judged cases keep an `expectations` array; routing cases carry an
-  `expect`/`forbid` `routing` block).
+- **Eval files**: every `tests/e2e/evals/<skill>.eval.ts` is named after a real
+  skill (the filename routes the `/afk:<skill>` prompt) and uses the shared
+  eval kit — shape validation beyond that is TypeScript's job, since evals are
+  code.
 - **Internal file references**: every `references/…` or `skills/…` path
   mentioned in a skill resolves to a file that exists.
 - **Markdown links**: every `.md` link across the repo points at a real file
@@ -65,15 +68,19 @@ It validates:
 
 ### `bun run test`: the every-edit gate
 
-[`tests/check.ts`](https://github.com/alexanderopalic/afk/blob/main/tests/check.ts)
-runs unit **and** integration in sequence and exits non-zero if either fails.
-This is the check to run after every edit: it is fast, free, and catches most
-regressions (broken frontmatter, dead links, a skill
-renamed without updating the catalog).
+`bun run test` is `vitest run`: it executes the unit and integration projects
+(defined in
+[`vitest.config.ts`](https://github.com/alexanderopalic/afk/blob/main/vitest.config.ts))
+and exits non-zero if either fails. The model-backed e2e project only exists
+when `AFK_E2E=1` is set, so this command can never spend money. This is the
+check to run after every edit: it is fast, free, and catches most regressions
+(broken frontmatter, dead links, a skill renamed without updating the catalog).
+`bun run test:watch` reruns on skill/agent/hook edits; `bun run test -- -t grill`
+filters by test name.
 
 ### e2e smoke: `bun run test:e2e`
 
-[`tests/e2e/plugin-load.ts`](https://github.com/alexanderopalic/afk/blob/main/tests/e2e/plugin-load.ts)
+[`tests/e2e/plugin-load.test.ts`](https://github.com/alexanderopalic/afk/blob/main/tests/e2e/plugin-load.test.ts)
 runs a single headless `claude -p` turn (~$0.01) against the working tree with
 `--plugin-dir .` and confirms the plugin loads: a `system/init` event is
 emitted, `afk` appears in the loaded plugins list, no `plugin_errors` are
@@ -83,36 +90,87 @@ shape the runtime rejects.
 
 ### Behavioral evals: `bun run test:evals`
 
-[`tests/e2e/evals/run-evals.ts`](https://github.com/alexanderopalic/afk/blob/main/tests/e2e/evals/run-evals.ts)
-is the deepest layer: it drives each skill end-to-end with real LLM calls and
-grades the behavior. Specs live under `tests/e2e/evals/specs/<skill>/evals.json`.
+Evals are ordinary Vitest tests, one file per skill under
+[`tests/e2e/evals/`](https://github.com/alexanderopalic/afk/tree/main/tests/e2e/evals)
+(`grill.eval.ts`, `implement.eval.ts`, …), written against the eval harness in
+[`tests/lib/harness.ts`](https://github.com/alexanderopalic/afk/blob/main/tests/lib/harness.ts).
+`task()` is one eval task — a prompt, an environment, and success criteria. It
+provides a `run()` fixture — it drives the skill end-to-end under `claude -p` in
+a fresh environment seeded with the task's fixture files, runs k trials, and
+returns the completed trials — plus the graders, which carry the grading
+semantics:
 
-Each eval runs the skill in a fresh temp project (its `fixture.files` are written
-in first), then grades the transcript three ways:
+```ts
+import { task } from "../../lib/harness";
 
-- **Deterministic assertions**: `required_substrings`, `forbidden_substrings`,
-  `required_files`, `required_file_substrings`, and `unchanged_files` are checked
-  in code against the output and the resulting project.
-- **Judged cases** (`kind: "judged"`): an LLM judge scores the transcript
-  against a list of `expectations`. The case passes when the mean score across
-  trials clears the threshold (default 70%).
-- **Routing cases** (`kind: "routing"`) are code-graded: the output must contain
-  every `expect` substring and none of the `forbid` substrings. A case passes on
-  a strict majority of trials; `overblock_guard` flags over-eager refusals.
+task("writes the plan artifact when decisions are resolved", async ({ run, expect }) => {
+  const result = await run("We have resolved the decisions. …");
 
-Each case runs multiple trials (default 3) to surface flaky routing. Useful env
-knobs:
+  for (const trial of result.trials) {
+    expect.soft(trial.output).toContainAll(["afk:implement"]);
+    expect.soft(trial).toHaveFile("brain/plans/team-billing.md");
+  }
+  await expect(result).toPassRubric(["Creates a brain/plans/<slug>.md artifact", "…"]);
+});
+```
+
+- **Code-based graders** are plain code per trial: `toContainAll` /
+  `toContainNone` on `trial.output` or `trial.file(path)`, `toHaveFile`,
+  `toLeaveUnchanged` (compares against the fixture content), and
+  `toUseTools({ required, forbidden, ordered })` over the trial's actual tool
+  calls — the outcome-not-self-report check for tool behavior (needles match by
+  tool name, or by call prefix when they carry a paren, e.g. `"Edit(brain/"`).
+- **`toPassRubric(assertions, options?)`** (model-based): an LLM judge scores
+  each trial's transcript per assertion (verdicts: met / unmet / unknown); the
+  task passes when **every assertion is met in a strict majority of trials**.
+  Pass `{ threshold: N }` to opt a genuinely fuzzy task back into a mean-score
+  gate, or `{ capability: true }` to mark a capability task (scored and
+  reported, never failing — a hill to climb that graduates to a regression task
+  once it passes reliably).
+- **`toRoute({ expect, forbid })`**: code-graded routing — the output must
+  contain every `expect` substring and none of the `forbid` ones, passing on a
+  strict majority of trials; `overblockGuard: true` flags over-eager refusals,
+  `capability: true` marks a capability task. Keep needles to identifiers
+  (skill, agent, and file names) or output-template markers — prose phrases
+  false-fail on negated mentions.
+- **`run(prompt, { execution: true })`**: execution tier — the skill actually
+  does the work and the task grades the **outcome** (the environment's end
+  state: files written, `trial.exec("bun test")` exit code) instead of the
+  agent's self-report.
+
+Tasks in a file run concurrently and each task's trials also run concurrently;
+a global semaphore caps live claude sessions (`AFK_EVAL_CONCURRENCY`). A trial
+that dies on infra (timeout, nonzero exit) is retried once, then excluded from
+grading; a verdict needs a strict majority of attempted trials to have
+completed (quorum), or the task fails as inconclusive. Filter natively:
+`bun run test:evals -- tests/e2e/evals/grill.eval.ts` runs one skill,
+`-t "<task name>"` one task. Useful env knobs:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `AFK_EVAL_TRIALS` | `3` | trials per eval |
-| `AFK_EVAL_SCORE_THRESHOLD` | `70` | judged pass threshold (%) |
-| `AFK_EVAL_SKILL` | (none) | run only one skill's evals |
-| `AFK_EVAL_ID` | (none) | run only one eval id |
+| `AFK_EVAL_CONCURRENCY` | `4` | max claude sessions in flight |
 | `AFK_EVAL_JUDGE_MODEL` | `claude-haiku-4-5` | the judge model |
 | `AFK_EVAL_MAX_BUDGET_USD` | `0.50` | per-eval budget cap |
+| `AFK_EVAL_TRIAL_RETRIES` | `1` | re-runs per infra-failed trial |
+| `AFK_EVAL_REJUDGE` | unset | `<run-dir>` or `latest`: re-grade a previous run's saved transcripts — judge cost only, no skill runs |
+| `AFK_EVAL_FAST` | unset | `1`: skip the rubric grader when a task's code-based graders already failed (dev loop only) |
 
-The invariant: **write the eval red first**. A case that cannot fail proves
+Each run appends a rollup (per-task verdicts, rubric percentages, cost, mean
+turns / tool calls / duration, `pass@k` and `pass^k`, model id, and a
+`pluginHash` of the plugin content) to `qa/evals/history.jsonl` and prints a
+delta against the previous run, so regressions and saturation are visible
+run-over-run — and an unchanged hash pins any drift on the model or judge
+rather than a plugin edit. `pass@k` counts tasks that passed at least one of
+their k trials; `pass^k` counts tasks that passed every trial — the consistency
+bar that matters for behavior users hit on every run.
+`bun run test:evals` also runs a **judge self-check** — canned ideal and
+sabotaged transcripts that must pass and fail respectively, proving the
+assertions are gradeable before any skill run is blamed. After a run, audit
+verdicts with `bun run eval:audit` (prints sampled judge verdicts next to the
+agent's final result).
+
+The invariant: **write the eval red first**. A task that cannot fail proves
 nothing. See [Eval-first](/concepts/eval-first) for how this drives the flow, and
 the [write-evals](/reference/write-evals) skill for scaffolding new specs.
 
@@ -129,6 +187,8 @@ It reports three metrics over the corpus:
 - **Activation %** — positive queries where any AFK skill fired.
 - **Accuracy %** — positive queries where the expected owner fired.
 - **False-positive %** — `none` queries where any AFK skill fired.
+- **pass^k** — queries where *every* trial was correct: the consistency bar a
+  router is actually held to by users.
 
 The runner runs 3 trials per query (strict-majority vote per query), prints a
 confusion matrix (expected owner × fired skill), and exits non-zero if activation
@@ -142,9 +202,10 @@ $10–14 per full suite, so this check is **local pre-release only** — it is n
 | --- | --- |
 | `tests/unit/` | file-level checks |
 | `tests/integration/` | cross-file checks |
-| `tests/e2e/plugin-load.ts` | plugin-load smoke test |
-| `tests/e2e/evals/` | model-backed behavioral evals + specs |
-| `tests/lib/` | shared Bun test helpers (`TestRun`, fs/path utils) |
+| `tests/e2e/plugin-load.test.ts` | plugin-load smoke test |
+| `tests/e2e/evals/` | model-backed behavioral evals, one `<skill>.eval.ts` per skill |
+| `tests/lib/` | shared helpers (lint rules, claude CLI runner, eval engine + kit) |
+| `vitest.config.ts` | the unit / integration / e2e project split |
 
 ## Adding tests
 
@@ -152,8 +213,8 @@ $10–14 per full suite, so this check is **local pre-release only** — it is n
   Add or extend a check in `tests/unit/`.
 - Adding a cross-file **relationship** (a new catalog, a new reference style)?
   Add a check in `tests/integration/`.
-- Changing a skill's **behavior**? Add a behavioral eval under
-  `tests/e2e/evals/specs/<skill>/evals.json` and prove it fails before your
+- Changing a skill's **behavior**? Add a behavioral eval test in
+  `tests/e2e/evals/<skill>.eval.ts` and prove it fails before your
   change makes it pass.
 
 Run `bun run test` before every commit; run `bun run test:e2e`,
